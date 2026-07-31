@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Search, Plus, X, Heart, CheckCircle2, Circle, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function BoxPage() {
-  const [isMounted, setIsMounted] = useState(false);
+  const isInitialized = useStore((state) => state.isInitialized);
   const currentUser = useStore((state) => state.currentUser);
   const albums = useStore((state) => state.albums);
   const medias = useStore((state) => state.medias);
@@ -25,7 +25,6 @@ export default function BoxPage() {
   const addMessage = useStore((state) => state.addMessage);
   const addAlbum = useStore((state) => state.addAlbum);
   const addMedia = useStore((state) => state.addMedia);
-  const fetchMessages = useStore((state) => state.fetchMessages);
 
   const [isSendOpen, setIsSendOpen] = useState(false);
   const [selectedTargets, setSelectedTargets] = useState<string[]>([]);
@@ -37,10 +36,7 @@ export default function BoxPage() {
   const receivedMessages = messages.filter(m => myMedias.includes(m.mediaId));
   const sentMessages = messages.filter(m => m.senderId === currentUser.id);
 
-  useEffect(() => {
-    fetchMessages();
-    setTimeout(() => setIsMounted(true), 0);
-  }, [fetchMessages]);
+
 
   const availableTargets = [
     { id: "me", name: `${currentUser.name} (나)`, subtitle: "나에게 보내기", icon: "", type: "me" },
@@ -240,7 +236,7 @@ export default function BoxPage() {
     );
   };
 
-  if (!isMounted) {
+  if (!isInitialized) {
     return (
       <div className="min-h-[100dvh] bg-[#f2f4f6]">
         <div className="max-w-md mx-auto pt-8 px-5 pb-32">

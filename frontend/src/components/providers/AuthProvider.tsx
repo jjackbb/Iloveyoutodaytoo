@@ -10,10 +10,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const setCurrentUser = useStore((state) => state.setCurrentUser);
+  const initializeData = useStore((state) => state.initializeData);
+  const subscribeToRealtime = useStore((state) => state.subscribeToRealtime);
+  const unsubscribeFromRealtime = useStore((state) => state.unsubscribeFromRealtime);
   const [isLoading, setIsLoading] = useState(true);
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  const initRef = useRef(false);
 
-  // Lazily create supabase client only on the client side
   function getSupabase() {
     if (!supabaseRef.current) {
       supabaseRef.current = createClient();
@@ -28,9 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         if (!session) {
           if (pathname !== "/login" && !pathname.startsWith("/invite")) {
@@ -41,16 +42,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        // Fetch user profile from public.users
-        const { data: userData, error: userError } = await supabase
+        // Fetch user profile
+        const { data: userData } = await supabase
           .from("users")
           .select("*")
           .eq("id", session.user.id)
           .maybeSingle();
-
-        if (userError) {
-          throw userError;
-        }
 
         if (userData) {
           setCurrentUser({
@@ -64,6 +61,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name: session.user.email?.split("@")[0] || "User",
             profileUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${session.user.id}`,
           });
+        }
+
+        // Initialize data + realtime (once)
+        if (!initRef.current) {
+          initRef.current = true;
+          await initializeData();
+          await subscribeToRealtime();
         }
 
         if (pathname === "/login") {
@@ -84,6 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_OUT" || !session) {
         setCurrentUser(null);
+        unsubscribeFromRealtime();
+        initRef.current = false;
         if (pathname !== "/login" && !pathname.startsWith("/invite")) {
           router.push("/login");
         }
@@ -95,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [pathname, router, setCurrentUser]);
+  }, [pathname, router, setCurrentUser, initializeData, subscribeToRealtime, unsubscribeFromRealtime]);
 
   if (isLoading) {
     return (

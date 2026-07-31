@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { Camera, Heart, MessageSquare, Send, UserPlus, FileImage, Lock, Mic, ArrowLeft } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -21,17 +21,14 @@ import { VoiceRecorderDialog } from "@/components/shared/VoiceRecorderDialog";
 
 export default function AlbumFeed() {
   const { id } = useParams<{ id: string }>();
-  const [isMounted, setIsMounted] = useState(false);
   
   const currentUser = useStore((state) => state.currentUser);
-  const albums = useStore((state) => state.albums);
   const album = useStore((state) => state.albums.find(a => a.id === id));
   const medias = useStore((state) => state.medias.filter(m => m.albumId === id));
   const messages = useStore((state) => state.messages);
   const addMedia = useStore((state) => state.addMedia);
-  const fetchMedias = useStore((state) => state.fetchMedias);
-  const fetchMessages = useStore((state) => state.fetchMessages);
   const addMessage = useStore((state) => state.addMessage);
+  const isInitialized = useStore((state) => state.isInitialized);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [newDesc, setNewDesc] = useState("");
@@ -41,12 +38,6 @@ export default function AlbumFeed() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-
-  useEffect(() => {
-    fetchMedias(id as string);
-    fetchMessages();
-    setTimeout(() => setIsMounted(true), 0);
-  }, [id, fetchMedias, fetchMessages]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -150,7 +141,7 @@ export default function AlbumFeed() {
     }
   };
 
-  if (!isMounted) {
+  if (!isInitialized) {
     return (
       <div className="min-h-[100dvh] bg-[#f2f4f6]">
         <div className="max-w-md mx-auto pt-8 px-5 pb-32 space-y-6">

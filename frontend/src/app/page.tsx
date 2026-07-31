@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Plus, Users, Image as ImageIcon, Camera } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -19,10 +19,9 @@ import { ImageCropperDialog } from "@/components/shared/ImageCropperDialog";
 
 export default function Home() {
   const albums = useStore((state) => state.albums);
-  const fetchAlbums = useStore((state) => state.fetchAlbums);
   const addAlbum = useStore((state) => state.addAlbum);
+  const isInitialized = useStore((state) => state.isInitialized);
 
-  const [isMounted, setIsMounted] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [newAlbumName, setNewAlbumName] = useState("");
   const [coverImage, setCoverImage] = useState("/logo.png");
@@ -30,11 +29,6 @@ export default function Home() {
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [isCropperOpen, setIsCropperOpen] = useState(false);
   const [uploadedCovers, setUploadedCovers] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetchAlbums();
-    setTimeout(() => setIsMounted(true), 0);
-  }, [fetchAlbums]);
 
   const handleCreateAlbum = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +90,7 @@ export default function Home() {
     }
   };
 
-  if (!isMounted) {
+  if (!isInitialized) {
     return (
       <div className="min-h-[100dvh] bg-[#f2f4f6]">
         <div className="max-w-md mx-auto pt-8 px-5 pb-32">
