@@ -53,77 +53,11 @@ type MockState = {
   setCurrentUser: (user: User | null) => void;
 };
 
-// Initial Mock Data
 const MOCK_USER: User = {
   id: 'u-1',
   name: '효녀딸내미',
   profileUrl: 'https://i.pravatar.cc/150?u=1',
 };
-
-const INITIAL_ALBUMS: Album[] = [
-  {
-    id: 'a-1',
-    name: '엄빠 사랑해요 ❤️',
-    relationType: '가족',
-    coverImage: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=600&auto=format&fit=crop',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
-    memberCount: 3,
-  },
-  {
-    id: 'a-2',
-    name: '우리집 강쥐 초코 🐶',
-    relationType: '반려동물',
-    coverImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-    memberCount: 4,
-  },
-];
-
-const INITIAL_MEDIAS: Media[] = [
-  {
-    id: 'm-1',
-    albumId: 'a-1',
-    uploaderId: 'u-1',
-    type: 'image',
-    url: 'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=600&auto=format&fit=crop',
-    description: '주말에 본가 내려가서 먹은 엄마표 김치찌개 🍲',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-  },
-  {
-    id: 'm-2',
-    albumId: 'a-1',
-    uploaderId: 'u-1',
-    type: 'image',
-    url: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=600&auto=format&fit=crop',
-    description: '오랜만에 아빠랑 등산 다녀옴 ⛰️',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-  }
-];
-
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: 'msg-1',
-    mediaId: 'm-1',
-    senderId: 'u-2',
-    senderName: '엄마',
-    senderProfile: 'https://i.pravatar.cc/150?u=2',
-    type: 'text',
-    content: '우리 딸 다음엔 더 맛있는거 해줄게 사랑한다~',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 47).toISOString(),
-    isLocked: false,
-  },
-  {
-    id: 'msg-2',
-    mediaId: 'm-2',
-    senderId: 'u-3',
-    senderName: '아빠',
-    senderProfile: 'https://i.pravatar.cc/150?u=3',
-    type: 'voice',
-    content: '0:15', // mock duration
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
-    isLocked: false,
-  }
-];
 
 export const useStore = create<MockState>((set, get) => ({
   currentUser: MOCK_USER, // Will be overridden by AuthProvider
@@ -139,8 +73,8 @@ export const useStore = create<MockState>((set, get) => ({
       set({ albums: data.map(a => ({
         id: a.id,
         name: a.name,
-        relationType: '가족', // simplified for MVP
-        coverImage: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=600&auto=format&fit=crop',
+        relationType: a.relationship_type || '가족',
+        coverImage: a.cover_image || '/logo.png',
         createdAt: a.created_at,
         memberCount: 1,
       }))});
@@ -173,7 +107,8 @@ export const useStore = create<MockState>((set, get) => ({
     
     const { data, error } = await query;
     if (!error && data) {
-      set({ messages: data.map((m: any) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      set({ messages: data.map((m: Record<string, any>) => ({
         id: m.id,
         mediaId: m.media_id,
         senderId: m.sender_id,

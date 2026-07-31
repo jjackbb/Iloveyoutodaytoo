@@ -8,17 +8,16 @@ import { ko } from "date-fns/locale";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
-import { useStore, Album } from "@/store/useStore";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { useStore } from "@/store/useStore";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { EmptyState } from "@/components/shared/EmptyState";
+
 import { AlbumCardSkeleton } from "@/components/shared/LoadingSkeleton";
 import { ImageCropperDialog } from "@/components/shared/ImageCropperDialog";
 
 export default function Home() {
-  const currentUser = useStore((state) => state.currentUser);
   const albums = useStore((state) => state.albums);
   const fetchAlbums = useStore((state) => state.fetchAlbums);
   const addAlbum = useStore((state) => state.addAlbum);

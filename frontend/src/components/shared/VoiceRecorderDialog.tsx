@@ -46,10 +46,10 @@ export function VoiceRecorderDialog({
       }
       mediaRecorderRef.current = null;
       audioChunksRef.current = [];
-      setAudioBlob(null);
 
       if (timerRef.current) clearInterval(timerRef.current);
       setTimeout(() => {
+        setAudioBlob(null);
         setRecordState("idle");
         setRecordingTime(0);
       }, 0);

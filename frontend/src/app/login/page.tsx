@@ -82,8 +82,9 @@ export default function LoginPage() {
         toast.success("회원가입 완료! 로그인 되었습니다.");
         router.push("/");
       }
-    } catch (error: any) {
-      toast.error(error.message || "오류가 발생했습니다.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "오류가 발생했습니다.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

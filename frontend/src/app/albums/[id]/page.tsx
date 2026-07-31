@@ -32,7 +32,6 @@ export default function AlbumFeed() {
   const fetchMedias = useStore((state) => state.fetchMedias);
   const fetchMessages = useStore((state) => state.fetchMessages);
   const addMessage = useStore((state) => state.addMessage);
-  const unlockMessage = useStore((state) => state.unlockMessage);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [newDesc, setNewDesc] = useState("");
@@ -81,7 +80,7 @@ export default function AlbumFeed() {
         .from('uploads')
         .getPublicUrl(filePath);
 
-      addMedia({
+      await addMedia({
         albumId: id,
         uploaderId: currentUser.id,
         type: "image",

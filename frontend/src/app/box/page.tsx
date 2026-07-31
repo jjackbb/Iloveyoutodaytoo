@@ -26,7 +26,6 @@ export default function BoxPage() {
   const addAlbum = useStore((state) => state.addAlbum);
   const addMedia = useStore((state) => state.addMedia);
   const fetchMessages = useStore((state) => state.fetchMessages);
-  const unlockMessage = useStore((state) => state.unlockMessage);
 
   const [isSendOpen, setIsSendOpen] = useState(false);
   const [selectedTargets, setSelectedTargets] = useState<string[]>([]);
@@ -48,12 +47,6 @@ export default function BoxPage() {
     { id: "random", name: "랜덤", subtitle: "가족 중 랜덤으로 마음 전하기", icon: "?", type: "random" },
     ...albums.map(a => ({ id: `album_all_${a.id}`, name: `${a.name} 전체`, subtitle: "가족방 전체에게 전하기", icon: a.coverImage, type: "album" }))
   ];
-
-  const handleAddTarget = (id: string) => {
-    if (!selectedTargets.includes(id)) {
-      setSelectedTargets([...selectedTargets, id]);
-    }
-  };
 
   const handleRemoveTarget = (id: string) => {
     setSelectedTargets(selectedTargets.filter(t => t !== id));
@@ -148,6 +141,34 @@ export default function BoxPage() {
             throw new Error("앨범 사서함을 생성할 수 없습니다.");
           }
           targetMediaId = albumMedia.id;
+        } else if (targetId === "random") {
+          // 랜덤: 아무 미디어나 하나 골라서 메시지 전송
+          const randomMedia = medias.length > 0 
+            ? medias[Math.floor(Math.random() * medias.length)] 
+            : null;
+          if (randomMedia) {
+            targetMediaId = randomMedia.id;
+          } else {
+            // 미디어가 없으면 나에게 보내기와 동일하게 처리
+            let myAlbum = albums.find(a => a.name === `${currentUser.name}의 사서함`);
+            if (!myAlbum) {
+              myAlbum = await addAlbum({
+                name: `${currentUser.name}의 사서함`,
+                relationType: "none",
+                coverImage: "/logo.png"
+              }) || undefined;
+            }
+            if (myAlbum) {
+              const newMedia = await addMedia({
+                albumId: myAlbum.id,
+                uploaderId: currentUser.id,
+                type: "image",
+                url: "/logo.png",
+                description: "내 사서함"
+              }) || undefined;
+              if (newMedia) targetMediaId = newMedia.id;
+            }
+          }
         }
 
         if (targetMediaId) {
