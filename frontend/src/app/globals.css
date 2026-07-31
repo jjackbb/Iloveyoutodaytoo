@@ -1,0 +1,110 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-brand-primary: #ff385c;
+  --color-brand-active: #e00b41;
+  --color-brand-ink: #222222;
+  --color-brand-body: #3f3f3f;
+  --color-brand-muted: #6a6a6a;
+  --color-brand-canvas: #ffffff;
+  --color-brand-surface-soft: #f7f7f7;
+  --color-brand-surface-strong: #f2f2f2;
+  --color-brand-hairline: #dddddd;
+  
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Inter", var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: "Inter", var(--font-sans);
+  
+  /* Map shadcn UI to Airbnb colors */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  /* Airbnb Light Theme (Canvas: #ffffff, Ink: #222222) */
+  --background: #ffffff;
+  --foreground: #222222;
+  --card: #ffffff;
+  --card-foreground: #222222;
+  --popover: #ffffff;
+  --popover-foreground: #222222;
+  --primary: #ff385c;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f7f7;
+  --secondary-foreground: #222222;
+  --muted: #f2f2f2;
+  --muted-foreground: #6a6a6a;
+  --accent: #f7f7f7;
+  --accent-foreground: #222222;
+  --destructive: #c13515;
+  --destructive-foreground: #ffffff;
+  --border: #dddddd;
+  --input: #dddddd;
+  --ring: #ff385c;
+  
+  /* Airbnb default radius md is ~14px */
+  --radius: 14px;
+}
+
+.dark {
+  /* Airbnb doesn't officially support dark mode in marketing, but we provide a fallback for Shadcn */
+  --background: #222222;
+  --foreground: #ffffff;
+  --card: #222222;
+  --card-foreground: #ffffff;
+  --popover: #222222;
+  --popover-foreground: #ffffff;
+  --primary: #ff385c;
+  --primary-foreground: #ffffff;
+  --secondary: #3f3f3f;
+  --secondary-foreground: #ffffff;
+  --muted: #3f3f3f;
+  --muted-foreground: #929292;
+  --accent: #3f3f3f;
+  --accent-foreground: #ffffff;
+  --destructive: #b32505;
+  --destructive-foreground: #ffffff;
+  --border: #3f3f3f;
+  --input: #3f3f3f;
+  --ring: #ff385c;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
