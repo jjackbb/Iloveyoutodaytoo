@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useStore } from "@/store/useStore";
@@ -9,11 +9,21 @@ import { Heart } from "lucide-react";
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const supabase = createClient();
   const setCurrentUser = useStore((state) => state.setCurrentUser);
   const [isLoading, setIsLoading] = useState(true);
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+
+  // Lazily create supabase client only on the client side
+  function getSupabase() {
+    if (!supabaseRef.current) {
+      supabaseRef.current = createClient();
+    }
+    return supabaseRef.current;
+  }
 
   useEffect(() => {
+    const supabase = getSupabase();
+
     const checkAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -23,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (!session) {
-          // No session, redirect to login if not already on login or invite page
           if (pathname !== "/login" && !pathname.startsWith("/invite")) {
             router.push("/login");
           } else {
@@ -50,7 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profileUrl: userData.profile_image || userData.profile_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.id}`,
           });
         } else {
-          // If no user row exists, provide a fallback user object
           setCurrentUser({
             id: session.user.id,
             name: session.user.email?.split("@")[0] || "User",
@@ -58,7 +66,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
-        // If on login page with valid session, redirect to home
         if (pathname === "/login") {
           router.push("/");
         }
@@ -81,8 +88,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           router.push("/login");
         }
       } else if (event === "SIGNED_IN" && session) {
-        // We handle fetching user data in checkAuth or wait for next navigation,
-        // but it's better to fetch here if possible. The checkAuth will run anyway.
         checkAuth();
       }
     });
@@ -90,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [pathname, router, setCurrentUser, supabase]);
+  }, [pathname, router, setCurrentUser]);
 
   if (isLoading) {
     return (
