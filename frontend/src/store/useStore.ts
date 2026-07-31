@@ -50,7 +50,6 @@ type MockState = {
   fetchAlbums: () => Promise<void>;
   fetchMedias: (albumId?: string) => Promise<void>;
   fetchMessages: (mediaId?: string) => Promise<void>;
-  unlockMessage: (messageId: string) => void;
   setCurrentUser: (user: User | null) => void;
 };
 
