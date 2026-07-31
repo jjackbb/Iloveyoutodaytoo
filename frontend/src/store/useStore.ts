@@ -144,11 +144,37 @@ export const useStore = create<MockState>((set, get) => ({
       set(state => ({ albums: [newAlbum, ...state.albums] }));
       return newAlbum;
     } else if (error) {
+      // 409: 이미 같은 이름의 앨범이 DB에 존재 → 기존 앨범 조회해서 반환
+      if (error.code === '23505' || (error as { status?: number }).status === 409) {
+        const { data: existing } = await supabase
+          .from('albums')
+          .select('*')
+          .eq('name', album.name)
+          .eq('created_by', currentUser.id)
+          .maybeSingle();
+        if (existing) {
+          const existingAlbum: Album = {
+            id: existing.id,
+            name: existing.name,
+            relationType: existing.relationship_type || 'none',
+            coverImage: existing.cover_image || album.coverImage,
+            createdAt: existing.created_at,
+            memberCount: 1,
+          };
+          // 로컬 상태에 없으면 추가
+          set(state => {
+            if (state.albums.some(a => a.id === existingAlbum.id)) return state;
+            return { albums: [existingAlbum, ...state.albums] };
+          });
+          return existingAlbum;
+        }
+      }
       console.error("Failed to add album:", error);
       return null;
     }
     return null;
   },
+
 
   addMedia: async (media) => {
     const supabase = (await import('@/lib/supabase/client')).createClient();
