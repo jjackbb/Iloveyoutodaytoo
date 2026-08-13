@@ -1,110 +1,151 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
 
-@custom-variant dark (&:is(.dark *));
+/* ============================================================
+   오늘도 사랑해 — 디자인 토큰
+   근거: PRD/04_PROJECT_SPEC.md "디자인 토큰"
+   모양의 출처: PRD/references/prototype-mingyu.html (폐기된 프로토타입)
+
+   톤: 따뜻한 오프화이트 바탕 위에 흰 카드가 떠 있다.
+   프로토타입에서 여백·모서리·그림자·굵기를 가져오고, **색과 글자 크기는 가져오지 않았다** —
+   프로토타입의 분홍(#FF4E74)은 흰 글자 대비 3.18:1로 AA 미달이고,
+   글자는 13.5px 기준이라 시니어 사용자에게 너무 작다.
+   ============================================================ */
 
 @theme {
-  --color-brand-primary: #ff385c;
-  --color-brand-active: #e00b41;
-  --color-brand-ink: #222222;
-  --color-brand-body: #3f3f3f;
-  --color-brand-muted: #6a6a6a;
-  --color-brand-canvas: #ffffff;
-  --color-brand-surface-soft: #f7f7f7;
-  --color-brand-surface-strong: #f2f2f2;
-  --color-brand-hairline: #dddddd;
-  
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 32px;
-  --radius-full: 9999px;
+  /* --- 면 ---
+     canvas 는 페이지 바탕, card 는 그 위에 떠 있는 흰 면이다.
+     예전에는 반대였다(흰 바탕 + 회색 카드). 그래서 카드가 눌려 보였다. */
+  --color-canvas: #fbf7f8;
+  --color-card: #ffffff;
+  /* 카드 안에 한 번 더 구분이 필요할 때. 인용·본문 블록·눌림 상태. */
+  --color-surface-soft: #fff6f8;
+
+  /* --- 강조색 ---
+     흰 글자 대비 5.13:1 — WCAG AA 통과. 프로토타입 색으로 바꾸지 마라(3.18:1). */
+  --color-primary: #d50e68;
+  --color-primary-active: #b00b56;
+  /* 버튼 그라데이션의 밝은 쪽 끝. 4.68:1 — 여기까지가 AA 한계다.
+     한 톤이라도 밝히면(#e51d76 = 4.40:1) 흰 글자가 미달로 떨어진다. */
+  --color-primary-light: #df1670;
+  /* 이 위에 primary(#d50e68) 글자를 올린다. 4.65:1 — WCAG AA 통과. */
+  --color-primary-soft: #fef0f6;
+
+  /* --- 글자 ---
+     canvas(#fbf7f8) 위 대비: ink 14.97:1, muted 5.09:1 — 둘 다 AA 통과.
+     프로토타입의 세 번째 회색(#A9A6AB)은 2.26:1로 미달이라 가져오지 않았다. */
+  --color-ink: #222222;
+  --color-muted: #6a6a6a;
+
+  /* --- 선 --- */
+  --color-hairline: #f0eaec;
+  /* 칩 테두리처럼 조금 더 또렷해야 할 때 */
+  --color-hairline-strong: #ebe2e5;
+
+  /* --- 브랜드 그라데이션 (로고·스플래시 전용) ---
+     ⚠️ 이 색들을 버튼 배경으로 쓰지 마세요. 흰 글자 대비가 AA 미달입니다. */
+  --color-brand-red: #fb2e39;
+  --color-brand-pink: #ed1074;
+  --color-brand-purple: #9a11c5;
+
+  /* --- 모서리 (프로토타입 값) --- */
+  --radius-card: 22px;
+  --radius-button: 17px;
+  /* 카드 안쪽 요소 — 카드보다 작아야 겹쳐 보이지 않는다 */
+  --radius-inner: 14px;
+  /* 한 겹 더 안쪽. 세그먼트에서 고른 칸이 14px 트랙 안에 들어가려면 이만큼 작아야 한다 */
+  --radius-inner-sm: 11px;
+  --radius-chip: 100px;
+
+  /* --- 그림자 (프로토타입 값, 그림자 색만 우리 강조색으로 바꿈) --- */
+  --shadow-card: 0 10px 30px -16px rgb(60 20 35 / 0.28);
+  --shadow-button: 0 12px 22px -10px rgb(213 14 104 / 0.45);
+  /* 세그먼트에서 고른 칸처럼, 트랙 위로 살짝만 떠야 하는 것 */
+  --shadow-pill: 0 3px 8px -3px rgb(60 20 35 / 0.2);
+  /* 사진 위에 얹히는 작은 알약 버튼처럼, 배경이 뭐가 될지 모르는 것 */
+  --shadow-chip: 0 4px 12px -4px rgb(60 20 35 / 0.25);
+
+  /* --- 화면 여백 (프로토타입 실측) ---
+     프로토타입의 앱바·본문·하단버튼이 좌우 20px으로 맞춰져 있어 세로줄이 하나로 보인다.
+     화면마다 손으로 적으면 이 줄이 어긋나므로 토큰으로 둔다.
+     (프로토타입의 action-bar만 18px이었으나 실수로 판단해 20px으로 통일했다.) */
+  --spacing-screen-x: 20px;
+  --spacing-screen-b: 22px;
+  /* 카드 사이 간격 */
+  --spacing-card: 14px;
+
+  /* --- 폰트 --- */
+  --font-sans: var(--font-noto-sans-kr), system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: "Inter", var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: "Inter", var(--font-sans);
-  
-  /* Map shadcn UI to Airbnb colors */
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) * 0.5);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+/* 시니어 사용자를 고려해 기본 글자를 넉넉하게 잡는다 (04_PROJECT_SPEC "항상 해").
+   이 값이 모든 rem 단위의 기준이다 — text-sm 은 14.9px, text-base 는 17px가 된다.
+   프로토타입은 13.5px 기준이었다. 비율만 가져오고 이 기준은 지킨다. */
+html {
+  font-size: 17px;
 }
 
-:root {
-  /* Airbnb Light Theme (Canvas: #ffffff, Ink: #222222) */
-  --background: #ffffff;
-  --foreground: #222222;
-  --card: #ffffff;
-  --card-foreground: #222222;
-  --popover: #ffffff;
-  --popover-foreground: #222222;
-  --primary: #ff385c;
-  --primary-foreground: #ffffff;
-  --secondary: #f7f7f7;
-  --secondary-foreground: #222222;
-  --muted: #f2f2f2;
-  --muted-foreground: #6a6a6a;
-  --accent: #f7f7f7;
-  --accent-foreground: #222222;
-  --destructive: #c13515;
-  --destructive-foreground: #ffffff;
-  --border: #dddddd;
-  --input: #dddddd;
-  --ring: #ff385c;
-  
-  /* Airbnb default radius md is ~14px */
-  --radius: 14px;
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
 }
 
-.dark {
-  /* Airbnb doesn't officially support dark mode in marketing, but we provide a fallback for Shadcn */
-  --background: #222222;
-  --foreground: #ffffff;
-  --card: #222222;
-  --card-foreground: #ffffff;
-  --popover: #222222;
-  --popover-foreground: #ffffff;
-  --primary: #ff385c;
-  --primary-foreground: #ffffff;
-  --secondary: #3f3f3f;
-  --secondary-foreground: #ffffff;
-  --muted: #3f3f3f;
-  --muted-foreground: #929292;
-  --accent: #3f3f3f;
-  --accent-foreground: #ffffff;
-  --destructive: #b32505;
-  --destructive-foreground: #ffffff;
-  --border: #3f3f3f;
-  --input: #3f3f3f;
-  --ring: #ff385c;
+/* 터치 목표 최소 44px — 손이 불편한 사용자도 누를 수 있게.
+   프로토타입의 아이콘 버튼은 40px이지만, 보이는 크기는 그대로 두고 여기만 44px로 지킨다. */
+button,
+a[role='button'],
+input[type='submit'] {
+  min-height: 44px;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+/* 키보드 사용자를 위한 또렷한 포커스 링 */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 주요 버튼의 면.
+   양쪽 끝 모두 흰 글자 대비 AA를 통과한다 (5.13:1 → 4.68:1).
+
+   왜 Tailwind 유틸리티가 아니라 여기 있나:
+   그라데이션은 background-image이고 hover 색은 background-color라, 유틸리티로 섞으면
+   어느 쪽이 이기는지가 레이어 순서에 달린다. 눌렀을 때 색이 안 바뀌는 버그가 나기 쉽다.
+   한 클래스 안에서 상태까지 다 정의해 그 싸움을 없앴다. */
+.btn-primary-surface {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-light) 100%
+  );
+  box-shadow: var(--shadow-button);
+}
+
+.btn-primary-surface:hover,
+.btn-primary-surface:active {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-primary-active) 0%,
+    var(--color-primary) 100%
+  );
+}
+
+/* 눌렀을 때 살짝 가라앉는다. 프로토타입의 transform .12s를 옮겨왔다. */
+.btn-primary-surface:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary-surface:active {
+    transform: none;
   }
-  body {
-    @apply bg-background text-foreground antialiased;
-  }
+}
+
+/* 로고·스플래시용 그라데이션 */
+.brand-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-red) 0%,
+    var(--color-brand-pink) 50%,
+    var(--color-brand-purple) 100%
+  );
 }
