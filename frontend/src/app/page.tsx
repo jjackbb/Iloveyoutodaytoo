@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import { RoomCard } from '@/components/room/RoomCard'
 import { ButtonLink } from '@/components/ui/Button'
 import { BottomNav } from '@/components/nav/BottomNav'
+import { NotificationBell } from '@/components/notification/NotificationBell'
+import { loadNotifications } from '@/lib/notifications'
 
 export const metadata: Metadata = { title: '오늘도 사랑해' }
 
@@ -27,6 +29,9 @@ export default async function HomePage() {
   const user = await requireUser()
   const supabase = await createClient()
 
+  // 알림은 방 목록과 무관하니 같이 출발시킨다 — 순서대로 기다리면 그만큼 늦어진다.
+  const notificationsPromise = loadNotifications()
+
   // RLS가 걸려 있어 내가 속한 방만 돌아온다. 방을 나간(left) 기록은 제외한다.
   const { data: memberships, error } = await supabase
     .from('room_members')
@@ -47,6 +52,8 @@ export default async function HomePage() {
     if (a.favorited === b.favorited) return 0
     return a.favorited ? -1 : 1
   })
+
+  const notifications = await notificationsPromise
 
   const roomIds = rows.map((row) => row.rooms?.id).filter((id) => id != null)
 
@@ -158,13 +165,15 @@ export default async function HomePage() {
         <div className="mx-auto flex w-full max-w-md items-center gap-2 px-screen-x pt-1.5 pb-3">
           {/*
             프로토타입 .brand — 하트 + 서비스 이름이 곧 이 화면의 제목이다(19px/900).
-            오른쪽 알림 종(.iconbtn)은 옮기지 않았다: 알림은 PRD에서 P2(Phase 2)라
-            지금 누르면 아무 일도 일어나지 않는 껍데기가 된다. 근거는 _workspace/01_home_port.md.
+            오른쪽 알림 종(.iconbtn)은 5-B단계에서 붙였다 — 그전까지는 눌러도
+            아무 일이 없는 껍데기라 일부러 비워두고 있었다.
           */}
-          <h1 className="flex min-w-0 items-center gap-2 truncate text-2xl font-black tracking-[-0.02em] text-ink">
+          <h1 className="flex min-w-0 flex-1 items-center gap-2 truncate text-2xl font-black tracking-[-0.02em] text-ink">
             <BrandHeart />
             오늘도 사랑해
           </h1>
+
+          <NotificationBell items={notifications} />
         </div>
       </header>
 

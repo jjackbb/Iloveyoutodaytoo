@@ -522,6 +522,84 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          /** 소프트 삭제. 모든 조회가 deleted_at is null을 건다. */
+          deleted_at: string | null
+          heart_message_id: string | null
+          id: string
+          memory_id: string | null
+          read_at: string | null
+          recipient_id: string
+          room_id: string | null
+          type: Database['public']['Enums']['notification_type']
+        }
+        // 넣기는 트리거(SECURITY DEFINER)만 한다. 앱에서 insert 하지 않는다.
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          heart_message_id?: string | null
+          id?: string
+          memory_id?: string | null
+          read_at?: string | null
+          recipient_id: string
+          room_id?: string | null
+          type: Database['public']['Enums']['notification_type']
+        }
+        // 앱이 바꾸는 건 read_at(읽음)과 deleted_at(지움) 둘뿐이다.
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          heart_message_id?: string | null
+          id?: string
+          memory_id?: string | null
+          read_at?: string | null
+          recipient_id?: string
+          room_id?: string | null
+          type?: Database['public']['Enums']['notification_type']
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_actor_id_fkey'
+            columns: ['actor_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notifications_recipient_id_fkey'
+            columns: ['recipient_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notifications_room_id_fkey'
+            columns: ['room_id']
+            isOneToOne: false
+            referencedRelation: 'rooms'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notifications_memory_id_fkey'
+            columns: ['memory_id']
+            isOneToOne: false
+            referencedRelation: 'memories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notifications_heart_message_id_fkey'
+            columns: ['heart_message_id']
+            isOneToOne: false
+            referencedRelation: 'heart_messages'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string
@@ -786,6 +864,11 @@ export type Database = {
       shares_room_with: { Args: { p_user_id: string }; Returns: boolean }
     }
     Enums: {
+      notification_type:
+        | 'memory_created'
+        | 'comment_created'
+        | 'member_joined'
+        | 'heart_received'
       auth_provider: 'email' | 'kakao' | 'google' | 'phone'
       media_type: 'photo' | 'video'
       member_role: 'admin' | 'member'
