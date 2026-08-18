@@ -6,6 +6,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { needsGuardianConsent } from '@/lib/age'
 import { validateBirthDate } from '@/lib/birth-date'
+import {
+  clearLargeTextCookie,
+  writeLargeTextCookie,
+} from '@/lib/large-text'
 import { safeNextPath } from '@/lib/safe-redirect'
 import {
   USERNAME_RULE_HINT,
@@ -138,8 +142,35 @@ export async function signIn(
     return { error: '아이디 또는 비밀번호가 맞지 않아요. 다시 확인해주세요.' }
   }
 
+  // 큰 글자 설정은 DB에 있지만 루트 레이아웃은 쿠키만 본다(@/lib/large-text).
+  // 로그인하는 이 순간이 둘을 맞출 자리다 — 안 맞추면 새 기기에서 설정이 꺼진 채 보인다.
+  await syncLargeTextCookie(supabase)
+
   revalidatePath('/', 'layout')
   redirect(next)
+}
+
+/**
+ * 방금 로그인한 사람의 큰 글자 설정을 쿠키에 옮겨 적는다.
+ *
+ * 실패해도 로그인을 막지 않는다 — 글자 크기가 기본으로 보일 뿐이고,
+ * 마이 화면의 토글을 한 번 누르면 다시 맞는다.
+ */
+async function syncLargeTextCookie(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+): Promise<void> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { data } = await supabase
+    .from('users')
+    .select('large_text')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  await writeLargeTextCookie(data?.large_text ?? false)
 }
 
 /** 회원가입 */
@@ -227,6 +258,11 @@ export async function signUp(
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
+
+  // 큰 글자 설정은 사람에 붙는 값이다. 안 지우면 다음에 로그인한 사람이
+  // 앞사람의 글자 크기를 그대로 물려받는다.
+  await clearLargeTextCookie()
+
   revalidatePath('/', 'layout')
   redirect('/login')
 }

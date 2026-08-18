@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Noto_Sans_KR } from 'next/font/google'
 
+import { readLargeTextCookie } from '@/lib/large-text'
+
 import './globals.css'
 
 /**
@@ -27,9 +29,21 @@ export const viewport: Viewport = {
   width: 'device-width',
 }
 
-export default function RootLayout({ children }: LayoutProps<'/'>) {
+/**
+ * 큰 글자 모드는 <html>의 글자 크기를 바꾼다(globals.css의 .large-text).
+ * 모든 rem이 그 값을 기준으로 하므로 여백·버튼 높이까지 같이 커진다 —
+ * 글자만 키우고 칸은 그대로면 줄이 서로 붙어 오히려 읽기 어려워진다.
+ *
+ * 값을 DB가 아니라 쿠키에서 읽는 이유는 @/lib/large-text 에 적어두었다.
+ */
+export default async function RootLayout({ children }: LayoutProps<'/'>) {
+  const largeText = await readLargeTextCookie()
+
   return (
-    <html lang="ko" className={`${notoSansKr.variable} h-full`}>
+    <html
+      lang="ko"
+      className={`${notoSansKr.variable} h-full${largeText ? ' large-text' : ''}`}
+    >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   )

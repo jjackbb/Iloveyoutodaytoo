@@ -84,6 +84,15 @@ html {
   font-size: 17px;
 }
 
+/* 큰 글자 모드 (캡처 48의 "큰 글자" 토글).
+   17px -> 20px, 약 1.18배. 모든 rem이 이 값을 기준으로 하므로 글자뿐 아니라
+   여백·버튼 높이도 함께 커진다 — 글자만 키우면 줄이 서로 붙어 더 읽기 어려워진다.
+   20px을 넘기지 않는 이유: 더 키우면 홈 카드의 메타줄("멤버 1명 · 게시물 1개 · 방금 전")이
+   두 줄로 접히면서 카드 높이가 들쭉날쭉해진다. */
+html.large-text {
+  font-size: 20px;
+}
+
 body {
   background: var(--color-canvas);
   color: var(--color-ink);

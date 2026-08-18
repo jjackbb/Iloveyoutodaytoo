@@ -687,6 +687,8 @@ export type Database = {
           guardian_phone: string | null
           id: string
           is_withdrawn: boolean
+          /** 큰 글자 모드(캡처 48). 기기가 아니라 사람에 붙는 설정이다. */
+          large_text: boolean
           name: string
           phone: string | null
           profile_image: string | null
@@ -702,6 +704,7 @@ export type Database = {
           guardian_phone?: string | null
           id: string
           is_withdrawn?: boolean
+          large_text?: boolean
           name: string
           phone?: string | null
           profile_image?: string | null
@@ -717,6 +720,7 @@ export type Database = {
           guardian_phone?: string | null
           id?: string
           is_withdrawn?: boolean
+          large_text?: boolean
           name?: string
           phone?: string | null
           profile_image?: string | null

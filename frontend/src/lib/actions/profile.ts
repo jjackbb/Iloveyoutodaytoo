@@ -5,16 +5,18 @@ import { redirect } from 'next/navigation'
 
 import { requireUser } from '@/lib/auth'
 import { AVATAR_BUCKET, avatarPath } from '@/lib/avatars'
+import { writeLargeTextCookie } from '@/lib/large-text'
 import { PASSWORD_MIN_LENGTH } from '@/lib/limits'
 import { createClient } from '@/lib/supabase/server'
 import { usernameToEmail } from '@/lib/username'
 
 /**
- * 내 정보 화면(/my/profile)의 Server Action 세 개.
+ * 내 정보 화면(/my/profile)과 마이 화면(/my)의 Server Action 네 개.
  *
  *   updateProfileImage  프로필 사진 올리기 (브라우저에서 이미 1:1로 자른 파일만 받는다)
  *   removeProfileImage  프로필 사진 지우고 기본 그림으로 되돌리기
  *   changePassword      비밀번호 바꾸기 (기존 비밀번호를 반드시 먼저 확인한다)
+ *   setLargeText        큰 글자 모드 켜고 끄기 (마이 화면 토글)
  *
  * 상수를 여기 두지 않은 이유: 'use server' 파일은 async 함수만 export할 수 있다.
  * 화면과 함께 써야 하는 값(PASSWORD_MIN_LENGTH)은 @/lib/limits 에 있다.
@@ -317,4 +319,33 @@ export async function changePassword(
     status: 'done',
     message: '비밀번호를 바꿨어요. 다음 로그인부터 새 비밀번호를 써주세요.',
   }
+}
+
+/**
+ * 큰 글자 모드 켜고 끄기 (캡처 48).
+ *
+ * 진짜 값은 DB에 적고, 루트 레이아웃이 볼 쿠키에도 같은 값을 적는다.
+ * 왜 두 군데인지는 @/lib/large-text 의 설명을 보라.
+ *
+ * DB 쓰기가 실패하면 쿠키도 건드리지 않는다 — 화면만 커지고 다음 로그인에
+ * 되돌아가면, 시니어 사용자에게는 "껐다 켜면 풀리는 고장"으로 보인다.
+ */
+export async function setLargeText(on: boolean): Promise<void> {
+  const user = await requireUser()
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('users')
+    .update({ large_text: on })
+    .eq('id', user.id)
+
+  if (error) {
+    console.error('[큰 글자] 저장 실패:', error.message)
+    return
+  }
+
+  await writeLargeTextCookie(on)
+
+  // 글자 크기는 <html>에 걸리므로 모든 화면을 다시 그려야 한다.
+  revalidatePath('/', 'layout')
 }

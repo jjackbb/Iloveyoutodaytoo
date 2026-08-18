@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { AvatarCircle } from '@/components/ui/AvatarCircle'
+import { LargeTextRow } from '@/app/my/large-text-row'
 import { TabScreen } from '@/components/layout/TabScreen'
-import { Button } from '@/components/ui/Button'
 import { signOut } from '@/lib/actions/auth'
 import { requireUser } from '@/lib/auth'
 import { loadAvatarUrl } from '@/lib/avatars'
@@ -24,6 +24,8 @@ export const metadata: Metadata = { title: '마이 · 오늘도 사랑해' }
  *   /my/contact      문의하기(권리 행사·신고 접수 창구)
  *   /my/withdraw     회원 탈퇴
  * 방 나가기·구성원 차단은 각 방의 설정 화면(/rooms/{id}/settings)에 있다.
+ *
+ * 배치는 캡처 48을 따른다 — 프로필 카드 / 설정 / 고객 지원 / 로그아웃 네 묶음.
  *
  * 약관·처리방침 링크를 여기 둔 이유:
  * 이용약관 제3조 1항이 "서비스 내에 게시"를 요구한다. 가입 화면에만 있으면
@@ -83,41 +85,65 @@ export default async function MyPage() {
       </section>
 
       {/*
-        안전 관련 화면으로 가는 입구. 목록 모양으로 두어 나중에 항목이 늘어도
-        화면이 흐트러지지 않게 했다.
+        설정 카드 (캡처 48의 두 번째 묶음).
+
+        캡처에는 큰 글자 / 테마 설정 / 구독 관리 / 알림 설정 네 줄이 있다.
+        지금은 **큰 글자만** 둔다 — 나머지 셋은 뒤를 받쳐줄 것이 아직 없다.
+        테마는 팔레트가 라이트 하나뿐이고, 구독은 결제가 없고, 알림은 알림 자체가 없다.
+        눌러도 아무 일이 없는 줄을 세워두면 시니어 사용자에게는 고장으로 보인다
+        (이 화면이 처음부터 지켜온 규칙이다). 각각이 생기는 단계에서 이 카드에 붙인다.
+
+        차단한 분을 여기 넣은 이유: 캡처에는 없지만 이미 있는 기능이라 없앨 수 없고,
+        '내가 켜고 끄는 것'이라는 점에서 아래 읽는 문서들보다 이 묶음에 가깝다.
       */}
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-medium text-ink">안전</h2>
+      <section>
+        <h2 className="sr-only">설정</h2>
 
         <ul className="flex flex-col divide-y divide-hairline overflow-hidden rounded-card bg-card shadow-card">
+          <LargeTextRow enabled={user.large_text} />
           <MenuLink href="/my/blocks">차단한 분</MenuLink>
         </ul>
       </section>
 
       {/*
-        약관·처리방침.
-        '안전'과 한 목록에 섞지 않았다 — 차단은 내가 하는 동작이고 이 둘은 읽는 문서다.
-        시니어 사용자에게는 성격이 다른 것을 같은 줄에 세우지 않는 편이 덜 헷갈린다.
-      */}
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-medium text-ink">약관·정책</h2>
+        고객 지원 (캡처 48의 세 번째 묶음).
+        캡처는 개인정보 처리방침·고객센터 두 줄이고, 제목이 카드 **안에** 있다.
 
-        <ul className="flex flex-col divide-y divide-hairline overflow-hidden rounded-card bg-card shadow-card">
-          <MenuLink href="/legal/terms">이용약관</MenuLink>
+        이용약관은 캡처에 없지만 뺄 수 없다 — 이용약관 제3조 1항이 "서비스 내에 게시"를
+        요구한다. 가입 화면에만 있으면 이미 가입한 사람은 자기가 무엇에 동의했는지
+        다시 볼 방법이 없다.
+
+        문의하기 = 캡처의 '고객센터'다. 개인정보 처리방침 제10조가 열람·정정·삭제 요구를
+        "마이 > 문의하기"로 받는다고 안내하고 있어, 그 문장이 가리키는 이름을 그대로 쓴다.
+      */}
+      <section className="overflow-hidden rounded-card bg-card shadow-card">
+        <h2 className="px-5 pt-4 pb-2 text-lg font-bold text-ink">고객 지원</h2>
+
+        <ul className="flex flex-col divide-y divide-hairline border-t border-hairline">
           <MenuLink href="/legal/privacy">개인정보 처리방침</MenuLink>
-          {/*
-            문의하기를 여기 둔 이유:
-            개인정보 처리방침 제10조가 열람·정정·삭제·처리정지 요구를 "마이 > 문의하기"로
-            받는다고 안내한다. 그 문장이 가리키는 화면이 바로 이 링크다.
-          */}
+          <MenuLink href="/legal/terms">이용약관</MenuLink>
           <MenuLink href="/my/contact">문의하기</MenuLink>
         </ul>
       </section>
 
-      <form action={signOut}>
-        <Button type="submit" variant="secondary" fullWidth>
+      {/*
+        로그아웃 (캡처 48의 마지막 카드).
+        캡처는 버튼이 아니라 **강조색 글씨의 목록 한 줄**이다. 위 카드들과 같은 모양이라
+        화면이 한 줄기로 읽힌다. form 안에 두어 자바스크립트가 꺼져도 동작한다.
+      */}
+      <form
+        action={signOut}
+        className="overflow-hidden rounded-card bg-card shadow-card"
+      >
+        <button
+          type="submit"
+          className="flex min-h-[52px] w-full items-center justify-between gap-3 px-5 py-4 text-lg text-primary active:bg-surface-soft"
+        >
           로그아웃
-        </Button>
+          <span aria-hidden className="text-primary">
+            ›
+          </span>
+        </button>
       </form>
 
       {/*
