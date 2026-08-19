@@ -30,6 +30,13 @@ export function SignupForm({ next }: { next: string }) {
     signUp,
     null,
   )
+  /*
+    이름은 이제 화면이 들고 있는다(제어 입력).
+    [아무 이름이나 넣어주세요]가 칸을 채우려면 값을 쥐고 있어야 하고,
+    저장에 실패했을 때 서버가 돌려준 값으로 시작해야 다시 적지 않아도 된다.
+  */
+  const [name, setName] = useState(state?.values?.name ?? '')
+
   const [birthDate, setBirthDate] = useState('')
   const [username, setUsername] = useState('')
   /** 한 번 칸을 벗어난 뒤에만 잔소리한다. 두 글자 쳤을 때부터 빨간 글씨면 성가시다. */
@@ -53,14 +60,38 @@ export function SignupForm({ next }: { next: string }) {
         서버가 실패하면서 값을 함께 돌려주고(AuthState.values), 여기서 다시 채운다.
         비밀번호만 일부러 안 채운다 — 서버가 돌려준 비밀번호가 화면에 남으면 안 된다.
       */}
-      <Field
-        id="name"
-        name="name"
-        label="이름"
-        required
-        autoComplete="name"
-        defaultValue={state?.values?.name}
-      />
+      {/*
+        어떻게 불러드릴까요 (캡처 02·03).
+        캡처는 이 질문을 가입 다음의 별도 화면에 뒀지만, 여기 이미 같은 것을 묻는 칸이
+        있어서 한 화면에 둔다 — 같은 것을 두 번 물으면 "아까 적었는데?"가 된다.
+        캡처에서 가져온 것은 **[아무거나] 버튼과 규칙 두 줄**이다.
+      */}
+      <div className="flex flex-col gap-2">
+        <Field
+          id="name"
+          name="name"
+          label="어떻게 불러드릴까요?"
+          hint="2~10자로 적어주세요. 특수문자는 쓸 수 없어요."
+          required
+          maxLength={10}
+          autoComplete="name"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+
+        {/*
+          이름 짓기가 막막한 분을 위한 길 (캡처 02의 [랜덤 입력]).
+          아무 이름이나 넣어주는 것이 아니라 **다정한 이름 중 하나**를 넣는다 —
+          이 앱에서 이름은 가족이 서로를 부르는 말이다.
+        */}
+        <button
+          type="button"
+          onClick={() => setName(randomName())}
+          className="min-h-11 self-start px-1 text-base font-medium text-primary underline underline-offset-4"
+        >
+          아무 이름이나 넣어주세요
+        </button>
+      </div>
 
       {/*
         생년월일 칸은 버튼이라 브라우저의 required가 걸리지 않는다(누르면 시트가 뜨는 칸이다).
@@ -199,4 +230,19 @@ export function SignupForm({ next }: { next: string }) {
       </p>
     </form>
   )
+}
+
+/**
+ * 이름이 막막할 때 넣어줄 다정한 이름들 (캡처 02의 [랜덤 입력]).
+ *
+ * 아무 글자나 만들어 넣지 않는다 — 이 앱에서 이름은 가족이 서로를 부르는 말이다.
+ * 규칙(2~10자, 특수문자 없음)을 이미 지키는 값만 둔다.
+ */
+const FRIENDLY_NAMES = [
+  '햇살', '포근한하루', '봄바람', '달빛', '토닥토닥', '단짝',
+  '따뜻한마음', '오늘도맑음', '별하나', '소중한사람',
+] as const
+
+function randomName(): string {
+  return FRIENDLY_NAMES[Math.floor(Math.random() * FRIENDLY_NAMES.length)]
 }

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 /** 로그인하지 않아도 들어갈 수 있는 경로 */
-const PUBLIC_PATHS = ['/login', '/signup', '/invite', '/legal', '/auth']
+const PUBLIC_PATHS = ['/start', '/login', '/signup', '/invite', '/legal', '/auth']
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some(
@@ -15,7 +15,7 @@ function isPublic(pathname: string) {
  *
  * 여기서 하는 일은 두 가지다.
  *  1. 만료된 로그인 세션 갱신
- *  2. 로그인 안 한 사람을 /login으로 보내기 (편의용)
+ *  2. 로그인 안 한 사람을 /start(시작 화면)로 보내기 (편의용)
  *
  * 2번은 UX용 방어선일 뿐이다. 실제 접근 제어는 DB의 RLS와
  * 서버 코드의 requireUser()가 담당한다 — proxy만 믿으면 안 된다.
@@ -52,13 +52,21 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (!user && !isPublic(pathname)) {
-    const loginUrl = request.nextUrl.clone()
-    loginUrl.pathname = '/login'
-    loginUrl.searchParams.set('next', pathname)
-    return NextResponse.redirect(loginUrl)
+    /*
+      처음 오신 분은 시작 화면으로 보낸다(캡처 01). 곧장 로그인 폼을 들이밀면
+      계정이 없는 분은 "아이디가 뭐지" 하고 막힌다. 시작 화면에는 가입·로그인이
+      둘 다 있다.
+    */
+    const startUrl = request.nextUrl.clone()
+    startUrl.pathname = '/start'
+    startUrl.searchParams.set('next', pathname)
+    return NextResponse.redirect(startUrl)
   }
 
-  if (user && (pathname === '/login' || pathname === '/signup')) {
+  if (
+    user &&
+    (pathname === '/start' || pathname === '/login' || pathname === '/signup')
+  ) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = '/'
     homeUrl.search = ''
