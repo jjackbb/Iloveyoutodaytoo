@@ -6,6 +6,7 @@ import { LeavePanel } from './leave-panel'
 import { MemberList, type RoomMemberView } from './member-list'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
+import { RenamePanel } from '@/app/rooms/[roomId]/settings/rename-panel'
 import { roomMemberName } from '@/lib/member-name'
 import { createClient } from '@/lib/supabase/server'
 
@@ -109,6 +110,9 @@ export default async function RoomSettingsPage({
 
   // 내가 나가면 방장을 이어받을 분. 이미 방장인 분이 있으면 그분, 없으면 가장 오래 있던 분.
   // (실제 판단은 leaveRoom 서버 액션이 다시 한다. 여기 값은 안내 문구용이다)
+  /** 내가 이 방의 방장인가. 이름 바꾸기 칸을 보여줄지 정한다. */
+  const iAmAdmin = members.some((member) => member.isMe && member.isAdmin)
+
   const successor =
     others.find((member) => member.role === 'admin') ?? others[0] ?? null
 
@@ -118,6 +122,17 @@ export default async function RoomSettingsPage({
         {roomResult.data?.name ? `‘${roomResult.data.name}’ 방에 ` : ''}함께 있는
         분들이에요.
       </p>
+
+      {/*
+        방 이름 바꾸기 (노션 IA 6.7). 방장에게만 보인다 —
+        못 하는 일을 보여주고 눌렀을 때 막으면 고장으로 읽힌다.
+      */}
+      {iAmAdmin ? (
+        <section className="flex flex-col gap-4">
+          <h3 className="text-lg font-medium text-ink">앨범방 이름</h3>
+          <RenamePanel roomId={roomId} currentName={roomResult.data?.name ?? ''} />
+        </section>
+      ) : null}
 
       <section className="flex flex-col gap-4">
         <h3 className="text-lg font-medium text-ink">함께하는 분</h3>

@@ -192,3 +192,60 @@ export async function toggleRoomFavorite(roomId: string): Promise<void> {
   // 클라이언트가 목록을 직접 고쳐 정렬하지 않는다 — 그 방식이 이 프로젝트를 한 번 엎었다.
   revalidatePath('/')
 }
+
+export type RenameRoomState =
+  | { status: 'error'; message: string }
+  | { status: 'done' }
+  | null
+
+/**
+ * 앨범방 이름 바꾸기 (노션 IA 6.7).
+ *
+ * 누가 바꿀 수 있는지는 여기서 따지지 않는다 — RLS(rooms_update)가 `is_room_admin`으로
+ * 이미 막고 있다. 서버 코드에서 한 번 더 검사하면 두 벌이 되어 언젠가 어긋난다.
+ * 방장이 아니면 업데이트가 0줄에 그치므로, 그때 안내를 돌려준다.
+ */
+export async function renameRoom(
+  _prev: RenameRoomState,
+  formData: FormData,
+): Promise<RenameRoomState> {
+  await requireUser()
+
+  const roomId = String(formData.get('room_id') ?? '')
+  const name = String(formData.get('name') ?? '').trim()
+
+  if (!roomId) return { status: 'error', message: '어느 방인지 알 수 없어요.' }
+
+  // 만들 때와 같은 규칙을 쓴다. 여기만 느슨하면 만들 땐 막힌 이름이 나중에 통과한다.
+  if (!name) {
+    return { status: 'error', message: '앨범방 이름을 입력해주세요.' }
+  }
+  if (name.length > ROOM_NAME_MAX_LENGTH) {
+    return {
+      status: 'error',
+      message: `앨범방 이름은 ${ROOM_NAME_MAX_LENGTH}자까지 쓸 수 있어요.`,
+    }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('rooms')
+    .update({ name })
+    .eq('id', roomId)
+    .select('id')
+
+  if (error) {
+    console.error('[방 이름] 바꾸기 실패:', error.message)
+    return { status: 'error', message: '이름을 바꾸지 못했어요. 다시 시도해 주세요.' }
+  }
+
+  // RLS가 막으면 오류가 아니라 **0줄**이 돌아온다. 그 경우를 성공으로 보면
+  // 화면만 바뀐 것처럼 보이고 새로고침하면 되돌아간다.
+  if (!data || data.length === 0) {
+    return { status: 'error', message: '이 방의 방장만 이름을 바꿀 수 있어요.' }
+  }
+
+  // 방 이름은 홈 카드·앱바·사서함 카드에 두루 나온다. 한 화면만 고치면 어긋난다.
+  revalidatePath('/', 'layout')
+  return { status: 'done' }
+}
