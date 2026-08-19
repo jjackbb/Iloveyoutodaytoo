@@ -91,8 +91,12 @@ export type Database = {
           id: string
           memory_id: string | null
           prompt_used: string | null
+          /** 받는 사람이 재생해서 들은 시각. 답장 미션이 이 값으로 "듣고도 답장 안 한 것"을 센다. */
+          read_at: string | null
           // 받는 사람이 탈퇴하면 NULL이 된다 (메시지는 보낸 사람 사서함에 남는다)
           receiver_id: string | null
+          /** 답장이 이루어진 시각. 답장을 보내면 그 사람의 미답장 마음이 한꺼번에 찍힌다. */
+          replied_at: string | null
           room_id: string
           sender_id: string | null
           /** 보낸 방식. 사서함 필터 칩(일대일·랜덤)이 이 값을 본다. */
@@ -110,7 +114,9 @@ export type Database = {
           id?: string
           memory_id?: string | null
           prompt_used?: string | null
+          read_at?: string | null
           receiver_id: string
+          replied_at?: string | null
           room_id: string
           sender_id?: string | null
           // 안 넣으면 DB 기본값 'direct'가 들어간다.
@@ -125,7 +131,9 @@ export type Database = {
           id?: string
           memory_id?: string | null
           prompt_used?: string | null
+          read_at?: string | null
           receiver_id?: string
+          replied_at?: string | null
           room_id?: string
           sender_id?: string | null
           send_mode?: Database['public']['Enums']['send_mode']
@@ -862,6 +870,19 @@ export type Database = {
         }[]
       }
       shares_room_with: { Args: { p_user_id: string }; Returns: boolean }
+      /**
+       * 지금 나에게 락이 걸린 발신자들 (답장 미션, PRD [MISSION-01]).
+       * "그 사람이 보낸 마음 중 내가 듣고도 답장하지 않은 것"이 5개 이상이면 잠긴다.
+       */
+      locked_senders: {
+        Args: Record<string, never>
+        Returns: { sender_id: string; unreplied_count: number }[]
+      }
+      /**
+       * 마음을 들었다고 표시한다(재생할 때 부른다).
+       * 잠긴 마음이면 false를 돌려주고 아무것도 하지 않는다.
+       */
+      mark_heart_read: { Args: { p_id: string }; Returns: boolean }
     }
     Enums: {
       notification_type:

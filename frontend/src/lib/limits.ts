@@ -69,3 +69,14 @@ export const REPORT_DETAIL_MAX_LENGTH = 500
  * 화면에서 통과한 값이 서버에서 거절된다.
  */
 export const PASSWORD_MIN_LENGTH = 8
+
+/**
+ * 답장 미션이 걸리는 기준 (PRD [MISSION-01] 수정안 1).
+ *
+ * "한 사람이 보낸 마음 중, 내가 **듣고도 답장하지 않은 것**"이 이 수에 이르면
+ * 그 사람의 다음 마음이 잠긴다. 즉 6번째부터 잠긴다.
+ *
+ * DB의 locked_senders() 안에도 같은 숫자가 박혀 있다. 바꾸려면 둘 다 고쳐야 한다 —
+ * 진짜 관문은 DB 쪽이고, 이 값은 화면에 "N개 남았어요"를 적기 위한 것이다.
+ */
+export const MISSION_UNREPLIED_LIMIT = 5

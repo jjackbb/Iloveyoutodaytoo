@@ -39,6 +39,14 @@ export interface VoicePlayerProps {
    * 넘기면 파일을 다시 내려받아 해석하지 않는다.
    */
   levels?: number[] | null
+  /**
+   * 이 소리를 **처음 재생했을 때** 한 번만 부른다.
+   *
+   * 사서함이 답장 미션의 "들었다"를 찍는 데 쓴다(PRD [MISSION-01]).
+   * 미션을 아는 것은 사서함뿐이라 이 부품에는 그 사정을 넣지 않고,
+   * "처음 틀었다"는 사실만 알려준다 — 피드·상세도 같은 부품을 쓰기 때문이다.
+   */
+  onFirstPlay?: () => void
 }
 
 export function VoicePlayer({
@@ -46,10 +54,13 @@ export function VoicePlayer({
   durationSec,
   label,
   levels: givenLevels = null,
+  onFirstPlay,
 }: VoicePlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
   const [elapsed, setElapsed] = useState(0)
+  /** 처음 한 번만 알리기 위한 표시. 멈췄다 다시 틀어도 다시 부르지 않는다. */
+  const firstPlayDone = useRef(false)
 
   /** 파일을 해석해서 얻은 높이. 어느 주소의 것인지 함께 들고 있어야 섞이지 않는다. */
   const [decoded, setDecoded] = useState<{
@@ -126,7 +137,13 @@ export function VoicePlayer({
         ref={audioRef}
         src={src}
         preload="none"
-        onPlay={() => setPlaying(true)}
+        onPlay={() => {
+          setPlaying(true)
+          if (!firstPlayDone.current) {
+            firstPlayDone.current = true
+            onFirstPlay?.()
+          }
+        }}
         onPause={() => setPlaying(false)}
         onEnded={() => {
           setPlaying(false)

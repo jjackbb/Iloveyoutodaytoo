@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/auth'
 import { COVER_PRESETS, isCoverPreset } from '@/lib/covers'
 import { roomMemberName } from '@/lib/member-name'
+import { isHeartLocked, loadLockedSenders } from '@/lib/mission'
 import { createClient } from '@/lib/supabase/server'
 import type { Enums } from '@/types/database'
 
@@ -76,6 +77,15 @@ export type MailboxItem = {
   avatarUrl: string | null
   /** 커버 사진이 없는 방에 깔 그라데이션. 사람 자리에는 null. */
   coverGradient: string | null
+  /**
+   * 답장 미션으로 잠긴 마음인지 (PRD [MISSION-01]).
+   *
+   * 잠겼으면 **내용을 아예 실어 보내지 않는다** — text와 mediaUrl이 null이다.
+   * 화면에서 가리기만 하면 개발자 도구로 그대로 보인다.
+   */
+  locked: boolean
+  /** 잠긴 이유를 설명할 때 쓸, 이 사람에게 밀린 통수. 안 잠겼으면 0. */
+  unrepliedCount: number
 }
 
 export type MailboxPage = {
@@ -106,7 +116,7 @@ const MEDIA_BUCKET = 'media'
  * 결과가 unknown이 된다(room-feed.ts와 같은 이유).
  */
 const SELECT_COLUMNS =
-  'id, room_id, type, content, duration_sec, voice_levels, prompt_used, created_at, send_mode, sender_id, receiver_id, sender:users!heart_messages_sender_id_fkey(id, name, profile_image), receiver:users!heart_messages_receiver_id_fkey(id, name, profile_image), room:rooms!heart_messages_room_id_fkey(id, name, cover_preset, cover_path), favorites:heart_message_favorites(id)' as const
+  'id, room_id, type, content, duration_sec, voice_levels, prompt_used, created_at, send_mode, sender_id, receiver_id, read_at, sender:users!heart_messages_sender_id_fkey(id, name, profile_image), receiver:users!heart_messages_receiver_id_fkey(id, name, profile_image), room:rooms!heart_messages_room_id_fkey(id, name, cover_preset, cover_path), favorites:heart_message_favorites(id)' as const
 
 /**
  * ♡ 칩을 눌렀을 때. `!inner`가 "표시가 달린 것만" 남긴다.
@@ -116,7 +126,7 @@ const SELECT_COLUMNS =
  * 거르는 일은 DB가 한 번에 하는 게 맞다.
  */
 const SELECT_COLUMNS_FAVORITED =
-  'id, room_id, type, content, duration_sec, voice_levels, prompt_used, created_at, send_mode, sender_id, receiver_id, sender:users!heart_messages_sender_id_fkey(id, name, profile_image), receiver:users!heart_messages_receiver_id_fkey(id, name, profile_image), room:rooms!heart_messages_room_id_fkey(id, name, cover_preset, cover_path), favorites:heart_message_favorites!inner(id)' as const
+  'id, room_id, type, content, duration_sec, voice_levels, prompt_used, created_at, send_mode, sender_id, receiver_id, read_at, sender:users!heart_messages_sender_id_fkey(id, name, profile_image), receiver:users!heart_messages_receiver_id_fkey(id, name, profile_image), room:rooms!heart_messages_room_id_fkey(id, name, cover_preset, cover_path), favorites:heart_message_favorites!inner(id)' as const
 
 /** 음성·영상 파일이 어디에 있는지. */
 type MediaRef = { bucket: string; path: string }
@@ -369,11 +379,25 @@ export async function fetchMailboxPage(
     }
   }
 
+  /*
+    답장 미션 (PRD [MISSION-01]).
+
+    '받은 마음'에만 건다 — 내가 보낸 마음은 내가 쓴 것이라 잠글 이유가 없다.
+    한 번만 읽어 페이지 전체에 쓴다(카드마다 물으면 질의가 카드 수만큼 늘어난다).
+  */
+  const lockedSenders =
+    safeBox === 'received' ? await loadLockedSenders() : new Map<string, number>()
+
   const items: MailboxItem[] = page.map((row, index) => {
     const ref = refs[index]
     const mediaUrl = ref
       ? (signedUrls.get(`${ref.bucket}/${ref.path}`) ?? null)
       : null
+
+    const locked = isHeartLocked(
+      { senderId: row.sender_id, readAt: row.read_at },
+      lockedSenders,
+    )
 
     // 받은 마음이면 상대는 보낸 사람, 보낸 마음이면 상대는 받는 사람이다.
     const partner = safeBox === 'received' ? row.sender : row.receiver
@@ -385,8 +409,10 @@ export async function fetchMailboxPage(
       roomName: row.room?.name ?? null,
       type: row.type,
       sendMode: row.send_mode,
-      text: row.type === 'text' ? row.content : null,
-      mediaUrl,
+      // 잠긴 마음은 내용을 실어 보내지 않는다. 화면에서 가리기만 하면
+      // 개발자 도구에 그대로 보여서 락이 무의미해진다.
+      text: locked ? null : row.type === 'text' ? row.content : null,
+      mediaUrl: locked ? null : mediaUrl,
       durationSec: row.duration_sec,
       voiceLevels: row.voice_levels,
       promptUsed: row.prompt_used,
@@ -419,6 +445,10 @@ export async function fetchMailboxPage(
         row.send_mode === 'broadcast' && isCoverPreset(row.room?.cover_preset)
           ? COVER_PRESETS[row.room.cover_preset].gradient
           : null,
+      locked,
+      unrepliedCount: locked
+        ? (lockedSenders.get(row.sender_id ?? '') ?? 0)
+        : 0,
     }
   })
 

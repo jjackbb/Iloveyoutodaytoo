@@ -4,11 +4,12 @@ import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { FavoriteHeartButton } from '@/components/message/FavoriteHeartButton'
 import { ReportButton } from '@/components/report/ReportButton'
 import { AvatarCircle } from '@/components/ui/AvatarCircle'
-import { Button } from '@/components/ui/Button'
+import { Button, ButtonLink } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { formatRelativeTime } from '@/lib/format'
 import type { MailboxBox, MailboxItem } from '@/lib/actions/mailbox'
+import { markHeartRead } from '@/lib/actions/mission'
 
 /**
  * 사서함 목록 (캡처 46·47).
@@ -249,6 +250,15 @@ function MessageCard({
 }
 
 function MessageBody({ item, title }: { item: MailboxItem; title: string }) {
+  /*
+    답장 미션으로 잠긴 마음 (PRD [MISSION-01]).
+
+    서버가 내용을 아예 안 실어 보내므로 여기서 가릴 것도 없다 — 대신 **왜 잠겼고
+    어떻게 풀리는지**를 적는다. 잠긴 이유를 안 적으면 시니어 사용자에게는
+    고장 난 카드로 보인다.
+  */
+  if (item.locked) return <LockedHeart item={item} />
+
   if (item.type === 'text') {
     return (
       <p className="mt-1 whitespace-pre-wrap break-words text-lg leading-relaxed text-ink">
@@ -284,7 +294,43 @@ function MessageBody({ item, title }: { item: MailboxItem; title: string }) {
         durationSec={item.durationSec ?? 0}
         levels={item.voiceLevels}
         label={`${title}의 음성`}
+        /*
+          답장 미션의 "들었다"를 여기서 찍는다 (PRD [MISSION-01]).
+          목록에 뜬 것만으로는 안 찍고 **실제로 재생했을 때**만 찍는다
+          (사용자 결정 2026-08-19).
+
+          기다리지 않는 이유: 표시가 늦어도 소리는 이미 나고 있다.
+          실패해도 다음에 다시 틀면 또 시도하므로 화면을 막을 이유가 없다.
+        */
+        onFirstPlay={() => void markHeartRead(item.id)}
       />
+    </div>
+  )
+}
+
+/**
+ * 잠긴 마음 자리.
+ *
+ * PRD는 "상대방에게 마음을 표현해보세요! 답장 후 확인이 가능합니다"를 띄우라고 한다.
+ * 그 문장을 쓰되, 시니어 사용자가 무엇을 해야 하는지 알 수 있게 버튼까지 붙였다.
+ */
+function LockedHeart({ item }: { item: MailboxItem }) {
+  const who = item.partnerName ?? '이분'
+
+  return (
+    <div className="mt-1 flex flex-col gap-3 rounded-[14px] bg-surface-soft px-4 py-4">
+      <p className="text-base leading-relaxed break-keep text-ink">
+        <span aria-hidden>🔒 </span>
+        {who}님께 마음을 표현해보세요. 답장하면 이 마음을 확인할 수 있어요.
+      </p>
+
+      <p className="text-sm break-keep text-muted">
+        {who}님이 보낸 마음 {item.unrepliedCount}개를 아직 답장하지 않았어요.
+      </p>
+
+      <ButtonLink href="/mailbox/send" variant="secondary">
+        마음 보내기
+      </ButtonLink>
     </div>
   )
 }
