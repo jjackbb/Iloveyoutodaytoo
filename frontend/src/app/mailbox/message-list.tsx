@@ -3,6 +3,7 @@
 import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { FavoriteHeartButton } from '@/components/message/FavoriteHeartButton'
 import { ReportButton } from '@/components/report/ReportButton'
+import { AvatarButton } from '@/components/ui/AvatarButton'
 import { AvatarCircle } from '@/components/ui/AvatarCircle'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -255,14 +256,22 @@ function MessageCard({
           동그란 사진은 세로 가운데에 온다(캡처 46) — 이름·시각·재생바가 쌓인 칸 전체와
           짝을 이루는 표식이라 맨 윗줄에 붙이면 카드가 왼쪽으로 기울어 보인다.
         */}
-        <AvatarCircle
-          url={item.avatarUrl}
-          name={title}
-          size="xs"
-          fallbackGradient={item.coverGradient}
-          // 방 전체에 보낸 마음의 동그라미는 사람 사진이 아니라 방 커버다.
-          alt={item.sendMode === 'broadcast' ? `${title} 커버 사진` : undefined}
-        />
+        {/*
+          사람 사진은 누르면 크게 볼 수 있다 (노션 IA 6.4) — 44px 동그라미로는
+          얼굴을 알아보기 어렵다. 방 커버(방 전체로 보낸 마음)는 그냥 그린다:
+          커버를 크게 봐서 알아낼 것이 없고, 누를 수 있는 자리만 늘면 헷갈린다.
+        */}
+        {item.sendMode === 'broadcast' ? (
+          <AvatarCircle
+            url={item.avatarUrl}
+            name={title}
+            size="xs"
+            fallbackGradient={item.coverGradient}
+            alt={`${title} 커버 사진`}
+          />
+        ) : (
+          <AvatarButton url={item.avatarUrl} name={title} size="xs" />
+        )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <h2 className="truncate text-lg font-extrabold text-ink">{title}</h2>

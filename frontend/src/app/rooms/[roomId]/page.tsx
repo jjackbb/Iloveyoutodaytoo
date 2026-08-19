@@ -13,6 +13,7 @@ import {
   MEMORY_CARD_SELECT,
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
+import { FeedScroll } from '@/app/rooms/[roomId]/feed-scroll'
 import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '앨범방 · 오늘도 사랑해' }
@@ -125,7 +126,11 @@ export default async function RoomPage({
         />
       </RoomAppBar>
 
-      <main className="min-h-0 flex-1 overflow-y-auto">
+      {/*
+        스크롤 칸과 떠 있는 [맨 아래로] 버튼을 함께 그린다 (노션 IA 3.4).
+        카드 목록은 여기서(서버에서) 그린 그대로 꽂히므로 번들에 들어가지 않는다.
+      */}
+      <FeedScroll showJump={cards.length > 0}>
         <div className="mx-auto w-full max-w-md px-screen-x pt-0.5 pb-screen-b">
           {memoriesResult.error ? (
             <p
@@ -147,7 +152,7 @@ export default async function RoomPage({
             </ul>
           )}
         </div>
-      </main>
+      </FeedScroll>
 
       {/* 아래 고정 줄 (캡처 10·22). 추억이 있든 없든 늘 같은 자리에 있다. */}
       <div className="shrink-0 border-t border-hairline bg-card px-screen-x py-3">

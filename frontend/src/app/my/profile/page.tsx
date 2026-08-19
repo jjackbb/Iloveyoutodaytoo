@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { AvatarCircle } from '@/components/ui/AvatarCircle'
+import { AvatarButton } from '@/components/ui/AvatarButton'
 import { ProfilePhotoRow } from '@/app/my/profile/photo-row'
 import { PasswordRow } from '@/app/my/profile/password-row'
 import { TabScreen } from '@/components/layout/TabScreen'
@@ -63,7 +63,8 @@ export default async function ProfilePage({
         <h2 className="sr-only">내 프로필</h2>
 
         <div className="relative">
-          <AvatarCircle url={avatarUrl} name={user.name} size="lg" />
+          {/* 누르면 크게 보인다 (노션 IA 6.4). 사진이 없으면 그냥 하트 그림이다. */}
+          <AvatarButton url={avatarUrl} name={user.name} size="lg" />
 
           {/*
             사진 지우기(캡처의 작은 ×). 지울 사진이 없으면 아예 그리지 않는다 —
