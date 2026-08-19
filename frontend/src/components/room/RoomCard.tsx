@@ -25,8 +25,12 @@ export interface RoomCardProps {
   roomId: string
   /** 앨범방 이름. 예: "우리 가족 행복방" */
   name: string
-  /** 커버 프리셋 키(rooms.cover_preset). */
-  coverPreset: string
+  /**
+   * 커버 프리셋 키. 방에 정해진 것(rooms.cover_preset)일 수도, 내가 고른 것
+   * (room_members.custom_cover_preset)일 수도 있다 — 고르는 규칙은 @/lib/room-name에 있다.
+   * 못 읽었으면 null이 오고, coverStyle이 기본 프리셋으로 되돌린다.
+   */
+  coverPreset: string | null
   /** 직접 올린 커버의 서명된 주소. 없으면 프리셋 그라데이션이 쓰인다. */
   coverUrl?: string | null
   /** 이 방의 활성 멤버 이름들. 아바타 더미를 그리는 데 쓴다. */

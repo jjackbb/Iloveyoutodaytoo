@@ -695,6 +695,16 @@ export type Database = {
       }
       room_members: {
         Row: {
+          /**
+           * 내 화면에서만 보이는 이 방의 이름. null이면 rooms.name(원래 이름)을 쓴다.
+           * 방장이 고치는 rooms.name과 **다른 값**이다 — 그건 모두의 화면이 바뀌고,
+           * 이건 내 화면만 바뀐다. 규칙은 src/lib/room-name.ts 한 곳에 있다.
+           */
+          custom_name: string | null
+          /** 내 화면에서만 보이는 커버 프리셋 키. rooms_cover_preset_check와 같은 목록. */
+          custom_cover_preset: string | null
+          /** 내 화면에서만 보이는 커버 사진 경로(covers 버킷, `{room_id}/…`). */
+          custom_cover_path: string | null
           favorited: boolean
           has_replied_first_invite: boolean
           id: string
@@ -713,6 +723,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          custom_name?: string | null
+          custom_cover_preset?: string | null
+          custom_cover_path?: string | null
           favorited?: boolean
           has_replied_first_invite?: boolean
           id?: string
@@ -726,6 +739,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          custom_name?: string | null
+          custom_cover_preset?: string | null
+          custom_cover_path?: string | null
           favorited?: boolean
           has_replied_first_invite?: boolean
           id?: string

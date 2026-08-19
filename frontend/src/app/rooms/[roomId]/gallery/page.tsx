@@ -11,6 +11,7 @@ import {
   signPaths,
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
+import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '갤러리 · 오늘도 사랑해' }
 
@@ -48,13 +49,14 @@ export default async function RoomGalleryPage({
   const viewer = await requireUser()
   const supabase = await createClient()
 
-  const [roomResult, hiddenIds, nicknameByUser] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [roomNameResult, hiddenIds, nicknameByUser] = await Promise.all([
+    // 방 이름은 사람마다 다를 수 있다 — 내가 바꿔 부르는 이름이 있으면 그것이다(@/lib/room-look).
+    loadRoomName(roomId),
     loadHiddenMemoryIds(supabase, roomId, viewer.id),
     loadRoomNicknames(supabase, roomId),
   ])
 
-  const roomName = roomResult.data?.name ?? '앨범방'
+  const roomName = roomNameResult ?? '앨범방'
 
   const memoriesQuery = supabase
     .from('memories')

@@ -31,6 +31,7 @@ import {
 } from '@/lib/heart-send'
 import { HEART_SEND_MAX_TARGETS } from '@/lib/limits'
 import { roomMemberName } from '@/lib/member-name'
+import { resolveRoomCover, roomDisplayName } from '@/lib/room-name'
 import { createClient } from '@/lib/supabase/server'
 import type { Enums } from '@/types/database'
 
@@ -42,7 +43,7 @@ type RoomRoster = {
   roomId: string
   roomName: string
   relationshipType: Enums<'relationship_type'> | null
-  coverPreset: string
+  coverPreset: string | null
   coverPath: string | null
   /** 나를 뺀 활성 멤버들. 방 안에서 부르는 이름(별명 우선)까지 정해 둔다. */
   others: { userId: string; name: string; avatarPath: string | null }[]
@@ -65,7 +66,7 @@ async function loadRosters(
   const { data: memberships, error: membershipError } = await supabase
     .from('room_members')
     .select(
-      'room_id, joined_at, rooms(id, name, relationship_type, cover_preset, cover_path)',
+      'room_id, joined_at, custom_name, custom_cover_preset, custom_cover_path, rooms(id, name, relationship_type, cover_preset, cover_path)',
     )
     .eq('user_id', myUserId)
     .eq('status', 'active')
@@ -96,12 +97,21 @@ async function loadRosters(
   for (const row of rows) {
     const room = row.rooms
     if (!room) continue
-    byRoom.set(row.room_id, {
-      roomId: room.id,
-      roomName: room.name,
-      relationshipType: room.relationship_type,
+    // 이름·커버는 내 화면 기준으로 고른다 — 홈 카드에서 부르던 이름과 달라지면
+    // 어느 방인지 못 알아본다(@/lib/room-name).
+    const cover = resolveRoomCover({
       coverPreset: room.cover_preset,
       coverPath: room.cover_path,
+      customCoverPreset: row.custom_cover_preset,
+      customCoverPath: row.custom_cover_path,
+    })
+
+    byRoom.set(row.room_id, {
+      roomId: room.id,
+      roomName: roomDisplayName({ name: room.name, customName: row.custom_name }),
+      relationshipType: room.relationship_type,
+      coverPreset: cover.preset,
+      coverPath: cover.path,
       others: [],
       activeCount: 0,
       joinedAt: row.joined_at,

@@ -5,6 +5,7 @@ import { NicknameForm } from './nickname-form'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
+import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '별명 설정 · 오늘도 사랑해' }
 
@@ -25,8 +26,9 @@ export default async function RoomNicknamePage({
   const viewer = await requireUser()
   const supabase = await createClient()
 
-  const [roomResult, membershipResult] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [roomNameResult, membershipResult] = await Promise.all([
+    // 방 이름은 사람마다 다를 수 있다 — 내가 바꿔 부르는 이름이 있으면 그것이다(@/lib/room-look).
+    loadRoomName(roomId),
     supabase
       .from('room_members')
       .select('nickname, user:users!room_members_user_id_fkey(id, name)')
@@ -36,7 +38,7 @@ export default async function RoomNicknamePage({
       .maybeSingle(),
   ])
 
-  const roomName = roomResult.data?.name ?? '앨범방'
+  const roomName = roomNameResult ?? '앨범방'
 
   if (membershipResult.error) {
     console.error('[별명] 내 정보 조회 실패:', membershipResult.error.message)

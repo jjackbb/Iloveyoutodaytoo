@@ -193,33 +193,38 @@ export async function toggleRoomFavorite(roomId: string): Promise<void> {
   revalidatePath('/')
 }
 
-export type RenameRoomState =
+export type RoomLookState =
   | { status: 'error'; message: string }
   | { status: 'done' }
   | null
 
 /**
- * 앨범방 이름 바꾸기 (노션 IA 6.7).
+ * 이 방을 **내 화면에서** 어떻게 부르고 어떻게 보이게 할지 바꾸기 (노션 IA 6.7 개정).
  *
- * 누가 바꿀 수 있는지는 여기서 따지지 않는다 — RLS(rooms_update)가 `is_room_admin`으로
- * 이미 막고 있다. 서버 코드에서 한 번 더 검사하면 두 벌이 되어 언젠가 어긋난다.
- * 방장이 아니면 업데이트가 0줄에 그치므로, 그때 안내를 돌려준다.
+ * **남의 화면은 건드리지 않는다.** 카카오톡 단체방과 같은 방식이다 —
+ * 처음 만든 사람이 이름과 커버를 정해두고, 그 뒤로는 각자 자기 화면에서만 바꿔 부른다.
+ * (사용자 결정 2026-08-20. 그전까지는 방장이 rooms.name을 고쳐 모두의 화면을 바꿨다)
+ *
+ * 그래서 값은 rooms가 아니라 room_members의 내 줄에 적는다. RLS(room_members_update)가
+ * "내 줄이면 고칠 수 있다"이므로, 남의 줄을 고치려 하면 0줄이 되어 아래에서 걸린다.
+ *
+ * 이름 칸을 비우면 커스텀을 **지운다**(null) — 원래 이름으로 돌아간다. 이름 칸을 비운 것을
+ * 오류로 막으면 되돌릴 방법이 없어진다.
  */
-export async function renameRoom(
-  _prev: RenameRoomState,
+export async function updateMyRoomLook(
+  _prev: RoomLookState,
   formData: FormData,
-): Promise<RenameRoomState> {
-  await requireUser()
+): Promise<RoomLookState> {
+  const user = await requireUser()
 
   const roomId = String(formData.get('room_id') ?? '')
   const name = String(formData.get('name') ?? '').trim()
+  const coverChoice = String(formData.get('cover_preset') ?? '')
+  const coverFile = formData.get('cover_file')
 
   if (!roomId) return { status: 'error', message: '어느 방인지 알 수 없어요.' }
 
-  // 만들 때와 같은 규칙을 쓴다. 여기만 느슨하면 만들 땐 막힌 이름이 나중에 통과한다.
-  if (!name) {
-    return { status: 'error', message: '앨범방 이름을 입력해주세요.' }
-  }
+  // 길이 규칙은 방을 만들 때와 같다. 여기만 느슨하면 만들 땐 막힌 이름이 나중에 통과한다.
   if (name.length > ROOM_NAME_MAX_LENGTH) {
     return {
       status: 'error',
@@ -227,25 +232,103 @@ export async function renameRoom(
     }
   }
 
+  const upload =
+    coverFile instanceof File && coverFile.size > 0 ? coverFile : null
+
+  if (upload) {
+    if (!COVER_MIME_TYPES.includes(upload.type)) {
+      return { status: 'error', message: '커버 사진은 JPG·PNG·WEBP만 올릴 수 있어요.' }
+    }
+    if (upload.size > COVER_MAX_BYTES) {
+      return { status: 'error', message: '커버 사진이 너무 커요. 다시 잘라서 올려주세요.' }
+    }
+  }
+
   const supabase = await createClient()
+
+  // 지금 내가 쓰고 있는 커버 사진. 새 사진으로 바꾸거나 원래대로 돌리면 이 파일을 지운다.
+  const { data: before } = await supabase
+    .from('room_members')
+    .select('custom_cover_path')
+    .eq('room_id', roomId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  /*
+    커버 선택은 세 갈래다.
+    - 'original' : 커스텀을 지운다 → 방을 만들 때 정해진 커버로 돌아간다.
+    - 프리셋 키   : 그 색으로 고정한다. 내가 올렸던 사진은 지운다.
+    - 사진 올리기 : 아래에서 업로드한 뒤 경로를 적는다.
+    아무 값도 안 오면(폼이 커버 칸을 안 보낸 경우) 커버는 손대지 않는다.
+  */
+  const patch: {
+    custom_name: string | null
+    custom_cover_preset?: string | null
+    custom_cover_path?: string | null
+  } = { custom_name: name || null }
+
+  if (upload) {
+    /*
+      경로 맨 앞은 반드시 방 id다 — covers 버킷의 RLS가 그 조각으로 멤버인지 본다
+      (방 만들기와 같은 규칙). 뒤에 내 id를 붙여 같은 방의 다른 사람 파일과 섞이지 않게 한다.
+    */
+    const extension = upload.type === 'image/png' ? 'png' : 'jpg'
+    const path = `${roomId}/my-${user.id}-${Date.now()}.${extension}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('covers')
+      .upload(path, upload, { contentType: upload.type, upsert: false })
+
+    if (uploadError) {
+      console.error('[내 방 꾸미기] 커버 업로드 실패:', uploadError.message)
+      return { status: 'error', message: '커버 사진을 올리지 못했어요. 다시 시도해 주세요.' }
+    }
+
+    patch.custom_cover_path = path
+    patch.custom_cover_preset = null
+  } else if (coverChoice === 'original') {
+    patch.custom_cover_path = null
+    patch.custom_cover_preset = null
+  } else if (isCoverPreset(coverChoice)) {
+    patch.custom_cover_path = null
+    patch.custom_cover_preset = coverChoice
+  }
+
   const { data, error } = await supabase
-    .from('rooms')
-    .update({ name })
-    .eq('id', roomId)
+    .from('room_members')
+    .update(patch)
+    .eq('room_id', roomId)
+    .eq('user_id', user.id)
     .select('id')
 
   if (error) {
-    console.error('[방 이름] 바꾸기 실패:', error.message)
-    return { status: 'error', message: '이름을 바꾸지 못했어요. 다시 시도해 주세요.' }
+    console.error('[내 방 꾸미기] 저장 실패:', error.message)
+    return { status: 'error', message: '바꾸지 못했어요. 다시 시도해 주세요.' }
   }
 
-  // RLS가 막으면 오류가 아니라 **0줄**이 돌아온다. 그 경우를 성공으로 보면
-  // 화면만 바뀐 것처럼 보이고 새로고침하면 되돌아간다.
+  // RLS가 막으면 오류가 아니라 **0줄**이 돌아온다. 그걸 성공으로 보면 화면만 바뀐 것처럼
+  // 보이고 새로고침하면 되돌아간다.
   if (!data || data.length === 0) {
-    return { status: 'error', message: '이 방의 방장만 이름을 바꿀 수 있어요.' }
+    return { status: 'error', message: '이 방의 구성원만 바꿀 수 있어요.' }
   }
 
-  // 방 이름은 홈 카드·앱바·사서함 카드에 두루 나온다. 한 화면만 고치면 어긋난다.
+  /*
+    쓰지 않게 된 내 커버 사진은 지운다. 안 지우면 바꿀 때마다 파일이 쌓이는데
+    아무 화면도 그것을 가리키지 않는다 — 이 프로젝트가 없애기로 한 잔여데이터다.
+    지우기에 실패해도 사용자에게는 알리지 않는다. 이미 화면은 새 커버로 바뀌었고,
+    남은 파일은 사용자가 할 수 있는 일이 없다.
+  */
+  const stale = before?.custom_cover_path
+  if (stale && patch.custom_cover_path !== undefined && stale !== patch.custom_cover_path) {
+    const { error: removeError } = await supabase.storage
+      .from('covers')
+      .remove([stale])
+    if (removeError) {
+      console.error('[내 방 꾸미기] 옛 커버 삭제 실패:', removeError.message)
+    }
+  }
+
+  // 방 이름과 커버는 홈 카드·머리띠·사서함 카드에 두루 나온다. 한 화면만 고치면 어긋난다.
   revalidatePath('/', 'layout')
   return { status: 'done' }
 }

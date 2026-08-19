@@ -12,6 +12,7 @@ import { requireUser } from '@/lib/auth'
 import { formatRelativeTime } from '@/lib/format'
 import { loadMemoryDetail } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
+import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '추억 · 오늘도 사랑해' }
 
@@ -39,12 +40,13 @@ export default async function MemoryDetailPage({
   const viewer = await requireUser()
   const supabase = await createClient()
 
-  const [roomResult, detail] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [roomNameResult, detail] = await Promise.all([
+    // 방 이름은 사람마다 다를 수 있다 — 내가 바꿔 부르는 이름이 있으면 그것이다(@/lib/room-look).
+    loadRoomName(roomId),
     loadMemoryDetail({ supabase, roomId, memoryId, viewerId: viewer.id }),
   ])
 
-  const roomName = roomResult.data?.name ?? '앨범방'
+  const roomName = roomNameResult ?? '앨범방'
 
   /*
     없거나, 지워졌거나, 볼 수 없는 글. 셋을 구분해 알려줄 방법도 이유도 없다.

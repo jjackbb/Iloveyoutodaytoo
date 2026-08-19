@@ -6,6 +6,8 @@ import { getCurrentUser, requireUser } from '@/lib/auth'
 import { COVER_PRESETS, isCoverPreset } from '@/lib/covers'
 import { roomMemberName } from '@/lib/member-name'
 import { isHeartLocked, loadLockedSenders } from '@/lib/mission'
+import { loadMyRoomCustoms } from '@/lib/room-look'
+import { resolveRoomCover, roomDisplayName } from '@/lib/room-name'
 import { createClient } from '@/lib/supabase/server'
 import type { Enums } from '@/types/database'
 
@@ -348,11 +350,26 @@ export async function fetchMailboxPage(
     사람 사진(avatars)과 방 커버(covers)는 버킷이 달라 따로 모아 한 번씩 서명한다.
     한 줄마다 서명하면 스무 줄에 스무 번 요청이 나간다.
   */
+  /*
+    방 이름·커버는 사람마다 다를 수 있다 — 내가 내 화면에서만 바꿔 부르는 값이 있으면
+    그것이 이긴다(@/lib/room-name). 홈 카드에서 부르던 이름과 사서함이 다르면
+    어느 방에서 온 마음인지 못 알아본다.
+  */
+  const myRoomCustoms = await loadMyRoomCustoms()
+  const roomLook = (row: { room_id: string | null }) =>
+    row.room_id ? myRoomCustoms.get(row.room_id) : undefined
+
   const avatarPaths: string[] = []
   const coverPaths: string[] = []
   for (const row of page) {
     if (row.send_mode === 'broadcast') {
-      if (row.room?.cover_path) coverPaths.push(row.room.cover_path)
+      const cover = resolveRoomCover({
+        coverPreset: row.room?.cover_preset,
+        coverPath: row.room?.cover_path,
+        customCoverPreset: roomLook(row)?.customCoverPreset,
+        customCoverPath: roomLook(row)?.customCoverPath,
+      })
+      if (cover.path) coverPaths.push(cover.path)
       continue
     }
     const partner = safeBox === 'received' ? row.sender : row.receiver
@@ -420,10 +437,24 @@ export async function fetchMailboxPage(
     const partner = safeBox === 'received' ? row.sender : row.receiver
     const partnerId = safeBox === 'received' ? row.sender_id : row.receiver_id
 
+    // 방 전체로 보낸 마음의 동그라미는 방 커버다. 위에서 서명한 것과 **같은 규칙**으로
+    // 골라야 한다 — 여기서만 원본 커버를 고르면 서명해둔 주소를 못 찾는다.
+    const myCover = resolveRoomCover({
+      coverPreset: row.room?.cover_preset,
+      coverPath: row.room?.cover_path,
+      customCoverPreset: roomLook(row)?.customCoverPreset,
+      customCoverPath: roomLook(row)?.customCoverPath,
+    })
+
     return {
       id: row.id,
       roomId: row.room_id,
-      roomName: row.room?.name ?? null,
+      roomName: row.room
+        ? roomDisplayName({
+            name: row.room.name,
+            customName: roomLook(row)?.customName,
+          })
+        : null,
       type: row.type,
       sendMode: row.send_mode,
       // 잠긴 마음은 내용을 실어 보내지 않는다. 화면에서 가리기만 하면
@@ -452,15 +483,15 @@ export async function fetchMailboxPage(
       favorited: (row.favorites ?? []).length > 0,
       avatarUrl:
         row.send_mode === 'broadcast'
-          ? row.room?.cover_path
-            ? (coverUrlByPath.get(row.room.cover_path) ?? null)
+          ? myCover.path
+            ? (coverUrlByPath.get(myCover.path) ?? null)
             : null
           : partner?.profile_image
             ? (avatarUrlByPath.get(partner.profile_image) ?? null)
             : null,
       coverGradient:
-        row.send_mode === 'broadcast' && isCoverPreset(row.room?.cover_preset)
-          ? COVER_PRESETS[row.room.cover_preset].gradient
+        row.send_mode === 'broadcast' && isCoverPreset(myCover.preset)
+          ? COVER_PRESETS[myCover.preset].gradient
           : null,
       locked,
       unrepliedCount: locked

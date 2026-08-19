@@ -6,6 +6,7 @@ import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
 import { buildMemoryCards, MEMORY_CARD_SELECT } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
+import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '숨긴 추억 · 오늘도 사랑해' }
 
@@ -31,8 +32,9 @@ export default async function RoomHiddenPage({
   const viewer = await requireUser()
   const supabase = await createClient()
 
-  const [roomResult, hidesResult] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [roomNameResult, hidesResult] = await Promise.all([
+    // 방 이름은 사람마다 다를 수 있다 — 내가 바꿔 부르는 이름이 있으면 그것이다(@/lib/room-look).
+    loadRoomName(roomId),
     supabase
       .from('memory_hides')
       // memory_hides에는 방 번호가 없다. 부모 게시물로 이 방 것만 좁힌다.
@@ -41,7 +43,7 @@ export default async function RoomHiddenPage({
       .eq('memories.room_id', roomId),
   ])
 
-  const roomName = roomResult.data?.name ?? '앨범방'
+  const roomName = roomNameResult ?? '앨범방'
 
   if (hidesResult.error) {
     console.error('[숨김 목록] 조회 실패:', hidesResult.error.message)

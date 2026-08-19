@@ -7,6 +7,7 @@ import { ButtonLink } from '@/components/ui/Button'
 import { BottomNav } from '@/components/nav/BottomNav'
 import { NotificationBell } from '@/components/notification/NotificationBell'
 import { loadNotifications } from '@/lib/notifications'
+import { resolveRoomCover, roomDisplayName } from '@/lib/room-name'
 
 export const metadata: Metadata = { title: '오늘도 사랑해' }
 
@@ -36,7 +37,8 @@ export default async function HomePage() {
   const { data: memberships, error } = await supabase
     .from('room_members')
     .select(
-      'id, joined_at, favorited, rooms(id, name, created_at, cover_preset, cover_path)',
+      // custom_* 는 내가 이 방을 어떻게 부르고 어떻게 보이길 바라는지다(나만 본다).
+      'id, joined_at, favorited, custom_name, custom_cover_preset, custom_cover_path, rooms(id, name, created_at, cover_preset, cover_path)',
     )
     .eq('user_id', user.id)
     .eq('status', 'active')
@@ -129,7 +131,12 @@ export default async function HomePage() {
   // 직접 올린 커버는 비공개 버킷이라 서명된 주소가 필요하다.
   // 프리셋만 쓰는 방은 여기 해당이 없어서 요청 자체를 보내지 않는다.
   const coverPaths = rows
-    .map((row) => row.rooms?.cover_path)
+    .map((row) => resolveRoomCover({
+      coverPath: row.rooms?.cover_path,
+      coverPreset: row.rooms?.cover_preset,
+      customCoverPath: row.custom_cover_path,
+      customCoverPreset: row.custom_cover_preset,
+    }).path)
     .filter((path): path is string => Boolean(path))
 
   const coverUrlByPath = new Map<string, string>()
@@ -221,17 +228,27 @@ export default async function HomePage() {
                 const room = row.rooms
                 if (!room) return null
 
+                // 이름도 커버도 **내 화면 기준**으로 고른다. 내가 바꾼 것이 있으면 그것,
+                // 없으면 방을 만들 때 정해진 값이다(@/lib/room-name).
+                const cover = resolveRoomCover({
+                  coverPreset: room.cover_preset,
+                  coverPath: room.cover_path,
+                  customCoverPreset: row.custom_cover_preset,
+                  customCoverPath: row.custom_cover_path,
+                })
+
                 return (
                   <RoomCard
                     key={row.id}
                     as="li"
                     roomId={room.id}
-                    name={room.name}
-                    coverPreset={room.cover_preset}
+                    name={roomDisplayName({
+                      name: room.name,
+                      customName: row.custom_name,
+                    })}
+                    coverPreset={cover.preset}
                     coverUrl={
-                      room.cover_path
-                        ? (coverUrlByPath.get(room.cover_path) ?? null)
-                        : null
+                      cover.path ? (coverUrlByPath.get(cover.path) ?? null) : null
                     }
                     memberNames={namesByRoom.get(room.id) ?? []}
                     postCount={postCountByRoom.get(room.id) ?? 0}

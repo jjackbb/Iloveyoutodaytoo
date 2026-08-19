@@ -13,6 +13,7 @@ import {
   MEMORY_CARD_SELECT,
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
+import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '앨범방 · 오늘도 사랑해' }
 
@@ -53,12 +54,13 @@ export default async function RoomPage({
     내가 숨긴 글은 목록에 **들어오기 전에** 걸러야 한다.
     30개를 가져온 뒤에 빼면 숨긴 만큼 화면이 짧아진다.
   */
-  const [roomResult, hiddenIds] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [roomNameResult, hiddenIds] = await Promise.all([
+    // 방 이름은 사람마다 다를 수 있다 — 내가 바꿔 부르는 이름이 있으면 그것이다(@/lib/room-look).
+    loadRoomName(roomId),
     loadHiddenMemoryIds(supabase, roomId, viewer.id),
   ])
 
-  const roomName = roomResult.data?.name ?? '앨범방'
+  const roomName = roomNameResult ?? '앨범방'
 
   const memoriesQuery = supabase
     .from('memories')

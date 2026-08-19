@@ -6,11 +6,15 @@ import { LeavePanel } from './leave-panel'
 import { MemberList, type RoomMemberView } from './member-list'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
-import { RenamePanel } from '@/app/rooms/[roomId]/settings/rename-panel'
+import { MyLookPanel } from '@/app/rooms/[roomId]/settings/my-look-panel'
 import { roomMemberName } from '@/lib/member-name'
+import { loadMyRoomLook } from '@/lib/room-look'
 import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = { title: '방 설정 · 오늘도 사랑해' }
+
+/** 커버 사진 주소의 유효 시간(초). 설정 화면을 오래 열어둬도 안 끊길 만큼만. */
+const COVER_URL_TTL_SEC = 60 * 60
 
 /**
  * 방 설정 — 함께 있는 분들과 이 방에서 나가기.
@@ -29,8 +33,8 @@ export default async function RoomSettingsPage({
   const user = await requireUser()
   const supabase = await createClient()
 
-  const [roomResult, membersResult] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [look, membersResult] = await Promise.all([
+    loadMyRoomLook(roomId),
     supabase
       .from('room_members')
       // 한 줄로 둔다 — 문자열을 이어 붙이면 타입 추론이 풀려서 결과가 unknown이 된다.
@@ -110,27 +114,60 @@ export default async function RoomSettingsPage({
 
   // 내가 나가면 방장을 이어받을 분. 이미 방장인 분이 있으면 그분, 없으면 가장 오래 있던 분.
   // (실제 판단은 leaveRoom 서버 액션이 다시 한다. 여기 값은 안내 문구용이다)
-  /** 내가 이 방의 방장인가. 이름 바꾸기 칸을 보여줄지 정한다. */
-  const iAmAdmin = members.some((member) => member.isMe && member.isAdmin)
-
   const successor =
     others.find((member) => member.role === 'admin') ?? others[0] ?? null
+
+  /*
+    커버 사진은 비공개 버킷이라 서명된 주소가 있어야 보인다.
+    [원래대로] 타일과 내가 올린 사진, 둘 다 필요할 수 있어 한 번에 서명한다 —
+    따로 부르면 왕복이 두 번이 된다. 사진을 쓰지 않는 방은 요청 자체가 없다.
+  */
+  const coverPaths = [look?.originalCoverPath, look?.customCoverPath].filter(
+    (path): path is string => Boolean(path),
+  )
+  const coverUrlByPath = new Map<string, string>()
+  if (coverPaths.length > 0) {
+    const { data: signed } = await supabase.storage
+      .from('covers')
+      .createSignedUrls(coverPaths, COVER_URL_TTL_SEC)
+    for (const item of signed ?? []) {
+      if (item.path && item.signedUrl && !item.error) {
+        coverUrlByPath.set(item.path, item.signedUrl)
+      }
+    }
+  }
+  // 서명에 실패하면 null이 되고, 타일은 조용히 프리셋 색으로 그려진다.
+  // 깨진 이미지 아이콘을 보여주지 않는다.
+  const coverUrl = (path: string | null | undefined) =>
+    path ? (coverUrlByPath.get(path) ?? null) : null
 
   return (
     <RoomSettingsShell roomId={roomId}>
       <p className="text-base leading-relaxed text-muted">
-        {roomResult.data?.name ? `‘${roomResult.data.name}’ 방에 ` : ''}함께 있는
-        분들이에요.
+        {look ? `‘${look.name}’ 방에 ` : ''}함께 있는 분들이에요.
       </p>
 
       {/*
-        방 이름 바꾸기 (노션 IA 6.7). 방장에게만 보인다 —
-        못 하는 일을 보여주고 눌렀을 때 막으면 고장으로 읽힌다.
+        내 화면에서 이 방을 어떻게 부를지 (노션 IA 6.7 개정).
+        방장만 쓰던 자리가 아니다 — 모든 구성원에게 보인다. 여기서 바꾼 이름과 커버는
+        나만 보고, 다른 분들 화면은 그대로다.
       */}
-      {iAmAdmin ? (
+      {look ? (
         <section className="flex flex-col gap-4">
-          <h3 className="text-lg font-medium text-ink">앨범방 이름</h3>
-          <RenamePanel roomId={roomId} currentName={roomResult.data?.name ?? ''} />
+          <h3 className="text-lg font-medium text-ink">내 화면에서 부를 이름</h3>
+          <p className="text-base leading-relaxed text-muted">
+            여기서 바꾼 이름과 커버는 <b className="font-medium text-ink">내 화면에서만</b>{' '}
+            보여요. 함께 계신 분들 화면은 그대로예요.
+          </p>
+          <MyLookPanel
+            roomId={roomId}
+            originalName={look.originalName}
+            customName={look.customName}
+            originalCoverPreset={look.originalCoverPreset}
+            originalCoverUrl={coverUrl(look.originalCoverPath)}
+            customCoverPreset={look.customCoverPreset}
+            customCoverUrl={coverUrl(look.customCoverPath)}
+          />
         </section>
       ) : null}
 
@@ -157,7 +194,7 @@ export default async function RoomSettingsPage({
 
         <LeavePanel
           roomId={roomId}
-          roomName={roomResult.data?.name ?? '이 방'}
+          roomName={look?.name ?? '이 방'}
           iAmAdmin={myMembership.role === 'admin'}
           remainingCount={others.length}
           // 내가 차단한 분이 이 방에 한 분이라도 계시면 초대를 받아도 입장이 막힌다

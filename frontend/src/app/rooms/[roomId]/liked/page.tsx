@@ -9,6 +9,7 @@ import {
   MEMORY_CARD_SELECT,
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
+import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '좋아요 · 오늘도 사랑해' }
 
@@ -31,8 +32,9 @@ export default async function RoomLikedPage({
   const viewer = await requireUser()
   const supabase = await createClient()
 
-  const [roomResult, likesResult, hiddenIds] = await Promise.all([
-    supabase.from('rooms').select('name').eq('id', roomId).maybeSingle(),
+  const [roomNameResult, likesResult, hiddenIds] = await Promise.all([
+    // 방 이름은 사람마다 다를 수 있다 — 내가 바꿔 부르는 이름이 있으면 그것이다(@/lib/room-look).
+    loadRoomName(roomId),
     supabase
       .from('memory_likes')
       // memory_likes에는 방 번호가 없다. 부모 게시물로 이 방 것만 좁힌다(피드의 숨김 조회와 같은 방식).
@@ -42,7 +44,7 @@ export default async function RoomLikedPage({
     loadHiddenMemoryIds(supabase, roomId, viewer.id),
   ])
 
-  const roomName = roomResult.data?.name ?? '앨범방'
+  const roomName = roomNameResult ?? '앨범방'
 
   if (likesResult.error) {
     console.error('[좋아요 목록] 조회 실패:', likesResult.error.message)
