@@ -29,6 +29,10 @@ export function LoginForm({ next }: { next: string }) {
         (개발 초기에 이메일로 만든 계정은 이 칸에 그 이메일을 적으면 그대로 들어간다.
          서버의 resolveLoginEmail이 `@`가 있는지로 갈라 본다.)
       */}
+      {/*
+        비밀번호만 틀렸는데 아이디까지 다시 치게 하지 않는다.
+        React가 폼 액션 뒤에 이 칸을 비우므로, 서버가 실패하며 돌려준 값으로 다시 채운다.
+      */}
       <Field
         id="username"
         name="username"
@@ -37,6 +41,7 @@ export function LoginForm({ next }: { next: string }) {
         autoCapitalize="off"
         spellCheck={false}
         required
+        defaultValue={state?.values?.username}
       />
 
       <Field

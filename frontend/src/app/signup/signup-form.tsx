@@ -46,7 +46,21 @@ export function SignupForm({ next }: { next: string }) {
       {/* 초대 링크를 타고 온 사람을 가입 후 그 초대장으로 돌려보내기 위한 값 */}
       <input type="hidden" name="next" value={next} />
 
-      <Field id="name" name="name" label="이름" required autoComplete="name" />
+      {/*
+        defaultValue가 붙은 칸들의 사정:
+        React는 폼 액션이 끝나면 제어하지 않는 입력칸을 비운다. 아이디 중복 하나 때문에
+        이름·보호자 칸·약관 체크가 통째로 지워져 처음부터 다시 적어야 했다.
+        서버가 실패하면서 값을 함께 돌려주고(AuthState.values), 여기서 다시 채운다.
+        비밀번호만 일부러 안 채운다 — 서버가 돌려준 비밀번호가 화면에 남으면 안 된다.
+      */}
+      <Field
+        id="name"
+        name="name"
+        label="이름"
+        required
+        autoComplete="name"
+        defaultValue={state?.values?.name}
+      />
 
       {/*
         생년월일 칸은 버튼이라 브라우저의 required가 걸리지 않는다(누르면 시트가 뜨는 칸이다).
@@ -69,6 +83,7 @@ export function SignupForm({ next }: { next: string }) {
             name="guardian_name"
             label="보호자 성함"
             required
+            defaultValue={state?.values?.guardianName}
           />
 
           <Field
@@ -79,6 +94,7 @@ export function SignupForm({ next }: { next: string }) {
             inputMode="tel"
             autoComplete="tel"
             required
+            defaultValue={state?.values?.guardianPhone}
           />
 
           <label className="flex min-h-[44px] items-center gap-3 text-base text-ink">
@@ -130,6 +146,7 @@ export function SignupForm({ next }: { next: string }) {
           type="checkbox"
           name="agree_terms"
           required
+          defaultChecked={state?.values?.agreed}
           className="mt-1 size-6 shrink-0 accent-[#d50e68]"
         />
         {/*

@@ -4,7 +4,6 @@ import { FavoriteButton } from '@/components/room/FavoriteButton'
 import { MemberStack } from '@/components/room/MemberStack'
 import { coverStyle } from '@/lib/covers'
 import { formatRelativeTime } from '@/lib/format'
-import type { Enums } from '@/types/database'
 
 /**
  * 홈에 늘어놓는 앨범방 카드 (캡처 37).
@@ -14,35 +13,13 @@ import type { Enums } from '@/types/database'
  *   아래: 방 이름 + "멤버 N명 · 게시물 N개 · 방금 전"
  *
  * 관계유형 라벨과 생성일은 더 이상 보여주지 않는다 — 캡처에 없다.
+ * 라벨을 만들던 relationshipTypeLabel()·RELATIONSHIP_TYPE_LABEL도 함께 지웠다
+ * (2026-08-19). 쓰는 곳이 한 군데도 없는데 남겨두면 "아직 쓰나?" 하고
+ * 되살리는 사람이 생긴다. rooms.relationship_type 컬럼 자체는 예전 방의 값이라 그대로 둔다.
  * 연속일수 배지도 뺐다. 그 자리는 캡처대로 ♡ 즐겨찾기가 쓴다.
  *
  * 이 컴포넌트는 DB를 직접 보지 않는다. 필요한 값은 전부 props로 받는다.
  */
-
-/**
- * relationship_type을 화면에 보여줄 한글 이름으로.
- *
- * ⚠️ 새 앨범방은 이 값을 갖지 않는다(캡처 기준 개정으로 입력받지 않는다).
- * 예전에 만든 방의 값을 사서함·방 화면에서 보여줄 때만 남아 있다.
- */
-export const RELATIONSHIP_TYPE_LABEL: Record<
-  Enums<'relationship_type'>,
-  string
-> = {
-  family: '가족',
-  lover: '연인',
-  friend: '친구',
-  self: '나 자신',
-}
-
-export function relationshipTypeLabel(
-  type: Enums<'relationship_type'> | string | null | undefined,
-): string {
-  if (!type) return ''
-  return (
-    RELATIONSHIP_TYPE_LABEL[type as Enums<'relationship_type'>] ?? String(type)
-  )
-}
 
 export interface RoomCardProps {
   roomId: string
