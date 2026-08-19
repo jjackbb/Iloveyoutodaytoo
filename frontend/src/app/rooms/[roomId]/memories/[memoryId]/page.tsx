@@ -94,6 +94,7 @@ export default async function MemoryDetailPage({
       >
         {/* 피드 카드의 ⋯ 와 같은 부품·같은 동작(고정·수정·숨기기·저장·삭제). */}
         <MemoryMenu
+          roomId={roomId}
           memoryId={detail.memoryId}
           authorName={detail.authorName}
           caption={detail.caption}

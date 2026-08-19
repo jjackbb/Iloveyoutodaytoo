@@ -387,6 +387,167 @@ export async function updateMemoryCaption(
   return { ok: true }
 }
 
+export type UpdateMemoryInput = {
+  memoryId: string
+  /** 화면에 놓인 순서 그대로의 사진 경로. 그대로 두는 사진과 새로 올린 사진이 섞여 있다. */
+  photoPaths: string[]
+  voicePath: string
+  voiceDurationSec: number
+  voiceLevels?: number[] | null
+  caption?: string | null
+}
+
+/**
+ * 추억 통째로 고치기 — 사진·목소리·문구 (노션 IA 3.8).
+ *
+ * 그전에는 문구만 고칠 수 있었다. 사진을 잘못 골랐거나 목소리를 다시 담고 싶으면
+ * 지우고 처음부터 다시 올리는 수밖에 없었는데, 그러면 **거기 달린 댓글과 좋아요가
+ * 함께 사라진다.** 가족이 남긴 말을 사진 한 장 바꾸자고 버리게 할 수는 없다.
+ *
+ * 검사 규칙은 새로 남길 때(createMemory)와 **글자 그대로 같다.** 여기만 느슨하면
+ * 만들 땐 막힌 것이 고치기로 들어온다.
+ *
+ * 파일은 브라우저가 먼저 올리고 경로만 여기로 온다(createMemory와 같은 구조).
+ * 쓰지 않게 된 옛 파일은 저장이 끝난 뒤 여기서 지운다 — 저장 전에 지우면
+ * 중간에 실패했을 때 원래 사진까지 잃는다.
+ */
+export async function updateMemory(
+  input: UpdateMemoryInput,
+): Promise<CreateMemoryResult> {
+  const user = await requireUser()
+  const supabase = await createClient()
+
+  const memory = await loadMemoryForAction(supabase, input.memoryId)
+  if (!memory) {
+    return fail('게시물을 찾지 못했어요. 화면을 새로고침해 주세요.')
+  }
+  if (memory.authorId !== user.id) {
+    return fail('내가 남긴 글만 고칠 수 있어요.')
+  }
+
+  const roomId = memory.roomId
+
+  // --- 사진 --- (createMemory와 같은 규칙)
+  const photoPaths = (input.photoPaths ?? []).map((path) => path.trim())
+  if (photoPaths.length === 0) {
+    return fail('사진을 한 장 이상 담아주세요.')
+  }
+  if (photoPaths.length > PHOTO_MAX_COUNT) {
+    return fail(`사진은 ${PHOTO_MAX_COUNT}장까지 담을 수 있어요.`)
+  }
+  if (new Set(photoPaths).size !== photoPaths.length) {
+    return fail('사진을 저장하지 못했어요. 다시 한 번 담아주세요.')
+  }
+  if (photoPaths.some((path) => !isOwnRoomPath(path, roomId))) {
+    return fail('사진을 저장하지 못했어요. 다시 한 번 담아주세요.')
+  }
+
+  // --- 음성 ---
+  const voicePath = input.voicePath?.trim() ?? ''
+  if (!isOwnRoomPath(voicePath, roomId)) {
+    return fail('녹음 파일을 저장하지 못했어요. 다시 한 번 녹음해주세요.')
+  }
+  const rawDuration = input.voiceDurationSec
+  if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration)) {
+    return fail('녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.')
+  }
+  const voiceDurationSec = Math.round(rawDuration)
+  if (voiceDurationSec < VOICE_MIN_SEC) {
+    return fail(`${VOICE_MIN_SEC}초 이상 녹음해주세요.`)
+  }
+  if (voiceDurationSec > VOICE_MAX_SEC) {
+    return fail(`녹음은 ${VOICE_MAX_SEC}초까지 담을 수 있어요.`)
+  }
+
+  // --- 문구 (선택) ---
+  const caption = (input.caption ?? '').trim()
+  if (caption.length > CAPTION_MAX_LENGTH) {
+    return fail(`문구는 ${CAPTION_MAX_LENGTH}자 안으로 줄여주세요.`)
+  }
+
+  // 지금 붙어 있는 사진과 목소리. 나중에 "쓰지 않게 된 파일"을 가려내는 데 쓴다.
+  const { data: beforeRows } = await supabase
+    .from('memory_photos')
+    .select('storage_path')
+    .eq('memory_id', memory.id)
+  const { data: beforeMemory } = await supabase
+    .from('memories')
+    .select('voice_path')
+    .eq('id', memory.id)
+    .maybeSingle()
+
+  const { error: updateError } = await supabase
+    .from('memories')
+    .update({
+      description: caption || null,
+      voice_path: voicePath,
+      voice_duration_sec: voiceDurationSec,
+      voice_levels: sanitizeLevels(input.voiceLevels),
+    })
+    .eq('id', memory.id)
+
+  if (updateError) {
+    if (updateError.code === '23514') {
+      return fail('담으신 내용을 다시 한 번 확인해주세요.')
+    }
+    console.error('[추억 고치기] 실패:', updateError.message)
+    return fail('연결이 잠시 불안정했어요. 잠시 후 다시 시도할게요.', true)
+  }
+
+  /*
+    사진 줄은 통째로 새로 놓는다. 어느 줄이 남고 어느 줄이 빠졌는지 맞춰 고치는 것보다
+    **화면에 놓인 순서 그대로 다시 쓰는 편**이 어긋날 여지가 없다(순서가 곧 sort_order다).
+
+    residue-scan-allow: physical-delete — 사용자의 기록이 아니라 게시물과 사진을 잇는
+    연결 줄이다. 사진 파일 자체는 아래에서 따로 판단해 지운다.
+  */
+  const { error: clearError } = await supabase
+    .from('memory_photos')
+    .delete()
+    .eq('memory_id', memory.id)
+
+  if (clearError) {
+    console.error('[추억 고치기] 사진 줄 비우기 실패:', clearError.message)
+    return fail('사진을 저장하지 못했어요. 잠시 후 다시 시도할게요.', true)
+  }
+
+  const { error: photoError } = await supabase.from('memory_photos').insert(
+    photoPaths.map((path, index) => ({
+      memory_id: memory.id,
+      storage_path: path,
+      sort_order: index,
+    })),
+  )
+
+  if (photoError) {
+    console.error('[추억 고치기] 사진 붙이기 실패:', photoError.message)
+    return fail('사진을 저장하지 못했어요. 잠시 후 다시 시도할게요.', true)
+  }
+
+  /*
+    이제 아무도 가리키지 않는 파일을 지운다.
+    실패해도 사용자에게는 알리지 않는다 — 고치기는 이미 끝났고, 남은 파일에 대해
+    사용자가 할 수 있는 일이 없다. 원인은 로그에 남긴다.
+  */
+  const stalePhotos = (beforeRows ?? [])
+    .map((row) => row.storage_path)
+    .filter((path) => path && !photoPaths.includes(path))
+
+  if (stalePhotos.length > 0) {
+    const { error } = await supabase.storage.from('media').remove(stalePhotos)
+    if (error) console.error('[추억 고치기] 옛 사진 삭제 실패:', error.message)
+  }
+
+  const staleVoice = beforeMemory?.voice_path
+  if (staleVoice && staleVoice !== voicePath) {
+    const { error } = await supabase.storage.from('voice').remove([staleVoice])
+    if (error) console.error('[추억 고치기] 옛 녹음 삭제 실패:', error.message)
+  }
+
+  revalidateRoom(roomId)
+  return { ok: true }
+}
+
 /**
  * 내 피드에서만 감추기 (⋯ 메뉴의 "숨기기").
  *

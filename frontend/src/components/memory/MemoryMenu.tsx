@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import {
   useEffect,
   useId,
@@ -38,6 +40,7 @@ import { CAPTION_MAX_LENGTH } from '@/lib/limits'
  * 초점 가두기와 뒤 화면 잠금이 필요하다.
  */
 export function MemoryMenu({
+  roomId,
   memoryId,
   authorName,
   caption,
@@ -45,6 +48,8 @@ export function MemoryMenu({
   isPinned,
   isSaved,
 }: {
+  /** 고치기 화면 주소를 만들려고 받는다. */
+  roomId: string
   memoryId: string
   /** 낭독기에서 어느 게시물의 메뉴인지 알리기 위해. 피드에 ⋯가 여럿이다. */
   authorName: string
@@ -194,8 +199,19 @@ export function MemoryMenu({
                 setDialog('edit')
               }}
             >
-              수정
+              문구 고치기
             </MenuItem>
+          ) : null}
+
+          {/*
+            사진·목소리까지 고치기 (노션 IA 3.8) — 작성 화면을 그대로 다시 연다.
+            문구만 고치는 길을 남겨둔 이유: 오탈자 하나 고치자고 화면을 옮겨 갔다
+            돌아오게 하면 그게 더 번거롭다. 짧은 일은 그 자리에서 끝내야 한다.
+          */}
+          {isMine ? (
+            <MenuLink href={`/rooms/${roomId}/memories/${memoryId}/edit`}>
+              사진·목소리 고치기
+            </MenuLink>
           ) : null}
 
           <MenuItem disabled={pending} onClick={() => run(() => hideMemory(memoryId))}>
@@ -256,6 +272,22 @@ export function MemoryMenu({
 }
 
 /** 메뉴 한 줄. 글자 17px·높이 44px는 이 앱의 최소값이다. */
+/**
+ * 다른 화면으로 가는 메뉴 항목. 버튼이 아니라 링크여야 하는 이유 —
+ * 화면을 옮기는 일은 브라우저가 하는 일이다(새 탭으로 열기·뒤로가기가 그대로 된다).
+ */
+function MenuLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      role="menuitem"
+      className="flex w-full items-center px-4 py-2.5 text-left text-base font-medium text-ink transition-colors active:bg-surface-soft"
+    >
+      {children}
+    </Link>
+  )
+}
+
 function MenuItem({
   children,
   onClick,

@@ -126,6 +126,18 @@ export function VoiceRecorder({
   disabled = false,
 }: VoiceRecorderProps) {
   const [phase, setPhase] = useState<RecorderPhase>(value ? 'recorded' : 'idle')
+
+  /*
+    부모가 **나중에** 녹음을 얹어주는 경우가 있다 — 추억 고치기 화면이 원래 목소리를
+    받아와 넣어줄 때다(노션 IA 3.8). 위 useState는 처음 그려질 때 한 번만 보므로,
+    그때는 아직 값이 없어 'idle'로 굳는다. 그러면 담긴 목소리가 있는데도
+    "마이크를 눌러 녹음을 시작하세요"가 그대로 남는다.
+
+    녹음하는 도중(preparing·recording)에는 건드리지 않는다 — 그건 이 부품이 주인이다.
+  */
+  useEffect(() => {
+    if (value && phase === 'idle') setPhase('recorded')
+  }, [value, phase])
   const [elapsedSec, setElapsedSec] = useState(0)
   const [error, setError] = useState<string | null>(null)
   /**

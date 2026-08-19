@@ -131,6 +131,7 @@ export function MemoryCard({
         </div>
 
         <MemoryMenu
+          roomId={roomId}
           memoryId={memoryId}
           authorName={authorName}
           caption={caption}

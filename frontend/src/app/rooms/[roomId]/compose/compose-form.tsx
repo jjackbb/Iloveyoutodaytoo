@@ -15,7 +15,7 @@ import {
 } from '@/components/message/VoiceRecorder'
 import { Button } from '@/components/ui/Button'
 import { controlClassName } from '@/components/ui/Field'
-import { createMemory } from '@/lib/actions/memories'
+import { createMemory, updateMemory } from '@/lib/actions/memories'
 import { resizePhoto } from '@/lib/image'
 import { CAPTION_MAX_LENGTH, PHOTO_MAX_COUNT } from '@/lib/limits'
 import { createClient } from '@/lib/supabase/client'
@@ -135,8 +135,14 @@ async function removeFrom(
 /** 화면에 놓인 사진 한 장. id는 지우기 버튼이 어느 장인지 가리키는 데 쓴다. */
 type PickedPhoto = {
   id: string
-  file: File
+  /**
+   * 방금 고른 사진. 이미 올라가 있는 사진(고치기로 들어온 것)은 파일이 없다 —
+   * 그때는 아래 `path`가 채워져 있고, 올리는 단계를 건너뛴다.
+   */
+  file: File | null
   preview: string
+  /** 이미 Storage에 있는 사진의 경로. 고치기로 들어온 사진만 갖는다. */
+  path?: string
 }
 
 type Phase = 'editing' | 'sending' | 'retrying' | 'failed'
@@ -422,12 +428,39 @@ function usePhotoReorder(
   return { listRef, draggingId, onTilePointerDown }
 }
 
-export function ComposeForm({ roomId }: { roomId: string }) {
-  const router = useRouter()
+/**
+ * 고치기로 들어올 때 서버가 넘겨주는 지금 상태 (노션 IA 3.8).
+ * 없으면 새로 남기는 화면이다 — 이 파일의 기본 동작은 그대로다.
+ */
+export type ComposeInitial = {
+  memoryId: string
+  /** 지금 붙어 있는 사진들. 순서 그대로다. */
+  photos: { path: string; url: string }[]
+  /** 지금 붙어 있는 목소리. 서명된 주소로 브라우저가 파일을 받아 온다. */
+  voice: { path: string; url: string; durationSec: number; levels: number[] | null }
+  caption: string
+}
 
-  const [photos, setPhotos] = useState<PickedPhoto[]>([])
+export function ComposeForm({
+  roomId,
+  initial,
+}: {
+  roomId: string
+  initial?: ComposeInitial
+}) {
+  const router = useRouter()
+  const editing = initial !== undefined
+
+  const [photos, setPhotos] = useState<PickedPhoto[]>(() =>
+    (initial?.photos ?? []).map((photo) => ({
+      id: photo.path,
+      file: null,
+      preview: photo.url,
+      path: photo.path,
+    })),
+  )
   const [recording, setRecording] = useState<VoiceRecording | null>(null)
-  const [caption, setCaption] = useState('')
+  const [caption, setCaption] = useState(initial?.caption ?? '')
   const [phase, setPhase] = useState<Phase>('editing')
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -439,6 +472,19 @@ export function ComposeForm({ roomId }: { roomId: string }) {
    */
   const uploadedPhotoPathsRef = useRef(new Map<string, string>())
   const uploadedVoicePathRef = useRef<string | null>(null)
+
+  /**
+   * 고치기로 들어왔을 때, 지금 화면의 목소리가 **원래 그 게시물의 것**인가.
+   *
+   * 원래 것이면 다시 올리지 않고 그 경로를 그대로 쓴다. 다시 녹음하면 false가 되고
+   * 새 파일이 올라간다. **원래 파일은 여기서 절대 지우지 않는다** —
+   * 저장하지 않고 나가면 그 게시물의 목소리가 통째로 사라지기 때문이다.
+   * 쓰이지 않게 된 옛 파일은 저장이 끝난 뒤 서버(updateMemory)가 지운다.
+   */
+  const [voiceIsOriginal, setVoiceIsOriginal] = useState(editing)
+
+  /** 원래 목소리를 아직 받아오는 중인가(고치기 화면에서 잠깐). */
+  const [loadingVoice, setLoadingVoice] = useState(editing)
 
   /** 저장이 끝났는지. 끝났으면 올라간 파일은 게시물의 것이라 건드리면 안 된다. */
   const committedRef = useRef(false)
@@ -485,8 +531,50 @@ export function ComposeForm({ roomId }: { roomId: string }) {
     const stale = uploadedVoicePathRef.current
     uploadedVoicePathRef.current = null
     if (stale) void discardUploads([], stale)
+    // 다시 녹음했으면 더 이상 원래 목소리가 아니다. 원래 파일은 건드리지 않는다.
+    setVoiceIsOriginal(false)
     setRecording(next)
   }, [])
+
+  /*
+    고치기로 들어왔으면 원래 목소리를 받아와 화면에 올려둔다.
+
+    왜 파일까지 받아오나: 녹음 부품은 "지금 녹음해 둔 것"을 파일(Blob)로 들고 있어야
+    재생을 보여줄 수 있다. 주소만 넘기면 들어보지도 못한 채 다시 녹음할지 정해야 한다.
+    60초짜리라 크지 않다.
+  */
+  useEffect(() => {
+    if (!initial) return
+    let cancelled = false
+
+    void (async () => {
+      try {
+        const response = await fetch(initial.voice.url)
+        if (!response.ok) throw new Error(`voice-fetch-${response.status}`)
+        const blob = await response.blob()
+        if (cancelled) return
+
+        const mimeType = blob.type || 'audio/webm'
+        setRecording({
+          blob,
+          durationSec: initial.voice.durationSec,
+          mimeType,
+          extension: mimeType.split('/')[1]?.split(';')[0] || 'webm',
+          levels: initial.voice.levels,
+        })
+      } catch (loadError) {
+        // 못 받아왔으면 새로 녹음하는 수밖에 없다. 화면을 막지는 않는다.
+        console.error('[추억 고치기] 원래 목소리 불러오기 실패:', loadError)
+        if (!cancelled) setVoiceIsOriginal(false)
+      } finally {
+        if (!cancelled) setLoadingVoice(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [initial])
 
   const canSubmit =
     photos.length > 0 &&
@@ -583,11 +671,17 @@ export function ComposeForm({ roomId }: { roomId: string }) {
       // 어디까지 됐는지도 알 수 없다. 차례로 하면 성공한 것은 재시도에서 건너뛴다.
       const photoPaths: string[] = []
       for (const photo of photos) {
+        // 고치기로 들어와 이미 올라가 있는 사진은 다시 올리지 않는다.
+        if (photo.path) {
+          photoPaths.push(photo.path)
+          continue
+        }
         const known = uploadedPhotoPathsRef.current.get(photo.id)
         if (known) {
           photoPaths.push(known)
           continue
         }
+        if (!photo.file) continue
         // 경로 첫 조각이 room_id여야 Storage RLS를 통과한다.
         const path = `${roomId}/${randomFileId()}.jpg`
         await upload(PHOTO_BUCKET, path, photo.file, 'image/jpeg')
@@ -596,7 +690,8 @@ export function ComposeForm({ roomId }: { roomId: string }) {
       }
 
       // 음성
-      let voicePath = uploadedVoicePathRef.current
+      // 원래 목소리를 그대로 두는 경우에는 올릴 것이 없다.
+      let voicePath = voiceIsOriginal && initial ? initial.voice.path : uploadedVoicePathRef.current
       if (!voicePath) {
         voicePath = `${roomId}/${randomFileId()}.${recording.extension}`
         await upload(
@@ -610,15 +705,18 @@ export function ComposeForm({ roomId }: { roomId: string }) {
 
       // 저장. 서버가 마지막으로 값들을 확인한다.
       for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
-        const result = await createMemory({
-          roomId,
+        const payload = {
           photoPaths,
           voicePath,
           voiceDurationSec: recording.durationSec,
           // 녹음하면서 이미 잰 값. 저장해 두면 피드가 파일을 안 받고도 파형을 그린다.
           voiceLevels: recording.levels,
           caption: caption.trim() || null,
-        })
+        }
+
+        const result = initial
+          ? await updateMemory({ memoryId: initial.memoryId, ...payload })
+          : await createMemory({ roomId, ...payload })
 
         if (result.ok) break
 
@@ -636,8 +734,13 @@ export function ComposeForm({ roomId }: { roomId: string }) {
       // 저장 성공. 올라간 파일은 이제 게시물의 것이므로 떠날 때 지우면 안 된다.
       committedRef.current = true
 
-      // 방 피드로 돌아가면 방금 남긴 추억이 맨 위에 보인다.
-      router.replace(`/rooms/${roomId}`)
+      /*
+        새로 남겼으면 방 피드로(방금 남긴 추억이 맨 위에 보인다),
+        고쳤으면 보던 게시물로 돌아간다 — 고치기는 그 글을 보다가 들어온 길이다.
+      */
+      router.replace(
+        initial ? `/rooms/${roomId}/memories/${initial.memoryId}` : `/rooms/${roomId}`,
+      )
       router.refresh()
     } catch (submitError) {
       // FriendlyError만 그대로 보여준다. 나머지는 영어 기술 문구라 사람 말로 바꾼다.
@@ -654,7 +757,18 @@ export function ComposeForm({ roomId }: { roomId: string }) {
       setError(message)
       setPhase('failed')
     }
-  }, [busy, canSubmit, caption, photos, recording, roomId, router, upload])
+  }, [
+    busy,
+    canSubmit,
+    caption,
+    initial,
+    photos,
+    recording,
+    roomId,
+    router,
+    upload,
+    voiceIsOriginal,
+  ])
 
   return (
     // 캡처 12처럼 [표현하기]가 화면 아래에 고정된다 — 스크롤 칸 + 고정 줄 2단이다.
@@ -836,6 +950,19 @@ export function ComposeForm({ roomId }: { roomId: string }) {
             사진과 음성 녹음을 모두 담아야 표현할 수 있어요
           </p>
 
+          {/*
+            고치기로 들어와 원래 목소리를 아직 받아오는 중. 이 동안 [저장하기]가 꺼져 있는데
+            이유를 말해주지 않으면 고장으로 읽힌다.
+          */}
+          {loadingVoice ? (
+            <p
+              role="status"
+              className="rounded-inner bg-surface-soft px-4 py-3 text-base leading-relaxed text-muted"
+            >
+              담아둔 목소리를 불러오는 중이에요…
+            </p>
+          ) : null}
+
           {notice ? (
             <p
               role="status"
@@ -867,7 +994,13 @@ export function ComposeForm({ roomId }: { roomId: string }) {
             pendingText={phase === 'retrying' ? '다시 담는 중…' : '담는 중…'}
           >
             <HeartIcon />
-            {phase === 'failed' ? '다시 표현하기' : '표현하기'}
+            {phase === 'failed'
+              ? editing
+                ? '다시 저장하기'
+                : '다시 표현하기'
+              : editing
+                ? '저장하기'
+                : '표현하기'}
           </Button>
         </div>
       </div>
