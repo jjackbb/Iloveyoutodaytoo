@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { GalleryGrid } from '@/app/rooms/[roomId]/gallery/gallery-grid'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
 import { formatKstDate } from '@/lib/format'
@@ -153,23 +154,14 @@ export default async function RoomGalleryPage({
               사진 {photos.length}장 · 최근에 남긴 것부터예요
             </p>
 
-            {/* 격자는 사진끼리 맞닿는다(피드 카드의 그리드와 같은 2px 틈). */}
-            <ul className="grid list-none grid-cols-3 gap-0.5">
-              {photos.map((photo) => (
-                <li
-                  key={photo.path}
-                  className="aspect-square overflow-hidden bg-surface-soft"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photo.url}
-                    alt={photo.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                </li>
-              ))}
-            </ul>
+            {/* 누르면 전체화면으로 크게 본다 (노션 IA 6.5). 격자 그리기는 그 부품이 한다. */}
+            <GalleryGrid
+              photos={photos.map((photo) => ({
+                key: photo.path,
+                url: photo.url,
+                alt: photo.alt,
+              }))}
+            />
 
             {capped ? (
               <p className="pt-4 text-center text-base leading-relaxed break-keep text-muted">

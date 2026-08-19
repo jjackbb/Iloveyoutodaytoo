@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 
+import { PhotoViewer } from '@/components/media/PhotoViewer'
 import type { MemoryPhotoView } from '@/components/memory/MemoryCard'
 
 /**
@@ -12,8 +13,8 @@ import type { MemoryPhotoView } from '@/components/memory/MemoryCard'
  *
  * 넘기는 일은 브라우저의 가로 스크롤과 CSS 스크롤 스냅이 한다 — 손가락으로 끌든
  * 트랙패드로 밀든 키보드 방향키를 쓰든 이미 다 되는 동작이다. 직접 만들면 그 셋을 다 놓친다.
- * 이 부품이 자바스크립트로 하는 일은 **몇 번째 장을 보고 있는지 세는 것뿐**이라
- * 배지를 그리려고만 'use client'다.
+ * 자바스크립트가 하는 일은 **몇 번째 장을 보고 있는지 세는 것**과,
+ * 사진을 누르면 전체화면 뷰어를 여는 것뿐이다(노션 IA 6.5).
  */
 export function PhotoPager({
   photos,
@@ -27,6 +28,9 @@ export function PhotoPager({
 }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
+
+  /** 전체화면으로 볼 사진의 번호. null이면 안 열린 상태다. */
+  const [viewerAt, setViewerAt] = useState<number | null>(null)
 
   if (photos.length === 0) {
     // 사진이 있는데 주소를 못 만들었으면 자리를 없애지 않고 사실을 말한다.
@@ -69,16 +73,33 @@ export function PhotoPager({
             key={photo.url}
             className="aspect-[4/3] w-full shrink-0 snap-center snap-always"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photo.url}
-              alt={
+            {/*
+              사진 자체가 [크게 보기] 버튼이다 (노션 IA 6.5).
+              돋보기 아이콘을 따로 얹지 않은 이유 — 사진 위에 놓이는 것은 무엇이든
+              사진을 가린다. 여기서는 사진을 누르는 것이 가장 자연스러운 동작이다.
+              대신 낭독기에는 "크게 보기"라고 분명히 읽힌다.
+            */}
+            <button
+              type="button"
+              onClick={() => setViewerAt(position)}
+              aria-label={
                 many
-                  ? `${authorName}님이 남긴 사진 ${position + 1}번째`
-                  : `${authorName}님이 남긴 사진`
+                  ? `${position + 1}번째 사진 크게 보기`
+                  : '사진 크게 보기'
               }
-              className="h-full w-full object-cover"
-            />
+              className="block h-full w-full"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photo.url}
+                alt={
+                  many
+                    ? `${authorName}님이 남긴 사진 ${position + 1}번째`
+                    : `${authorName}님이 남긴 사진`
+                }
+                className="h-full w-full object-cover"
+              />
+            </button>
           </div>
         ))}
       </div>
@@ -95,6 +116,19 @@ export function PhotoPager({
         >
           {index + 1}/{photos.length}
         </span>
+      ) : null}
+
+      {viewerAt !== null ? (
+        <PhotoViewer
+          photos={photos.map((photo, position) => ({
+            url: photo.url,
+            alt: many
+              ? `${authorName}님이 남긴 사진 ${position + 1}번째`
+              : `${authorName}님이 남긴 사진`,
+          }))}
+          startIndex={viewerAt}
+          onClose={() => setViewerAt(null)}
+        />
       ) : null}
     </div>
   )
