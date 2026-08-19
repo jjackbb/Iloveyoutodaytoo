@@ -47,6 +47,11 @@ export interface MessageListProps {
   onRetry: () => void
   /** ♡를 눌러 서버 값이 바뀐 뒤 목록을 다시 읽기 위해. */
   onRefresh: () => void
+  /** 편집(정리) 모드인지. 켜지면 카드가 링크가 아니라 고르는 칸이 된다. */
+  editing: boolean
+  /** 편집 모드에서 고른 마음들의 id. */
+  picked: string[]
+  onTogglePick: (id: string) => void
 }
 
 /**
@@ -95,6 +100,9 @@ export function MessageList({
   onLoadMore,
   onRetry,
   onRefresh,
+  editing,
+  picked,
+  onTogglePick,
 }: MessageListProps) {
   const firstLoad = loading && items.length === 0
 
@@ -150,6 +158,9 @@ export function MessageList({
             box={box}
             item={item}
             onRefresh={onRefresh}
+            editing={editing}
+            picked={picked.includes(item.id)}
+            onTogglePick={() => onTogglePick(item.id)}
           />
         ))}
       </ul>
@@ -183,13 +194,59 @@ function MessageCard({
   box,
   item,
   onRefresh,
+  editing,
+  picked,
+  onTogglePick,
 }: {
   box: MailboxBox
   item: MailboxItem
   onRefresh: () => void
+  editing: boolean
+  picked: boolean
+  onTogglePick: () => void
 }) {
   const title = cardTitle(box, item)
   const meta = cardMeta(box, item)
+
+  /*
+    정리하는 중에는 카드 전체가 고르는 칸이 된다 (노션 IA 2.2).
+    이때 안쪽의 ♡·신고·재생 버튼은 누를 수 없게 덮는다 — 정리하려고 눌렀는데
+    소리가 재생되면 무엇을 한 건지 알 수 없다.
+  */
+  if (editing) {
+    return (
+      <Card as="li">
+        <button
+          type="button"
+          onClick={onTogglePick}
+          aria-pressed={picked}
+          className="flex w-full items-center gap-3 text-left"
+        >
+          <span
+            aria-hidden
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-chip border text-sm ${
+              picked
+                ? 'border-primary bg-primary text-white'
+                : 'border-hairline-strong text-transparent'
+            }`}
+          >
+            ✓
+          </span>
+
+          <AvatarCircle
+            url={item.avatarUrl}
+            name={title}
+            fallbackGradient={item.coverGradient}
+          />
+
+          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="truncate text-lg font-bold text-ink">{title}</span>
+            <span className="truncate text-sm text-muted">{meta}</span>
+          </span>
+        </button>
+      </Card>
+    )
+  }
 
   return (
     <Card as="li">

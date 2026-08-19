@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser, requireUser } from '@/lib/auth'
 import { COVER_PRESETS, isCoverPreset } from '@/lib/covers'
 import { roomMemberName } from '@/lib/member-name'
 import { isHeartLocked, loadLockedSenders } from '@/lib/mission'
@@ -272,6 +272,23 @@ export async function fetchMailboxPage(
       ? query.eq('receiver_id', user.id)
       : query.eq('sender_id', user.id)
 
+  /*
+    내가 사서함에서 치운 마음은 빼고 보여준다 (노션 IA 2.2의 편집 모드).
+
+    치운 id를 먼저 읽어와 제외하는 방식이다. 붙여서(embed) 거르지 않는 이유:
+    "붙은 줄이 없는 것만" 거르는 문법이 없어서, 걸러낸 만큼 한 쪽이 비어
+    "다음 쪽 있음" 판단이 어긋난다. RLS가 내 표시만 돌려주므로 남의 것은 안 섞인다.
+  */
+  const { data: hides } = await supabase
+    .from('heart_message_hides')
+    .select('message_id')
+    .eq('user_id', user.id)
+
+  const hiddenIds = (hides ?? []).map((row) => row.message_id)
+  if (hiddenIds.length > 0) {
+    filtered = filtered.not('id', 'in', `(${hiddenIds.join(',')})`)
+  }
+
   // 일대일·랜덤은 "어떻게 보냈는가"로 가른다. 방 인원수로 유추하지 않는다 —
   // 멤버가 나중에 늘거나 줄면 과거 기록의 분류가 통째로 바뀌어 버린다.
   if (chip === 'direct' || chip === 'random') {
@@ -516,4 +533,33 @@ export async function toggleHeartMessageFavorite(
 
   revalidatePath('/mailbox')
   return { ok: true }
+}
+
+/**
+ * 사서함에서 고른 마음들을 내 화면에서 치운다 (노션 IA 2.2의 편집 모드).
+ *
+ * **지우는 게 아니라 치우는 것이다.** 받은 마음을 진짜로 지우면 보낸 사람의
+ * '보낸 마음'에서도 사라진다. 내가 정리한 것 때문에 상대의 기록이 없어지면 안 된다.
+ * 그래서 나만 안 보이게 하는 표시를 남긴다(heart_message_hides).
+ *
+ * 내가 주고받은 마음만 치울 수 있다 — 그 확인은 RLS가 한다. 여기서 또 하지 않는다.
+ */
+export async function hideHeartMessages(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+
+  const user = await requireUser()
+  const supabase = await createClient()
+
+  const { error } = await supabase.from('heart_message_hides').upsert(
+    ids.map((messageId) => ({ message_id: messageId, user_id: user.id })),
+    // 이미 치운 것을 또 고르면 조용히 넘어간다. 오류를 띄울 일이 아니다.
+    { onConflict: 'message_id,user_id', ignoreDuplicates: true },
+  )
+
+  if (error) {
+    console.error('[사서함] 치우기 실패:', error.message)
+    return
+  }
+
+  revalidatePath('/mailbox')
 }

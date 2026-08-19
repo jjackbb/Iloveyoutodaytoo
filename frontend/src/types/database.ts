@@ -213,6 +213,46 @@ export type Database = {
           },
         ]
       }
+      /**
+       * 사서함에서 내가 치운 마음 (노션 IA 2.2의 편집 모드).
+       * 물리 삭제가 아니다 — 나만 안 보이고 상대의 사서함에는 그대로 남는다.
+       */
+      heart_message_hides: {
+        Row: {
+          created_at: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'heart_message_hides_message_id_fkey'
+            columns: ['message_id']
+            isOneToOne: false
+            referencedRelation: 'heart_messages'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'heart_message_hides_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       invitations: {
         Row: {
           created_at: string

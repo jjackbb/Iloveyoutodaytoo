@@ -1,10 +1,17 @@
 'use client'
 
-import { useCallback, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  useCallback,
+  useRef,
+  useState,
+  useTransition,
+  type KeyboardEvent,
+} from 'react'
 
 import { MessageList } from './message-list'
 import {
   fetchMailboxPage,
+  hideHeartMessages,
   type MailboxBox,
   type MailboxFilter,
   type MailboxItem,
@@ -92,6 +99,17 @@ export interface MailboxTabsProps {
 export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
   const [box, setBox] = useState<MailboxBox>(initialBox)
   const [filter, setFilter] = useState<MailboxFilter>('all')
+
+  /*
+    정리(편집) 모드 — 노션 IA 2.2.
+
+    켜는 순간 카드가 링크 대신 고르는 칸이 된다. 고른 것을 [치우기]로 내 사서함에서
+    감춘다. **지우는 게 아니라 치우는 것**이라 상대의 보낸함에는 그대로 남는다.
+    잔여데이터가 아닌 이유: 고른 목록은 정리하는 동안만 쓰고, 끝나면 비운다.
+  */
+  const [editing, setEditing] = useState(false)
+  const [picked, setPicked] = useState<string[]>([])
+  const [hiding, startHiding] = useTransition()
   const [state, setState] = useState<Record<MailboxBox, BoxState>>(() => ({
     received: EMPTY_BOX,
     sent: EMPTY_BOX,
@@ -273,6 +291,58 @@ export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
         })}
       </div>
 
+      {/*
+        정리 줄 (노션 IA 2.2의 편집 모드).
+        캡처에는 롱프레스로 들어가지만 버튼으로 뒀다 — 길게 누르기는 화면에 흔적이 없어
+        있는 줄 모르면 영영 못 쓴다. 이 앱의 주 사용자는 시니어다(댓글 ⋯와 같은 판단).
+      */}
+      {current.items.length > 0 ? (
+        <div className="mt-3 flex items-center justify-end gap-2">
+          {editing ? (
+            <>
+              <button
+                type="button"
+                disabled={picked.length === 0 || hiding}
+                onClick={() =>
+                  startHiding(async () => {
+                    await hideHeartMessages(picked)
+                    setPicked([])
+                    setEditing(false)
+                    refresh()
+                  })
+                }
+                className="min-h-[44px] rounded-chip px-3 text-base font-medium text-primary disabled:text-muted"
+              >
+                {hiding
+                  ? '치우는 중…'
+                  : picked.length > 0
+                    ? `${picked.length}개 치우기`
+                    : '치울 마음을 골라주세요'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEditing(false)
+                  setPicked([])
+                }}
+                className="min-h-[44px] rounded-chip px-3 text-base text-muted"
+              >
+                취소
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="min-h-[44px] rounded-chip px-3 text-base text-muted"
+            >
+              정리하기
+            </button>
+          )}
+        </div>
+      ) : null}
+
       <div
         role="tabpanel"
         id={`mailbox-panel-${box}`}
@@ -291,6 +361,13 @@ export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
           onLoadMore={() => void load(box, current.fetched, filter)}
           onRetry={() => void load(box, 0, filter)}
           onRefresh={refresh}
+          editing={editing}
+          picked={picked}
+          onTogglePick={(id) =>
+            setPicked((was) =>
+              was.includes(id) ? was.filter((x) => x !== id) : [...was, id],
+            )
+          }
         />
       </div>
     </section>
