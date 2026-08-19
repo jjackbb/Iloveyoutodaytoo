@@ -330,6 +330,8 @@ export type MemoryCommentView = {
   createdAt: string
   /** 텍스트 댓글의 내용. 음성 댓글이면 null. */
   body: string | null
+  /** 한 번이라도 고친 댓글인가. 화면에 "수정됨"을 붙인다. */
+  edited: boolean
   /** 서명된 voice 버킷 주소. 못 만들었으면 null. */
   voiceUrl: string | null
   voiceDurationSec: number | null
@@ -366,7 +368,7 @@ const MEMORY_DETAIL_SELECT =
 
 /** 댓글 한 줄을 읽을 때 쓰는 컬럼들. */
 const COMMENT_SELECT =
-  'id, created_at, body, voice_path, voice_duration_sec, voice_levels, author_id, author:users!memory_comments_author_id_fkey(id, name)' as const
+  'id, created_at, edited_at, body, voice_path, voice_duration_sec, voice_levels, author_id, author:users!memory_comments_author_id_fkey(id, name)' as const
 
 /**
  * 게시물 하나와 그 댓글들을 상세 화면 모양으로 읽는다.
@@ -495,6 +497,7 @@ export async function loadMemoryDetail(options: {
       isMine: comment.author_id !== null && comment.author_id === viewerId,
       createdAt: comment.created_at,
       body: comment.body,
+      edited: comment.edited_at !== null,
       voiceUrl: isRoomPath(comment.voice_path, roomId)
         ? (voiceUrlByPath.get(comment.voice_path) ?? null)
         : null,

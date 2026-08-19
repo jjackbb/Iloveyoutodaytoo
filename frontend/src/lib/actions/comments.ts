@@ -222,3 +222,72 @@ export async function deleteComment(
   if (memory) revalidateRoom(memory.roomId)
   return { ok: true }
 }
+
+/**
+ * 텍스트 댓글 고치기 (노션 IA 3.9).
+ *
+ * **음성 댓글은 고칠 수 없다.** 목소리를 "고친다"는 것은 결국 다시 녹음해 파일을
+ * 갈아끼우는 일이라, 지우고 새로 남기는 것과 다르지 않다. 그런데 그 편이 훨씬
+ * 정직하다 — 남은 흔적(지움 → 새 댓글)이 실제로 일어난 일과 같기 때문이다.
+ * 그래서 ⋯ 메뉴도 텍스트 댓글에만 [수정]을 보여준다.
+ *
+ * 고친 사실은 `edited_at`에 남긴다. 가족이 주고받는 말이 아무 흔적 없이 다른 말로
+ * 바뀌면 안 된다.
+ */
+export async function updateTextComment(
+  commentId: string,
+  body: string,
+): Promise<CommentActionResult> {
+  const user = await requireUser()
+
+  const trimmed = (body ?? '').trim()
+  // 빈 값으로 고치는 것은 삭제와 다르다. 지우려면 [삭제]를 쓰게 한다.
+  if (!trimmed) {
+    return { ok: false, error: '내용을 적어주세요. 지우려면 [삭제]를 눌러주세요.' }
+  }
+  if (trimmed.length > TEXT_MAX_LENGTH) {
+    return { ok: false, error: `댓글은 ${TEXT_MAX_LENGTH}자 안으로 줄여주세요.` }
+  }
+
+  const supabase = await createClient()
+
+  const { data: comment, error: readError } = await supabase
+    .from('memory_comments')
+    .select('id, author_id, memory_id, body')
+    .eq('id', commentId)
+    .is('deleted_at', null)
+    .maybeSingle()
+
+  if (readError) {
+    console.error('[댓글 수정] 조회 실패:', readError.message)
+    return { ok: false, error: '잠시 후 다시 시도해 주세요.' }
+  }
+  if (!comment) {
+    return { ok: false, error: '댓글을 찾지 못했어요. 화면을 새로고침해 주세요.' }
+  }
+  if (comment.author_id !== user.id) {
+    return { ok: false, error: '내가 남긴 댓글만 고칠 수 있어요.' }
+  }
+  // 음성 댓글은 body가 비어 있다. 위 안내대로 고치는 길을 막는다.
+  if (comment.body === null) {
+    return { ok: false, error: '음성 댓글은 고칠 수 없어요. 지우고 다시 남겨주세요.' }
+  }
+
+  // 글자가 그대로면 "수정됨"을 붙이지 않는다. 눌렀다 그냥 닫은 것까지 고친 것으로
+  // 기록하면, 바뀐 적 없는 말에 흔적이 남는다.
+  if (comment.body === trimmed) return { ok: true }
+
+  const { error } = await supabase
+    .from('memory_comments')
+    .update({ body: trimmed, edited_at: new Date().toISOString() })
+    .eq('id', commentId)
+
+  if (error) {
+    console.error('[댓글 수정] 실패:', error.message)
+    return { ok: false, error: '잠시 후 다시 시도해 주세요.' }
+  }
+
+  const memory = await loadMemoryForComment(supabase, comment.memory_id)
+  if (memory) revalidateRoom(memory.roomId)
+  return { ok: true }
+}

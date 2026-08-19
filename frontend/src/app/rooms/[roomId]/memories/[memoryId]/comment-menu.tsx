@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { deleteComment } from '@/lib/actions/comments'
 
 /**
- * 내 댓글의 ⋯ 메뉴 — 지금은 [삭제] 하나뿐이다 (캡처 33).
+ * 내 댓글의 ⋯ 메뉴 — [수정](텍스트 댓글만)과 [삭제] (캡처 33, 노션 IA 3.9).
  *
  * **왜 길게 누르기가 아니라 ⋯ 버튼인가**
  * 원본 프로토타입은 댓글을 길게 눌러 메뉴를 띄웠다. 우리는 버튼으로 바꿨다:
@@ -23,9 +23,16 @@ export function CommentMenu({
   commentId,
   /** 낭독기에서 어느 댓글의 메뉴인지 구분되도록. 한 화면에 ⋯가 여럿이다. */
   isVoice,
+  onEdit,
 }: {
   commentId: string
   isVoice: boolean
+  /**
+   * [수정]을 눌렀을 때. 음성 댓글에는 넘기지 않는다 —
+   * 목소리를 고치는 것은 다시 녹음해 갈아끼우는 일이라 지우고 새로 남기는 것과 같다.
+   * 그 편이 남는 흔적도 실제 일어난 일과 맞다.
+   */
+  onEdit?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
@@ -112,6 +119,21 @@ export function CommentMenu({
           // right-0: 오른쪽 끝을 맞춰야 좁은 화면 밖으로 나가지 않는다.
           className="absolute top-10 right-0 z-20 w-32 overflow-hidden rounded-inner border border-hairline bg-card py-1 shadow-card"
         >
+          {onEdit ? (
+            <button
+              type="button"
+              role="menuitem"
+              disabled={pending}
+              onClick={() => {
+                setOpen(false)
+                onEdit()
+              }}
+              className="flex w-full items-center px-4 py-2.5 text-left text-base font-medium text-ink transition-colors active:bg-surface-soft disabled:opacity-60"
+            >
+              수정
+            </button>
+          ) : null}
+
           <button
             type="button"
             role="menuitem"

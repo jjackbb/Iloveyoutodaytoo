@@ -390,6 +390,8 @@ export type Database = {
           created_at: string
           /** 지운 시각. null이면 살아 있는 댓글이다. */
           deleted_at: string | null
+          /** 마지막으로 고친 시각. 있으면 화면에 "수정됨"을 붙인다. 음성 댓글은 항상 null. */
+          edited_at: string | null
           id: string
           memory_id: string
           /** voice 버킷 경로 "{room_id}/파일명". 텍스트 댓글이면 null. */
@@ -403,6 +405,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           deleted_at?: string | null
+          edited_at?: string | null
           id?: string
           memory_id: string
           voice_path?: string | null
@@ -414,6 +417,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           deleted_at?: string | null
+          edited_at?: string | null
           id?: string
           memory_id?: string
           voice_path?: string | null
