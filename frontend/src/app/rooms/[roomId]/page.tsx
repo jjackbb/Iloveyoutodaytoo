@@ -14,6 +14,8 @@ import {
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
 import { FeedScroll } from '@/app/rooms/[roomId]/feed-scroll'
+import { FeedSearch, type FeedAuthor } from '@/app/rooms/[roomId]/feed-search'
+import { roomMemberName } from '@/lib/member-name'
 import { loadRoomName } from '@/lib/room-look'
 
 export const metadata: Metadata = { title: '앨범방 · 오늘도 사랑해' }
@@ -36,14 +38,41 @@ const GALLERY_PREVIEW_COUNT = 3
  * 예전 이 화면이 보여주던 heart_messages(1:1 마음)는 지우지 않았다. 그건 사서함의 것이고,
  * 이 화면에서 안 보일 뿐이다.
  */
+/**
+ * 그 다음 날의 날짜 키. "2026-08-31" → "2026-09-01".
+ *
+ * Date를 UTC로만 다뤄 서버 시간대에 흔들리지 않게 한다 —
+ * 이 값은 시각이 아니라 **날짜 이름**이다.
+ */
+function nextKstDay(dateKey: string): string {
+  const [year, month, day] = dateKey.split('-').map(Number)
+  return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10)
+}
+
 export default async function RoomPage({
   params,
   searchParams,
 }: PageProps<'/rooms/[roomId]'>) {
   const { roomId } = await params
+  const query = await searchParams
+
   // 방을 막 만들고 넘어왔는지(캡처 10의 "앨범방이 만들어졌어요 🎉").
   // 만든 쪽에서 상태를 들고 오지 않고 주소로만 알린다 — 새로고침하면 자연히 사라진다.
-  const justCreated = (await searchParams).created === '1'
+  const justCreated = query.created === '1'
+
+  /*
+    찾아보기 조건 (노션 IA 3.4·6.8). **주소에만 있다.**
+    화면이 들고 있지 않으므로 뒤로가기로 되돌아가고, 그 화면을 그대로 다시 열 수 있다.
+
+    형식이 어긋난 값은 조용히 버린다(null). 여기서 오류를 띄울 일이 아니다 —
+    주소를 손으로 고쳤거나 옛 링크를 열었을 뿐이고, 그때는 그냥 전체를 보여주면 된다.
+  */
+  const who = typeof query.who === 'string' && query.who ? query.who : null
+  const on =
+    typeof query.on === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(query.on)
+      ? query.on
+      : null
+  const searchOpen = query.find === '1' || who !== null || on !== null
 
   // 멤버인지는 layout.tsx가 이미 확인했다. 여기서 사람을 다시 읽는 것은
   // **누구의 화면인지**를 알아야 하기 때문이다 — 좋아요·저장·숨김은 사람마다 다르고,
@@ -78,9 +107,24 @@ export default async function RoomPage({
     .order('created_at', { ascending: false })
     .limit(MEMORY_PAGE_SIZE)
 
-  const memoriesResult = await (hiddenIds.length > 0
+  const filteredQuery = hiddenIds.length > 0
     ? memoriesQuery.not('id', 'in', `(${hiddenIds.join(',')})`)
-    : memoriesQuery)
+    : memoriesQuery
+
+  const byAuthor = who ? filteredQuery.eq('author_id', who) : filteredQuery
+
+  /*
+    날짜는 **KST 하루**로 자른다. `+09:00`을 직접 붙이는 이유:
+    서버가 어느 시간대에서 돌든 같은 하루를 가리켜야 한다. 서버 기본 시간대를 믿으면
+    밤 11시에 올린 추억이 다음 날로 잡힌다.
+  */
+  const byDate = on
+    ? byAuthor
+        .gte('created_at', `${on}T00:00:00+09:00`)
+        .lt('created_at', `${nextKstDay(on)}T00:00:00+09:00`)
+    : byAuthor
+
+  const memoriesResult = await byDate
 
   // 사진 서명·좋아요·저장·이름 정하기는 전부 여기서 끝난다(N+1 없음, @/lib/room-feed).
   const cards = await buildMemoryCards({
@@ -89,6 +133,14 @@ export default async function RoomPage({
     viewerId: viewer.id,
     rows: memoriesResult.data ?? [],
   })
+
+  /*
+    찾아보기의 [누가] 칩에 쓸 사람 목록.
+    지금 화면에 보이는 카드에서 뽑지 않고 **방의 구성원**에서 뽑는다 —
+    카드에서 뽑으면 "그 사람 걸로 좁히면 목록이 비는" 조건은 아예 고를 수도 없어서,
+    왜 안 보이는지 알 길이 없다. 찾기 칸을 열었을 때만 읽는다.
+  */
+  const authors = searchOpen ? await loadFeedAuthors(supabase, roomId) : []
 
   /*
     더보기 서랍의 갤러리 미리보기 — **가장 최근 게시물 3개**의 대표 사진.
@@ -105,6 +157,17 @@ export default async function RoomPage({
     // 100dvh: 모바일 브라우저 주소창이 접혔다 펴져도 높이가 흔들리지 않는다(홈과 같다).
     <div className="flex h-[100dvh] flex-col">
       <RoomAppBar backHref="/" backLabel="홈으로 돌아가기" title={roomName}>
+        {/*
+          찾아보기 (노션 IA 3.4). 링크인 이유 — 여는 것도 주소(?find=1)라
+          뒤로가기로 그대로 닫힌다. 여는 데에 화면 상태를 쓰지 않는다.
+        */}
+        <RoomAppBarLink
+          href={searchOpen ? `/rooms/${roomId}` : `/rooms/${roomId}?find=1`}
+          label={searchOpen ? '추억 찾기 닫기' : '추억 찾아보기'}
+        >
+          <SearchIcon />
+        </RoomAppBarLink>
+
         {/* 멤버 추가 (캡처 10의 person+). 기존 초대 화면으로 그대로 이어진다. */}
         <RoomAppBarLink
           href={`/rooms/${roomId}/invite`}
@@ -132,6 +195,15 @@ export default async function RoomPage({
       */}
       <FeedScroll showJump={cards.length > 0}>
         <div className="mx-auto w-full max-w-md px-screen-x pt-0.5 pb-screen-b">
+          {/* 찾기 칸 (노션 IA 3.4·6.8). 고르는 일만 여기서 하고 거르는 일은 위 조회가 했다. */}
+          <FeedSearch
+            authors={authors}
+            who={who}
+            on={on}
+            open={searchOpen}
+            resultCount={cards.length}
+          />
+
           {memoriesResult.error ? (
             <p
               role="alert"
@@ -140,7 +212,11 @@ export default async function RoomPage({
               추억을 불러오지 못했어요. 잠시 후 다시 열어봐 주세요.
             </p>
           ) : cards.length === 0 ? (
-            <EmptyFeed />
+            // 조건을 걸어서 비었으면 "첫 추억을 남겨보세요"가 아니다 —
+            // 그 안내는 찾기 칸이 이미 하고 있다(FeedSearch).
+            searchOpen ? null : (
+              <EmptyFeed />
+            )
           ) : (
             <ul
               aria-label={`${roomName}의 추억`}
@@ -174,6 +250,39 @@ export default async function RoomPage({
 }
 
 /**
+ * 찾아보기의 [누가] 칩에 놓을 사람들 — 이 방의 활성 구성원.
+ *
+ * 이름 규칙은 피드 카드와 같다(별명이 있으면 별명, 없으면 전역 이름).
+ * 여기서만 본명으로 보이면 같은 사람이 화면마다 다른 사람처럼 읽힌다(@/lib/member-name).
+ */
+async function loadFeedAuthors(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  roomId: string,
+): Promise<FeedAuthor[]> {
+  const { data, error } = await supabase
+    .from('room_members')
+    .select('user_id, nickname, users(name)')
+    .eq('room_id', roomId)
+    .eq('status', 'active')
+    .order('joined_at', { ascending: true })
+
+  if (error) {
+    // 사람 목록을 못 읽어도 날짜로는 찾을 수 있다. 화면을 통째로 막지 않는다.
+    console.error('[앨범방 찾기] 구성원 조회 실패:', error.message)
+    return []
+  }
+
+  return (data ?? []).map((member) => ({
+    id: member.user_id,
+    name: roomMemberName({
+      userId: member.user_id,
+      nickname: member.nickname,
+      name: member.users?.name,
+    }),
+  }))
+}
+
+/**
  * 아직 아무것도 없을 때 (캡처 10).
  *
  * 버튼을 여기 달지 않는다 — 아래 고정 줄에 이미 [마음 표현하기]가 있다.
@@ -187,6 +296,26 @@ function EmptyFeed() {
       아래 <strong className="font-extrabold text-ink">마음 표현하기</strong>로
       <br />첫 번째 추억을 남겨보세요 🌷
     </p>
+  )
+}
+
+/** 찾아보기(돋보기). */
+function SearchIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 4.5 4.5" />
+    </svg>
   )
 }
 
