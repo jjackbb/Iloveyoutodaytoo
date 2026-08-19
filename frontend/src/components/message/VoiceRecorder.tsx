@@ -128,6 +128,13 @@ export function VoiceRecorder({
   const [phase, setPhase] = useState<RecorderPhase>(value ? 'recorded' : 'idle')
   const [elapsedSec, setElapsedSec] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  /**
+   * 최대 길이에 닿아 **저절로 멈춘** 경우.
+   *
+   * 아무 말 없이 멈추면 시니어 사용자에게는 고장으로 보인다 —
+   * "내가 뭘 잘못 눌렀나" 하고 처음부터 다시 녹음하게 된다.
+   */
+  const [stoppedAtMax, setStoppedAtMax] = useState(false)
 
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -244,6 +251,7 @@ export function VoiceRecorder({
 
   const startRecording = useCallback(async () => {
     setError(null)
+    setStoppedAtMax(false)
 
     if (
       typeof navigator === 'undefined' ||
@@ -345,7 +353,10 @@ export function VoiceRecorder({
       const elapsed = (performance.now() - startedAtRef.current) / 1000
       setElapsedSec(elapsed)
       // 최대 길이에 닿으면 알아서 멈춘다. 넘겨서 저장 못 하는 일이 없게.
-      if (elapsed >= VOICE_MAX_SEC) stopRecording()
+      if (elapsed >= VOICE_MAX_SEC) {
+        setStoppedAtMax(true)
+        stopRecording()
+      }
     }, 200)
   }, [
     clearTick,
@@ -439,6 +450,12 @@ export function VoiceRecorder({
           ? `${VOICE_MIN_SEC}초 이상 충족 완료`
           : `${VOICE_MIN_SEC}초 이상 녹음해 주세요`}
       </p>
+
+      {stoppedAtMax ? (
+        <p role="status" className="text-base leading-relaxed break-keep text-muted">
+          한 번에 {VOICE_MAX_SEC}초까지 담을 수 있어요. 여기까지 녹음했어요.
+        </p>
+      ) : null}
 
       {error ? (
         <p role="alert" className="text-base leading-relaxed text-primary">
