@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { InviteLetter } from '@/components/invite/InviteLetter'
 import { ButtonLink } from '@/components/ui/Button'
 import { getCurrentUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
@@ -151,20 +152,16 @@ export default async function InvitePreviewPage({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-7 px-6 py-12">
-      <header className="flex flex-col gap-3 text-center">
-        <p className="text-base text-muted">초대장이 도착했어요</p>
-        <h1 className="text-2xl font-bold leading-snug text-ink">
-          {invitation.inviter_name}님이
-          <br />
-          {invitation.relationship_label}님을 ‘{invitation.room_name}’에
-          부르고 있어요
-        </h1>
-      </header>
-
-      {/* 초대자가 남긴 첫 마디. 이 화면에서 가장 먼저 읽히도록 크게 둔다. */}
-      <blockquote className="rounded-[14px] bg-primary-soft px-5 py-6 text-center text-lg leading-relaxed text-ink">
-        “{invitation.invite_message}”
-      </blockquote>
+      {/*
+        보내는 분이 미리 보는 화면(방 > 초대하기)도 **이 부품을 그대로** 쓴다.
+        미리 본 것과 실제로 가는 것이 달라지면 미리보기가 없느니만 못하다.
+      */}
+      <InviteLetter
+        inviterName={invitation.inviter_name}
+        relationshipLabel={invitation.relationship_label}
+        roomName={invitation.room_name}
+        message={invitation.invite_message}
+      />
 
       {user ? (
         <AcceptPanel

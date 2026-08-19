@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { loadMyAliveInvitations } from '@/lib/actions/invitations'
 import { loadRoomInvitations } from '@/lib/actions/invitations-manage'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth'
 import { loadRoomName } from '@/lib/room-look'
 import { InvitePanel } from './invite-panel'
 import { InvitationList } from './invitation-list'
@@ -21,9 +21,10 @@ export default async function InvitePage({
 }: PageProps<'/rooms/[roomId]/invite'>) {
   const { roomId } = await params
 
-  const supabase = await createClient()
-
   // 방 이름은 안내 문구에 쓴다. RLS 덕분에 내가 속한 방만 조회된다.
+  // 미리보기에 "누가 부르고 있는지"를 실제 이름으로 적으려면 내 이름이 필요하다.
+  const me = await requireUser()
+
   const [roomName, alive, invitations] = await Promise.all([
     loadRoomName(roomId),
     loadMyAliveInvitations(roomId),
@@ -46,7 +47,13 @@ export default async function InvitePage({
           코드를 보내주세요. 그분이 열어보면 바로 들어올 수 있어요.
         </p>
 
-        <InvitePanel roomId={roomId} aliveInvitations={alive} />
+        <InvitePanel
+          roomId={roomId}
+          aliveInvitations={alive}
+          // 받는 분 화면 미리보기(노션 IA 3.2)에 그대로 쓰인다.
+          inviterName={me.name}
+          roomName={roomName ?? '앨범방'}
+        />
 
         <InvitationList roomId={roomId} invitations={invitations} />
       </main>

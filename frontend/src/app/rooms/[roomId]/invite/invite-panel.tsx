@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from 'react'
 
+import { InviteLetter } from '@/components/invite/InviteLetter'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Field } from '@/components/ui/Field'
@@ -44,10 +45,15 @@ import {
 export function InvitePanel({
   roomId,
   aliveInvitations,
+  inviterName,
+  roomName,
 }: {
   roomId: string
   /** 내가 만든 초대장 중 아직 살아 있는 것들. 최근 것이 먼저 온다. */
   aliveInvitations: InviteView[]
+  /** 나. 받는 분 화면 미리보기에 "○○님이 부르고 있어요"로 들어간다. */
+  inviterName: string
+  roomName: string
 }) {
   /** 이번에 초대장을 보낼 사람들. 이 화면이 살아 있는 동안에만 있다. */
   const [recipients, setRecipients] = useState<Recipient[]>([])
@@ -70,6 +76,9 @@ export function InvitePanel({
 
   /** 결과가 있는데도 만들기 화면을 다시 연 상태인지. */
   const [formOpen, setFormOpen] = useState(false)
+
+  /** 받는 분 화면 미리보기가 열려 있는지 (노션 IA 3.2). */
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   /*
     보여줄 초대장이 하나도 없으면 당연히 만들기 화면부터.
@@ -167,6 +176,20 @@ export function InvitePanel({
             placeholder="엄마, 우리 하루에 한마디씩 나눠봐요."
           />
 
+          {/*
+            보내기 전에 받는 분 화면을 그대로 본다 (노션 IA 3.2).
+            첫 마디는 한 번 보내면 고칠 수 없다 — 링크를 다시 만드는 수밖에 없다.
+            그래서 보내기 전에 확인할 자리를 여기, 첫 마디 바로 아래에 둔다.
+          */}
+          <button
+            type="button"
+            onClick={() => setPreviewOpen(true)}
+            disabled={message.trim().length === 0}
+            className="min-h-11 self-start px-1 text-base font-medium text-primary underline underline-offset-4 disabled:text-muted disabled:no-underline"
+          >
+            받는 분에게 어떻게 보이는지 미리 보기
+          </button>
+
           {errorMessage ? (
             <p role="alert" className="text-base leading-relaxed text-primary">
               {errorMessage}
@@ -197,6 +220,18 @@ export function InvitePanel({
             ) : null}
           </div>
         </form>
+
+        {previewOpen ? (
+          <InvitePreviewModal
+            inviterName={inviterName}
+            roomName={roomName}
+            // 여러 명을 골랐어도 미리보기는 첫 분 기준이다 — 화면 모양은 모두 같고
+            // 호칭만 다르다. 아직 아무도 안 골랐으면 흔한 호칭으로 자리만 보여준다.
+            relationshipLabel={recipients[0]?.name ?? '엄마'}
+            message={message.trim()}
+            onClose={() => setPreviewOpen(false)}
+          />
+        ) : null}
 
         {pickerOpen ? (
           <RecipientPicker
@@ -611,5 +646,88 @@ function InviteResultRow({
         ) : null}
       </div>
     </Card>
+  )
+}
+
+/**
+ * 받는 분 화면 미리보기 (노션 IA 3.2).
+ *
+ * 실제 초대장 화면과 **같은 부품(InviteLetter)** 으로 그린다. 미리 본 것과 실제로 가는
+ * 것이 다르면 미리보기가 없느니만 못하다.
+ *
+ * 아래 버튼은 흉내만 낸 것이라 눌리지 않게 두고, 그렇다고 말해준다 —
+ * 눌리는 것처럼 생겼는데 아무 일이 없으면 고장으로 읽힌다.
+ */
+function InvitePreviewModal({
+  inviterName,
+  relationshipLabel,
+  roomName,
+  message,
+  onClose,
+}: {
+  inviterName: string
+  relationshipLabel: string
+  roomName: string
+  message: string
+  onClose: () => void
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    closeRef.current?.focus()
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onClose()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onClose])
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="받는 분 화면 미리 보기"
+      className="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-black/45 px-5 py-8"
+    >
+      <div className="flex w-full max-w-md flex-col gap-5 rounded-card bg-canvas px-6 py-7 shadow-card">
+        <p className="text-center text-sm text-muted">
+          받는 분에게는 이렇게 보여요
+        </p>
+
+        <InviteLetter
+          inviterName={inviterName}
+          relationshipLabel={relationshipLabel}
+          roomName={roomName}
+          message={message}
+        />
+
+        {/* 실제 화면의 [시작하기] 자리. 여기서는 눌리지 않는다. */}
+        <p
+          aria-hidden
+          className="rounded-inner bg-primary/40 py-3.5 text-center text-base font-bold text-white"
+        >
+          시작하기
+        </p>
+        <p className="text-center text-sm leading-relaxed text-muted">
+          위의 [시작하기]는 받는 분 화면에서만 눌러져요.
+        </p>
+
+        {/*
+          Button 부품은 ref를 받지 않는다. 열자마자 초점을 둘 곳이 필요해
+          이 자리만 기본 button으로 그린다(모양은 secondary와 같은 값이다).
+        */}
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          className="min-h-[52px] w-full rounded-inner border border-primary bg-card text-base font-bold text-primary active:bg-primary-soft"
+        >
+          닫기
+        </button>
+      </div>
+    </div>
   )
 }

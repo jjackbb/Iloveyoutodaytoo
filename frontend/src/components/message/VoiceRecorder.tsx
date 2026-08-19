@@ -125,7 +125,9 @@ export function VoiceRecorder({
   onChange,
   disabled = false,
 }: VoiceRecorderProps) {
-  const [phase, setPhase] = useState<RecorderPhase>(value ? 'recorded' : 'idle')
+  const [ownPhase, setPhase] = useState<RecorderPhase>(
+    value ? 'recorded' : 'idle',
+  )
 
   /*
     부모가 **나중에** 녹음을 얹어주는 경우가 있다 — 추억 고치기 화면이 원래 목소리를
@@ -133,11 +135,13 @@ export function VoiceRecorder({
     그때는 아직 값이 없어 'idle'로 굳는다. 그러면 담긴 목소리가 있는데도
     "마이크를 눌러 녹음을 시작하세요"가 그대로 남는다.
 
-    녹음하는 도중(preparing·recording)에는 건드리지 않는다 — 그건 이 부품이 주인이다.
+    그래서 **그릴 때마다 계산한다.** 효과(useEffect)로 상태를 뒤늦게 고치면
+    한 번 잘못 그린 뒤에 다시 그리게 되고, 그 사이 화면이 깜빡인다.
+    녹음하는 도중(preparing·recording)에는 계산이 끼어들지 않는다 —
+    그때는 이 부품이 주인이다.
   */
-  useEffect(() => {
-    if (value && phase === 'idle') setPhase('recorded')
-  }, [value, phase])
+  const phase: RecorderPhase =
+    ownPhase === 'idle' && value ? 'recorded' : ownPhase
   const [elapsedSec, setElapsedSec] = useState(0)
   const [error, setError] = useState<string | null>(null)
   /**
