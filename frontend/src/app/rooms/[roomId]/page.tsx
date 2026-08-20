@@ -72,7 +72,17 @@ export default async function RoomPage({
     typeof query.on === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(query.on)
       ? query.on
       : null
-  const searchOpen = query.find === '1' || who !== null || on !== null
+  /*
+    글자로 찾기 (카카오톡 채팅방의 돋보기와 같은 것).
+    사람·날짜 필터보다 **이쪽이 본체**다 — 돋보기를 누르는 이유의 대부분은
+    "그 말 어디 있더라"이기 때문이다(_workspace/12_ux_baseline.md).
+    앞뒤 공백만 있는 값은 안 찾은 것으로 본다.
+  */
+  const q =
+    typeof query.q === 'string' && query.q.trim() ? query.q.trim() : null
+
+  const searchOpen =
+    query.find === '1' || who !== null || on !== null || q !== null
 
   // 멤버인지는 layout.tsx가 이미 확인했다. 여기서 사람을 다시 읽는 것은
   // **누구의 화면인지**를 알아야 하기 때문이다 — 좋아요·저장·숨김은 사람마다 다르고,
@@ -124,7 +134,23 @@ export default async function RoomPage({
         .lt('created_at', `${nextKstDay(on)}T00:00:00+09:00`)
     : byAuthor
 
-  const memoriesResult = await byDate
+  /*
+    글자로 좁히기. 게시물 문구뿐 아니라 **댓글까지** 본다 —
+    카톡에서 찾는 말은 내가 쓴 말일 수도, 상대가 남긴 말일 수도 있다.
+    댓글에서 걸린 게시물의 번호를 먼저 모은 뒤 한 번에 건다(게시물마다 묻지 않는다).
+
+    한국어는 Postgres 기본 전문검색이 제대로 못 쪼갠다. 방 하나의 게시물은 많아야 수백 개라
+    ilike(부분 일치)로 충분하고, 오히려 "사랑"으로 "사랑해"가 걸리는 편이 기대에 맞는다.
+  */
+  const byText = q
+    ? byDate.or(
+        `description.ilike.%${escapeForFilter(q)}%,id.in.(${(
+          await loadMemoryIdsMatchingComments(supabase, roomId, q)
+        ).join(',')})`,
+      )
+    : byDate
+
+  const memoriesResult = await byText
 
   // 사진 서명·좋아요·저장·이름 정하기는 전부 여기서 끝난다(N+1 없음, @/lib/room-feed).
   const cards = await buildMemoryCards({
@@ -200,6 +226,7 @@ export default async function RoomPage({
             authors={authors}
             who={who}
             on={on}
+            q={q}
             open={searchOpen}
             resultCount={cards.length}
           />
@@ -247,6 +274,48 @@ export default async function RoomPage({
       ) : null}
     </div>
   )
+}
+
+/**
+ * PostgREST의 `or()` 문자열에 값을 넣을 때 문법을 깨뜨리는 글자를 지운다.
+ *
+ * `or()`는 쉼표로 조건을, 괄호로 묶음을 구분하는 **문자열 문법**이다.
+ * 사용자가 친 쉼표·괄호가 그대로 들어가면 조건이 쪼개지거나 문법 오류가 난다.
+ * 검색어에서 이 글자들이 의미를 갖는 경우는 사실상 없으므로 지우고 찾는다.
+ */
+function escapeForFilter(value: string): string {
+  return value.replace(/[,()\\*]/g, ' ').trim()
+}
+
+/**
+ * 댓글에 그 말이 들어 있는 게시물 번호들.
+ *
+ * 항상 최소 한 개(있을 수 없는 번호)를 넣어 돌려준다 — 빈 목록이면
+ * `id.in.()` 이 되어 문법이 깨진다.
+ */
+async function loadMemoryIdsMatchingComments(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  roomId: string,
+  keyword: string,
+): Promise<string[]> {
+  const EMPTY = '00000000-0000-0000-0000-000000000000'
+
+  const { data, error } = await supabase
+    .from('memory_comments')
+    .select('memory_id, memories!inner(room_id)')
+    .eq('memories.room_id', roomId)
+    .is('deleted_at', null)
+    .ilike('body', `%${keyword}%`)
+    .limit(200)
+
+  if (error) {
+    // 댓글을 못 뒤졌어도 게시물 문구로는 찾을 수 있다. 화면을 막지 않는다.
+    console.error('[앨범방 찾기] 댓글 검색 실패:', error.message)
+    return [EMPTY]
+  }
+
+  const ids = Array.from(new Set((data ?? []).map((row) => row.memory_id)))
+  return ids.length > 0 ? ids : [EMPTY]
 }
 
 /**

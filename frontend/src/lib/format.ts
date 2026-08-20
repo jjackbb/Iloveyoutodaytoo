@@ -237,3 +237,16 @@ export function formatDuration(seconds: number | null | undefined): string {
   if (rest === 0) return `${minutes}분`
   return `${minutes}분 ${rest}초`
 }
+
+/**
+ * KST 기준 "2026년 8월". 갤러리에서 사진을 월별로 묶는 이름이다.
+ *
+ * 묶는 이름을 **서버에서** 만들어 내려보낸다 — 브라우저 시간대에 따라
+ * 월말 밤에 올린 사진이 다음 달로 넘어가면 안 된다.
+ */
+export function formatKstMonth(input: DateInput | null | undefined): string {
+  const key = toKstDateKey(input)
+  if (!key) return ''
+  const [year, month] = key.split('-')
+  return `${year}년 ${Number(month)}월`
+}

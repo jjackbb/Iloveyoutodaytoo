@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { GalleryGrid } from '@/app/rooms/[roomId]/gallery/gallery-grid'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
-import { formatKstDate } from '@/lib/format'
+import { formatKstDate, formatKstMonth } from '@/lib/format'
 import { roomMemberName } from '@/lib/member-name'
 import {
   isRoomPath,
@@ -96,6 +96,8 @@ export default async function RoomGalleryPage({
         path: photo.storage_path,
         // 무엇이 찍혔는지는 알 수 없다. 누가 언제 남긴 것인지만 말한다.
         alt: `${authorName}님이 ${formatKstDate(memory.created_at)}에 남긴 사진`,
+        // 월별로 묶어 보여주기 위해 남긴 시각을 함께 들고 간다(카톡 사진 모아보기와 같다).
+        createdAt: memory.created_at,
       }))
   })
 
@@ -160,6 +162,9 @@ export default async function RoomGalleryPage({
                 key: photo.path,
                 url: photo.url,
                 alt: photo.alt,
+                // "2026년 8월" 꼴. 묶는 규칙을 서버에서 정해 내려보낸다 —
+                // 브라우저 시간대에 따라 달이 갈리면 안 된다(KST 고정).
+                month: formatKstMonth(photo.createdAt),
               }))}
             />
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { DatePickerModal } from '@/app/rooms/[roomId]/date-picker-modal'
 import { formatKstFullDate, kstTodayKey } from '@/lib/format'
@@ -28,6 +28,8 @@ export function FeedSearch({
   who,
   /** 지금 걸려 있는 날짜 필터(KST, YYYY-MM-DD). */
   on,
+  /** 지금 걸려 있는 검색어. */
+  q,
   /** 조건이 없어도 찾기 칸을 열어둘지. 주소의 ?find=1 이 정한다. */
   open,
   /** 이 조건으로 찾은 결과가 몇 개인지. 0이면 안내가 달라진다. */
@@ -36,18 +38,49 @@ export function FeedSearch({
   authors: FeedAuthor[]
   who: string | null
   on: string | null
+  q: string | null
   open: boolean
   resultCount: number
 }) {
   const router = useRouter()
   const [calendarOpen, setCalendarOpen] = useState(false)
 
+  /** 입력칸의 초안. 엔터를 누르거나 [찾기]를 눌러야 주소에 반영된다. */
+  const [draft, setDraft] = useState(q ?? '')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  /*
+    서버가 새 결과를 내려주면 입력칸도 그 값에 맞춘다.
+    뒤로가기로 이전 검색으로 돌아왔는데 칸에 옛 글자가 남아 있으면,
+    화면에 보이는 목록과 칸의 내용이 서로 다른 말을 하게 된다.
+
+    효과(useEffect)가 아니라 **그리는 중에** 맞춘다. 효과로 고치면 한 번 옛 값으로
+    그린 뒤에 다시 그려서 글자가 깜빡인다. 직전에 받은 검색어를 따로 기억해 두고
+    달라졌을 때만 갈아끼운다(React가 권하는 방식).
+  */
+  const [lastQ, setLastQ] = useState(q)
+  if (q !== lastQ) {
+    setLastQ(q)
+    setDraft(q ?? '')
+  }
+
+  // 찾기 칸을 열면 바로 칠 수 있게 커서를 둔다. 카톡 돋보기도 그렇게 동작한다.
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   /** 조건 하나를 갈아 끼운 주소로 옮긴다. 나머지 조건은 그대로 둔다. */
-  function apply(next: { who?: string | null; on?: string | null }) {
+  function apply(next: {
+    who?: string | null
+    on?: string | null
+    q?: string | null
+  }) {
     const params = new URLSearchParams()
     const nextWho = next.who === undefined ? who : next.who
     const nextOn = next.on === undefined ? on : next.on
+    const nextQ = next.q === undefined ? q : next.q
 
+    if (nextQ) params.set('q', nextQ)
     if (nextWho) params.set('who', nextWho)
     if (nextOn) params.set('on', nextOn)
     // 조건을 다 지워도 찾기 칸은 열린 채로 둔다 — 지우자마자 칸이 사라지면
@@ -63,13 +96,57 @@ export function FeedSearch({
 
   if (!open) return null
 
-  const filtered = who !== null || on !== null
+  const filtered = who !== null || on !== null || q !== null
 
   return (
     <section
       aria-label="추억 찾아보기"
       className="mt-2 flex flex-col gap-3 rounded-card bg-card px-4 py-4 shadow-card"
     >
+      {/*
+        글자로 찾기 — 카카오톡 채팅방의 돋보기와 같은 자리다.
+        form으로 감싸는 이유: 모바일 자판의 [검색] 키가 그대로 동작하고,
+        엔터로도 찾아진다. 버튼만 두면 자판을 내렸다가 다시 눌러야 한다.
+      */}
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          apply({ q: draft.trim() || null })
+        }}
+        className="flex flex-col gap-2"
+      >
+        <label htmlFor="feed-q" className="text-base font-medium text-ink">
+          어떤 말이 들어 있나요
+        </label>
+        <div className="flex gap-2">
+          <input
+            ref={inputRef}
+            id="feed-q"
+            type="search"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="문구나 댓글 속 한 마디"
+            enterKeyHint="search"
+            className="min-h-11 min-w-0 flex-1 rounded-inner border border-hairline-strong bg-card px-3.5 text-base text-ink"
+          />
+          <button
+            type="submit"
+            className="min-h-11 shrink-0 rounded-inner bg-primary px-4 text-base font-bold text-white active:bg-primary-active"
+          >
+            찾기
+          </button>
+        </div>
+        {q ? (
+          <button
+            type="button"
+            onClick={() => apply({ q: null })}
+            className="min-h-11 self-start px-1 text-base font-medium text-primary active:bg-primary-soft"
+          >
+            ‘{q}’ 지우기
+          </button>
+        ) : null}
+      </form>
+
       <div className="flex flex-col gap-2">
         <h2 className="text-base font-medium text-ink">누가 올렸나요</h2>
         <div className="flex flex-wrap gap-2">
@@ -126,7 +203,7 @@ export function FeedSearch({
         {filtered ? (
           <button
             type="button"
-            onClick={() => apply({ who: null, on: null })}
+            onClick={() => apply({ who: null, on: null, q: null })}
             className="min-h-11 px-2 text-base font-medium text-primary active:bg-primary-soft"
           >
             조건 지우기
