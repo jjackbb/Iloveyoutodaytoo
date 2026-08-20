@@ -3,12 +3,18 @@
 import Link from 'next/link'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 
+import { MemberStack } from '@/components/room/MemberStack'
 import { ROOM_APP_BAR_ACTION_CLASS } from '@/components/room/RoomAppBar'
 
 /**
  * 앨범방 머리띠의 더보기(≡) + 오른쪽에서 밀려 들어오는 사이드 메뉴 (캡처 `참고/앨범방_더보기.png`).
  *
- * 안에 드는 것: 갤러리(+최근 사진 미리보기) / 좋아요 / 별명 설정 / 숨김 / 앨범방 나가기.
+ * 안에 드는 것: **함께하는 분(+초대)** / 갤러리(+최근 사진 미리보기) / 좋아요 / 별명 설정 /
+ * 숨김 / 앨범방 나가기.
+ *
+ * 맨 위의 참여자 줄은 카카오톡 채팅방 서랍과 같은 자리다(_workspace/12_ux_baseline.md).
+ * 그전에는 "방에 누가 있나"를 보려면 방 설정까지 들어가야 했는데, 그건 서랍에서
+ * 가장 자주 보게 되는 정보다.
  * 하나같이 **다른 화면으로 가는 링크**다. 여기서 무언가를 저장하지 않는다 —
  * 그래서 이 부품이 들고 있는 상태는 "열렸나" 하나뿐이고, 화면을 떠나면 같이 사라진다.
  *
@@ -21,11 +27,14 @@ export function MoreDrawer({
   roomId,
   roomName,
   previewPhotos,
+  memberNames,
 }: {
   roomId: string
   roomName: string
   /** 가장 최근 게시물 3개의 대표 사진(서명된 주소). 없으면 "사진이 아직 없어요"가 뜬다. */
   previewPhotos: string[]
+  /** 이 방의 활성 구성원 이름들. 서랍 맨 위 아바타 줄에 쓴다. */
+  memberNames: string[]
 }) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -58,6 +67,7 @@ export function MoreDrawer({
         <DrawerDialog
           roomId={roomId}
           previewPhotos={previewPhotos}
+          memberNames={memberNames}
           onClose={close}
         />
       ) : null}
@@ -68,10 +78,12 @@ export function MoreDrawer({
 function DrawerDialog({
   roomId,
   previewPhotos,
+  memberNames,
   onClose,
 }: {
   roomId: string
   previewPhotos: string[]
+  memberNames: string[]
   onClose: () => void
 }) {
   const ref = useRef<HTMLDialogElement>(null)
@@ -135,6 +147,32 @@ function DrawerDialog({
           >
             <CloseIcon />
           </button>
+        </div>
+
+        {/*
+          함께하는 분 (카톡 서랍 맨 위와 같은 자리).
+          줄 전체가 구성원 목록으로 가고, 오른쪽 [초대]만 따로 초대 화면으로 간다 —
+          링크 안에 링크를 넣을 수 없어 나란히 둔다.
+        */}
+        <div className="flex items-center gap-2 border-b border-hairline px-5 pb-3">
+          <Link
+            href={`/rooms/${roomId}/settings`}
+            onClick={onClose}
+            className="flex min-h-11 flex-1 items-center gap-3 rounded-inner active:bg-surface-soft"
+          >
+            <MemberStack names={memberNames} />
+            <span className="text-base font-medium text-ink">
+              함께하는 분 {memberNames.length}명
+            </span>
+          </Link>
+
+          <Link
+            href={`/rooms/${roomId}/invite`}
+            onClick={onClose}
+            className="flex min-h-11 shrink-0 items-center rounded-chip border border-primary px-3 text-base font-bold text-primary active:bg-primary-soft"
+          >
+            초대
+          </Link>
         </div>
 
         {/* 스크롤은 이 안에서만. 항목이 늘어도 머리줄은 늘 보인다. */}

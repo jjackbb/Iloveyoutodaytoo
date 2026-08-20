@@ -13,7 +13,7 @@ import {
   MEMORY_CARD_SELECT,
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
-import { FeedScroll } from '@/app/rooms/[roomId]/feed-scroll'
+import { FeedItem, FeedScroll } from '@/app/rooms/[roomId]/feed-scroll'
 import { FeedSearch, type FeedAuthor } from '@/app/rooms/[roomId]/feed-search'
 import { roomMemberName } from '@/lib/member-name'
 import { loadRoomName } from '@/lib/room-look'
@@ -25,6 +25,15 @@ const MEMORY_PAGE_SIZE = 30
 
 /** 더보기 서랍의 갤러리 미리보기에 놓을 사진 수 (캡처 `참고/앨범방_더보기.png`). */
 const GALLERY_PREVIEW_COUNT = 3
+
+/**
+ * 찾는 동안 읽어올 게시물 수.
+ *
+ * 찾기는 목록을 거르지 않고 **그 자리로 데려가는** 방식이라, 찾은 게시물이 화면에
+ * 실제로 있어야 한다. 평소 30개만 읽으면 조금만 옛날 것이어도 갈 곳이 없다.
+ * 이보다 더 오래된 것은 아직 못 간다 — 피드에 더보기(페이지네이션)가 생기면 그때 잇는다.
+ */
+const SEARCH_FEED_LIMIT = 200
 
 /**
  * 앨범방 상세 — 추억 피드 (캡처 10 빈 화면 / 캡처 22 게시물).
@@ -102,6 +111,15 @@ export default async function RoomPage({
 
   const roomName = roomNameResult ?? '앨범방'
 
+  /*
+    찾는 중이면 피드를 더 많이 가져온다.
+
+    **찾기는 목록을 거르지 않고 그 자리로 데려간다**(카카오톡 채팅방 검색과 같다.
+    사용자 결정 2026-08-20 — "걸러서 보기는 필요없어"). 그러려면 찾은 게시물이
+    화면에 실제로 있어야 하므로, 찾는 동안에는 범위를 넓혀서 읽는다.
+  */
+  const feedLimit = searchOpen ? SEARCH_FEED_LIMIT : MEMORY_PAGE_SIZE
+
   const memoriesQuery = supabase
     .from('memories')
     .select(MEMORY_CARD_SELECT)
@@ -115,42 +133,12 @@ export default async function RoomPage({
     */
     .order('pinned_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
-    .limit(MEMORY_PAGE_SIZE)
+    .limit(feedLimit)
 
-  const filteredQuery = hiddenIds.length > 0
+  const memoriesResult = await (hiddenIds.length > 0
     ? memoriesQuery.not('id', 'in', `(${hiddenIds.join(',')})`)
-    : memoriesQuery
+    : memoriesQuery)
 
-  const byAuthor = who ? filteredQuery.eq('author_id', who) : filteredQuery
-
-  /*
-    날짜는 **KST 하루**로 자른다. `+09:00`을 직접 붙이는 이유:
-    서버가 어느 시간대에서 돌든 같은 하루를 가리켜야 한다. 서버 기본 시간대를 믿으면
-    밤 11시에 올린 추억이 다음 날로 잡힌다.
-  */
-  const byDate = on
-    ? byAuthor
-        .gte('created_at', `${on}T00:00:00+09:00`)
-        .lt('created_at', `${nextKstDay(on)}T00:00:00+09:00`)
-    : byAuthor
-
-  /*
-    글자로 좁히기. 게시물 문구뿐 아니라 **댓글까지** 본다 —
-    카톡에서 찾는 말은 내가 쓴 말일 수도, 상대가 남긴 말일 수도 있다.
-    댓글에서 걸린 게시물의 번호를 먼저 모은 뒤 한 번에 건다(게시물마다 묻지 않는다).
-
-    한국어는 Postgres 기본 전문검색이 제대로 못 쪼갠다. 방 하나의 게시물은 많아야 수백 개라
-    ilike(부분 일치)로 충분하고, 오히려 "사랑"으로 "사랑해"가 걸리는 편이 기대에 맞는다.
-  */
-  const byText = q
-    ? byDate.or(
-        `description.ilike.%${escapeForFilter(q)}%,id.in.(${(
-          await loadMemoryIdsMatchingComments(supabase, roomId, q)
-        ).join(',')})`,
-      )
-    : byDate
-
-  const memoriesResult = await byText
 
   // 사진 서명·좋아요·저장·이름 정하기는 전부 여기서 끝난다(N+1 없음, @/lib/room-feed).
   const cards = await buildMemoryCards({
@@ -166,7 +154,27 @@ export default async function RoomPage({
     카드에서 뽑으면 "그 사람 걸로 좁히면 목록이 비는" 조건은 아예 고를 수도 없어서,
     왜 안 보이는지 알 길이 없다. 찾기 칸을 열었을 때만 읽는다.
   */
-  const authors = searchOpen ? await loadFeedAuthors(supabase, roomId) : []
+  /*
+    이 방의 구성원. 찾기의 [누가] 칩과 **더보기 서랍 맨 위 아바타 줄**이 함께 쓴다.
+    그래서 찾는 중이 아니어도 읽는다 — 서랍은 언제든 열릴 수 있다.
+  */
+  const members = await loadFeedAuthors(supabase, roomId)
+  const authors = searchOpen ? members : []
+
+  /*
+    찾은 게시물의 번호들 — **피드에 보이는 순서 그대로**.
+    화면은 이 목록을 받아 그 자리로 데려가고, ∧∨로 앞뒤 결과를 오간다.
+    목록 자체는 손대지 않는다(거르지 않는다).
+  */
+  const matchIds = await findMatchingMemoryIds({
+    supabase,
+    roomId,
+    q,
+    who,
+    on,
+    // 화면에 없는 게시물로는 데려갈 수 없다. 보이는 것들 안에서만 찾는다.
+    within: cards.map((card) => card.memoryId),
+  })
 
   /*
     더보기 서랍의 갤러리 미리보기 — **가장 최근 게시물 3개**의 대표 사진.
@@ -212,6 +220,7 @@ export default async function RoomPage({
           roomId={roomId}
           roomName={roomName}
           previewPhotos={previewPhotos}
+          memberNames={members.map((member) => member.name)}
         />
       </RoomAppBar>
 
@@ -219,7 +228,7 @@ export default async function RoomPage({
         스크롤 칸과 떠 있는 [맨 아래로] 버튼을 함께 그린다 (노션 IA 3.4).
         카드 목록은 여기서(서버에서) 그린 그대로 꽂히므로 번들에 들어가지 않는다.
       */}
-      <FeedScroll showJump={cards.length > 0}>
+      <FeedScroll showJump={cards.length > 0} matchIds={matchIds}>
         <div className="mx-auto w-full max-w-md px-screen-x pt-0.5 pb-screen-b">
           {/* 찾기 칸 (노션 IA 3.4·6.8). 고르는 일만 여기서 하고 거르는 일은 위 조회가 했다. */}
           <FeedSearch
@@ -228,7 +237,7 @@ export default async function RoomPage({
             on={on}
             q={q}
             open={searchOpen}
-            resultCount={cards.length}
+            matchCount={matchIds.length}
           />
 
           {memoriesResult.error ? (
@@ -250,7 +259,10 @@ export default async function RoomPage({
               className="mt-card flex flex-col gap-card"
             >
               {cards.map((card) => (
-                <MemoryCard key={card.memoryId} {...card} />
+                // 찾은 결과로 데려갈 때 이 자리를 표시한다. 카드 내용은 그대로 지나간다.
+                <FeedItem key={card.memoryId} memoryId={card.memoryId}>
+                  <MemoryCard {...card} as="div" />
+                </FeedItem>
               ))}
             </ul>
           )}
@@ -274,6 +286,76 @@ export default async function RoomPage({
       ) : null}
     </div>
   )
+}
+
+/**
+ * 조건에 맞는 게시물의 번호들 — **화면에 보이는 순서 그대로**.
+ *
+ * 찾기는 목록을 거르지 않는다. 어떤 게시물이 걸렸는지만 알아내고, 데려가는 일은 화면이 한다
+ * (카카오톡 채팅방 검색과 같다. 사용자 결정 2026-08-20).
+ *
+ * `within`은 지금 화면에 그려진 게시물들이다. 그 밖의 것이 걸려도 데려갈 자리가 없으므로
+ * 아예 후보에서 뺀다 — "3개 찾았어요"라고 해놓고 두 번째에서 멈추면 고장으로 읽힌다.
+ */
+async function findMatchingMemoryIds(options: {
+  supabase: Awaited<ReturnType<typeof createClient>>
+  roomId: string
+  q: string | null
+  who: string | null
+  on: string | null
+  within: string[]
+}): Promise<string[]> {
+  const { supabase, roomId, q, who, on, within } = options
+
+  // 아무 조건도 없으면 찾은 것도 없다. 조건 없이 "전부 찾음"으로 두면 ∧∨가 의미를 잃는다.
+  if (!q && !who && !on) return []
+  if (within.length === 0) return []
+
+  let query = supabase
+    .from('memories')
+    .select('id')
+    .eq('room_id', roomId)
+    .is('deleted_at', null)
+    .in('id', within)
+
+  if (who) query = query.eq('author_id', who)
+
+  /*
+    날짜는 **KST 하루**로 자른다. `+09:00`을 직접 붙이는 이유:
+    서버가 어느 시간대에서 돌든 같은 하루를 가리켜야 한다. 서버 기본 시간대를 믿으면
+    밤 11시에 올린 추억이 다음 날로 잡힌다.
+  */
+  if (on) {
+    query = query
+      .gte('created_at', `${on}T00:00:00+09:00`)
+      .lt('created_at', `${nextKstDay(on)}T00:00:00+09:00`)
+  }
+
+  /*
+    글자로 찾기. 게시물 문구뿐 아니라 **댓글까지** 본다 —
+    찾는 말은 내가 쓴 말일 수도, 상대가 남긴 말일 수도 있다.
+
+    한국어는 Postgres 기본 전문검색이 제대로 못 쪼갠다. 방 하나의 게시물은 많아야 수백 개라
+    ilike(부분 일치)로 충분하고, 오히려 "사랑"으로 "사랑해"가 걸리는 편이 기대에 맞는다.
+  */
+  if (q) {
+    const inComments = await loadMemoryIdsMatchingComments(supabase, roomId, q)
+    query = query.or(
+      `description.ilike.%${escapeForFilter(q)}%,id.in.(${inComments.join(',')})`,
+    )
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('[앨범방 찾기] 실패:', error.message)
+    return []
+  }
+
+  // 화면에 놓인 순서(고정 글 먼저, 그다음 최신순)를 그대로 따른다.
+  // DB가 준 순서를 믿지 않는다 — ∧∨가 화면 순서와 어긋나면 위아래가 뒤집힌 것처럼 보인다.
+  const found = new Set((data ?? []).map((row) => row.id))
+  return within.filter((id) => found.has(id))
 }
 
 /**

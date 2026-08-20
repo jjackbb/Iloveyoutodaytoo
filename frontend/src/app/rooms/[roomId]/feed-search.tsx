@@ -7,17 +7,22 @@ import { DatePickerModal } from '@/app/rooms/[roomId]/date-picker-modal'
 import { formatKstFullDate, kstTodayKey } from '@/lib/format'
 
 /**
- * 피드 찾아보기 — 누가 올렸는지 / 언제 올렸는지로 좁혀 보기 (노션 IA 3.4 · 6.8).
+ * 피드에서 찾기 — 카카오톡 채팅방 검색과 같은 방식 (노션 IA 3.4 · 6.8).
  *
- * **고르는 일만 여기서 하고, 거르는 일은 서버가 한다.** 고른 값은 주소(?who=&on=)에
- * 실려 서버로 가고, 서버가 그 조건으로 다시 읽어 내려준다.
- * 화면이 30개를 받아놓고 자기가 걸러 보여주지 않는다 — 그러면 "화면에 보이는 목록"과
- * "실제 데이터"가 어긋나고, 걸러낸 만큼 목록이 짧아진다.
+ * **목록을 거르지 않는다.** 조건에 맞는 게시물이 어느 것인지만 알아내고,
+ * 화면은 그 자리로 데려간다(∧∨로 앞뒤 결과 이동). 피드는 늘 전체가 그대로 보인다.
+ * (사용자 결정 2026-08-20 — "결과로 이동으로 ㄱㄱ, 걸러서 보기는 필요없어")
  *
+ * 거르지 않기로 한 이유: 찾는 사람이 알고 싶은 것은 "그 말이 어디 있었나"이지
+ * "그 말이 든 목록"이 아니다. 걸러버리면 앞뒤 맥락이 사라져서, 찾고 나서 다시
+ * 전체 목록으로 돌아가 그 자리를 또 찾아야 한다.
+ *
+ * 찾는 일 자체는 서버가 한다. 고른 값은 주소(?q=&who=&on=)에 실려 가고,
+ * 서버가 걸린 게시물 번호를 돌려준다 — 화면이 30개를 받아놓고 자기가 뒤지지 않는다.
  * 주소에 실리니 뒤로가기로 되돌아가고, 그 화면을 그대로 다시 열 수도 있다.
  *
- * 잔여데이터가 아닌 이유: 이 부품이 들고 있는 것은 "달력이 열려 있는가" 하나뿐이다.
- * 고른 조건은 전부 주소에 있다.
+ * 잔여데이터가 아닌 이유: 이 부품이 들고 있는 것은 입력칸의 초안과
+ * "달력이 열려 있는가"뿐이다. 고른 조건은 전부 주소에 있다.
  */
 
 export type FeedAuthor = { id: string; name: string }
@@ -32,15 +37,15 @@ export function FeedSearch({
   q,
   /** 조건이 없어도 찾기 칸을 열어둘지. 주소의 ?find=1 이 정한다. */
   open,
-  /** 이 조건으로 찾은 결과가 몇 개인지. 0이면 안내가 달라진다. */
-  resultCount,
+  /** 이 조건으로 몇 개를 찾았는지. 0이면 안내가 달라진다. */
+  matchCount,
 }: {
   authors: FeedAuthor[]
   who: string | null
   on: string | null
   q: string | null
   open: boolean
-  resultCount: number
+  matchCount: number
 }) {
   const router = useRouter()
   const [calendarOpen, setCalendarOpen] = useState(false)
@@ -148,7 +153,7 @@ export function FeedSearch({
       </form>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-base font-medium text-ink">누가 올렸나요</h2>
+        <h2 className="text-base font-medium text-ink">누가 올린 것에서</h2>
         <div className="flex flex-wrap gap-2">
           <Chip selected={who === null} onClick={() => apply({ who: null })}>
             모두
@@ -166,7 +171,7 @@ export function FeedSearch({
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-base font-medium text-ink">언제 올렸나요</h2>
+        <h2 className="text-base font-medium text-ink">언제 올린 것에서</h2>
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
@@ -190,12 +195,15 @@ export function FeedSearch({
       </div>
 
       {/*
-        결과가 없을 때 목록 자리만 비면 "고장 났나" 싶어진다. 무엇으로 찾았는지와
-        되돌리는 길을 여기서 함께 말해준다.
+        찾은 결과를 말해준다. 목록은 그대로라 아무것도 안 바뀐 것처럼 보이기 때문에,
+        **찾았는지 못 찾았는지는 반드시 글자로 알려야 한다.**
+        몇 번째를 보고 있는지는 아래 떠 있는 줄이 이어서 말한다.
       */}
-      {filtered && resultCount === 0 ? (
+      {filtered ? (
         <p role="status" className="text-base leading-relaxed break-keep text-muted">
-          이 조건에 맞는 추억이 없어요.
+          {matchCount > 0
+            ? `${matchCount}개를 찾았어요. 아래 화살표로 하나씩 볼 수 있어요.`
+            : '이 조건에 맞는 추억을 찾지 못했어요.'}
         </p>
       ) : null}
 
