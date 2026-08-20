@@ -293,8 +293,13 @@ export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
 
       {/*
         정리 줄 (노션 IA 2.2의 편집 모드).
-        캡처에는 롱프레스로 들어가지만 버튼으로 뒀다 — 길게 누르기는 화면에 흔적이 없어
-        있는 줄 모르면 영영 못 쓴다. 이 앱의 주 사용자는 시니어다(댓글 ⋯와 같은 판단).
+
+        캡처에는 롱프레스로 들어가지만 버튼으로 뒀다. 이유가 바뀌었으니 다시 적는다 —
+        그전에는 "시니어라 흔적 없는 제스처를 못 쓴다"였는데, 부모님도 카톡에서
+        메시지를 꾹 눌러 답장하신다(_workspace/12_ux_baseline.md).
+        지금 근거는 **여러 개를 고르는 일이라서**다. 롱프레스로 편집 모드에 들어가면
+        "지금 고르는 중"이라는 상태가 어디에도 안 보인다. 버튼은 그 상태를 켜고 끄는
+        자리를 만들어 준다. 나가는 길([취소])도 같은 줄에 생긴다.
       */}
       {current.items.length > 0 ? (
         <div className="mt-3 flex items-center justify-end gap-2">
