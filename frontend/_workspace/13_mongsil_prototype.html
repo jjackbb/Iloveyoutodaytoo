@@ -470,6 +470,28 @@
   }
   .times b { color: var(--primary); font-size: 13px; }
 
+  /* 글 쓰는 칸만 글자 선택을 되살린다 — 화면 전체는 막아 뒀다 */
+  .pouch textarea {
+    width: 100%;
+    border: none;
+    background: rgb(34 34 34 / 0.05);
+    border-radius: var(--r-inner);
+    padding: 10px 12px;
+    font: inherit; font-family: inherit; font-size: 15px; line-height: 1.5;
+    color: var(--ink);
+    resize: none;
+    -webkit-user-select: text; user-select: text;
+    touch-action: auto;
+  }
+  .pouch textarea::placeholder { color: var(--muted); }
+  .pouch textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+  /* 방금 올린 카드에 표시를 둔다 — 어느 것에 한마디를 다는지 알아야 한다 */
+  .post.just {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+
   .pouch .row { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; }
   .pouch .row button {
     flex: 1 1 0; min-height: 44px;
@@ -582,6 +604,57 @@
   .tabs div.sel { color: var(--primary); font-weight: 700; }
 
   /* ── 갤러리 시트 ─────────────────────────────────────────── */
+  /* ── 첫 실행 안내 ───────────────────────────────────────── */
+  .tut {
+    position: absolute; inset: 0;
+    z-index: 60;
+    display: grid; place-items: center;
+    padding: 0 24px;
+    background: rgb(34 34 34 / 0.44);
+    opacity: 0; pointer-events: none;
+    transition: opacity 260ms ease;
+  }
+  .tut.on { opacity: 1; pointer-events: auto; }
+  .tut-card {
+    width: 100%;
+    background: var(--card);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-card);
+    padding: 22px 20px 18px;
+    text-align: center;
+    transform: translateY(10px) scale(0.97);
+    transition: transform 300ms cubic-bezier(0.2, 1, 0.3, 1);
+  }
+  .tut.on .tut-card { transform: translateY(0) scale(1); }
+  .tut-cloud { width: 84px; margin: 0 auto 12px; }
+  .tut-cloud svg { width: 100%; display: block; }
+  .tut-card h2 { margin: 0 0 14px; font-size: 18px; font-weight: 700; }
+  .tut-card ul {
+    margin: 0 0 14px; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 9px;
+    text-align: left;
+  }
+  .tut-card li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 15px; color: var(--muted);
+  }
+  .tut-card li b {
+    flex: 0 0 auto; min-width: 78px;
+    background: var(--primary-soft); color: var(--primary);
+    font-size: 14px; font-weight: 700;
+    padding: 5px 10px; border-radius: var(--r-chip);
+    text-align: center;
+  }
+  .tut-note { margin: 0 0 16px; font-size: 13px; color: var(--muted); }
+  #tutOk {
+    width: 100%; min-height: 50px;
+    border: none; border-radius: var(--r-button);
+    background: var(--primary); color: #fff;
+    font: inherit; font-family: inherit; font-size: 16px; font-weight: 700;
+    box-shadow: var(--sh-button); cursor: pointer;
+  }
+  #tutOk:active { background: var(--primary-active); }
+
   .scrim {
     position: absolute; inset: 0;
     background: rgb(34 34 34 / 0.42);
@@ -824,6 +897,19 @@
             </div>
           </div>
 
+          <!-- 던져 올린 **뒤에** 한마디를 단다.
+               올리기 전에 물으면 "쓸 말이 없어서" 던지기를 망설이게 된다.
+               올라간 다음에 묻는 것은 덤이라 부담이 없다(사용자 결정 2026-08-24). -->
+          <div id="pCaption">
+            <h3>한마디 덧붙일까요?</h3>
+            <textarea id="capText" rows="2" placeholder="안 써도 괜찮아요"
+                      aria-label="한마디"></textarea>
+            <div class="row">
+              <button type="button" class="btn-ghost" id="capSkip">건너뛰기</button>
+              <button type="button" class="btn-fill" id="capDone">달기</button>
+            </div>
+          </div>
+
           <!-- 사진·영상을 담았을 때 -->
           <div id="pPhoto">
             <div class="held" id="held"></div>
@@ -850,6 +936,27 @@
         마이
       </div>
     </nav>
+
+    <!-- 첫 실행 안내. 카카오톡에 없는 동작이라 한 번은 말로 알려 준다.
+         그 뒤로는 화면을 깨끗하게 둔다 — 상시 버튼을 두지 않는다. -->
+    <div class="tut" id="tut">
+      <div class="tut-card">
+        <div class="tut-cloud" aria-hidden="true">
+          <svg viewBox="0 0 120 84"><g fill="#fbd9e8">
+            <rect x="14" y="44" width="92" height="28" rx="14"/>
+            <circle cx="36" cy="46" r="22"/><circle cx="62" cy="33" r="28"/><circle cx="88" cy="46" r="22"/>
+          </g></svg>
+        </div>
+        <h2>몽실이로 마음을 올려요</h2>
+        <ul>
+          <li><b>톡</b> 사진·영상 고르기</li>
+          <li><b>꾹</b> 목소리 녹음</li>
+          <li><b>위로 던지기</b> 올리기</li>
+        </ul>
+        <p class="tut-note">한마디는 올린 뒤에 달 수 있어요.</p>
+        <button type="button" id="tutOk">알겠어요</button>
+      </div>
+    </div>
 
     <div class="scrim" id="scrim"></div>
     <section class="sheet" id="sheet" aria-label="사진 고르기">
@@ -956,11 +1063,16 @@
      viewBox를 실제 픽셀 크기로 잡는 이유: 모양 하나를 늘려 쓰면 동그라미가
      타원으로 찌그러져 구름으로 안 보인다. 크기마다 새로 그린다.
      반지름을 하나씩 번갈아 바꾸는 이유: 다 같으면 톱니처럼 보인다. */
+  const POUCH_HEIGHT = { voice: 278, photo: POUCH_H, caption: 262 };
+
   function showPouch(kind) {
-    document.getElementById('pVoice').classList.toggle('on', kind === 'voice');
-    document.getElementById('pPhoto').classList.toggle('on', kind === 'photo');
+    ['voice', 'photo', 'caption'].forEach((k) => {
+      document.getElementById(
+        k === 'voice' ? 'pVoice' : k === 'photo' ? 'pPhoto' : 'pCaption',
+      ).classList.toggle('on', k === kind);
+    });
     // 흰 판이 몸통(27%~92%) 안에 들어가야 하므로 높이를 그만큼 넉넉히 준다
-    sizeCloud(bigW(), kind === 'voice' ? 278 : POUCH_H);
+    sizeCloud(bigW(), POUCH_HEIGHT[kind]);
     cloud.classList.add('open');
     mode = 'busy';
     // 커지는 480ms 동안 트랙 폭이 계속 바뀐다. 그동안 손잡이 자리를 다시 잡아준다.
@@ -1576,9 +1688,55 @@
       card.style.visibility = '';
       card.classList.add('landing');
       resetCloud();
-      mode = 'idle';
+      /* 올라간 다음에 한마디를 묻는다.
+         한 박자 쉬는 이유: resetCloud 가 전환을 잠깐 꺼 두고 다음 프레임에 되살린다.
+         그 사이에 크기를 바꾸면 몽실이가 애니메이션 없이 툭 커진다. */
+      setTimeout(() => openCaption(card), reduced ? 0 : 80);
     }, reduced ? 0 : 470);
   }
+
+  /* ── 올린 뒤 한마디 달기 ──────────────────────────────
+     올리기 **전에** 물으면 "쓸 말이 없어서" 던지기를 망설이게 된다.
+     올라간 다음에 묻는 것은 덤이라 부담이 없고, 안 써도 이미 올라가 있다. */
+  const capText = document.getElementById('capText');
+  let capCard = null;
+
+  function openCaption(card) {
+    capCard = card;
+    card.classList.add('just');
+    capText.value = '';
+    showPouch('caption');
+    // 판이 다 열린 뒤에 커서를 둔다. 열리는 중에 두면 자판이 판을 밀어 올린다.
+    setTimeout(() => capText.focus(), reduced ? 0 : 520);
+  }
+
+  function closeCaption(text) {
+    if (capCard) {
+      if (text) {
+        const p = document.createElement('p');
+        p.className = 'post-body';
+        p.style.marginTop = '12px';
+        p.textContent = text;
+        capCard.querySelector('.post-foot').before(p);
+      }
+      capCard.classList.remove('just');
+      capCard = null;
+    }
+    capText.blur();
+    hidePouch();
+    mode = 'idle';
+  }
+
+  document.getElementById('capDone').addEventListener('click', () => {
+    const t = capText.value.trim();
+    closeCaption(t);
+    tick(300, 50, 0.04);
+    showHint(t ? '한마디를 달았어요' : '올렸어요', 2000);
+  });
+  document.getElementById('capSkip').addEventListener('click', () => {
+    closeCaption('');
+    showHint('올렸어요', 1800);
+  });
 
   /* 톡 쳤을 때의 짧은 반응 — 눌렸다는 것이 손보다 눈에 먼저 닿아야 한다 */
   function tapPop() {
@@ -1848,13 +2006,10 @@
     hidePouch();
     closeGallery();
     resetCloud();
+    capCard = null;
     mode = 'idle';
-    // 카카오톡에 없는 동작이므로 첫 실행 때 0.6초 한 번만 알려준다.
-    setTimeout(() => {
-      cloud.classList.add('nudge');
-      showHint('톡 치면 사진, 꾹 누르면 목소리', 3800);
-    }, 500);
-    setTimeout(() => cloud.classList.remove('nudge'), 1300);
+    // 카카오톡에 없는 동작이라 첫 실행 때 한 번 말로 알려주고, 닫으면 몸으로 보여준다.
+    tut.classList.add('on');
   }
 
   /* ── 바깥을 누르면 이전으로 ───────────────────────────
@@ -1900,6 +2055,13 @@
 
     // 3) 판이 열려 있음 — 담은 것은 그대로 두고 접기만 한다
     if (cloud.classList.contains('open')) {
+      // 한마디 판은 '건너뛰기'와 같다. 이미 올라갔으니 되돌릴 것이 없다.
+      if (document.getElementById('pCaption').classList.contains('on')) {
+        closeCaption('');
+        tick(200, 50, 0.04);
+        showHint('올렸어요', 1800);
+        return;
+      }
       if (document.getElementById('pVoice').classList.contains('on')) {
         setCarrying({ kind: 'voice', sec: Math.max(1, Math.round(b - a)) });
       }
@@ -1944,6 +2106,18 @@
   window.addEventListener('resize', () => {
     if (dur) paintTrim();
     if (sheet.classList.contains('on')) sizeGridRows();
+  });
+
+  /* 안내를 닫으면 몽실이가 한 번 튕겨 보인다 — 말로 들은 것을 몸으로 잇는다. */
+  const tut = document.getElementById('tut');
+  document.getElementById('tutOk').addEventListener('click', () => {
+    tut.classList.remove('on');
+    tick(360, 44, 0.04);
+    setTimeout(() => {
+      cloud.classList.add('nudge');
+      showHint('톡 치면 사진, 꾹 누르면 목소리', 3600);
+    }, 260);
+    setTimeout(() => cloud.classList.remove('nudge'), 1060);
   });
 
   document.getElementById('reset').addEventListener('click', firstRun);
