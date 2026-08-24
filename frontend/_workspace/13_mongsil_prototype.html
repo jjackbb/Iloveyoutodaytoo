@@ -1064,13 +1064,20 @@
      타원으로 찌그러져 구름으로 안 보인다. 크기마다 새로 그린다.
      반지름을 하나씩 번갈아 바꾸는 이유: 다 같으면 톱니처럼 보인다. */
   const POUCH_HEIGHT = { voice: 278, photo: POUCH_H, caption: 262 };
+  const PANELS = { voice: 'pVoice', photo: 'pPhoto', caption: 'pCaption' };
+
+  /* 판은 **반드시 이 함수로만** 갈아 끼운다.
+     손으로 하나 끄고 하나 켜면 새 판이 생겼을 때 끄는 것을 빠뜨린다 —
+     실제로 갤러리→수정창 자리에서 문구 판을 안 꺼서 두 판이 겹쳐 떴다
+     (사용자 신고 2026-08-24). */
+  function setPanel(kind) {
+    Object.entries(PANELS).forEach(([k, id]) => {
+      document.getElementById(id).classList.toggle('on', k === kind);
+    });
+  }
 
   function showPouch(kind) {
-    ['voice', 'photo', 'caption'].forEach((k) => {
-      document.getElementById(
-        k === 'voice' ? 'pVoice' : k === 'photo' ? 'pPhoto' : 'pCaption',
-      ).classList.toggle('on', k === kind);
-    });
+    setPanel(kind);
     // 흰 판이 몸통(27%~92%) 안에 들어가야 하므로 높이를 그만큼 넉넉히 준다
     sizeCloud(bigW(), POUCH_HEIGHT[kind]);
     cloud.classList.add('open');
@@ -1894,8 +1901,7 @@
        끝에서 한꺼번에 바꿔치기하면 빈 흰 상자만 오그라들다 톡 바뀐다. */
     setCarrying({ kind: 'photo', idxs: chosen });
     renderHeld();
-    document.getElementById('pVoice').classList.remove('on');
-    document.getElementById('pPhoto').classList.add('on');
+    setPanel('photo');
     cloud.classList.add('open');
 
     requestAnimationFrame(() => {
