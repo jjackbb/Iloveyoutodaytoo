@@ -1,0 +1,1954 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>몽실이 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+
+<style>
+  /* ============================================================
+     몽실이 시안 — 감촉 확인용
+     색·모서리·그림자는 오늘도 사랑해의 globals.css 토큰을 그대로 옮겼다.
+     새 색을 만들지 않았다. 여기서 확인할 것은 "색"이 아니라 "동작"이다.
+     ============================================================ */
+  :root {
+    --canvas: #fbf7f8;
+    --card: #ffffff;
+    --surface-soft: #fff6f8;
+    --primary: #d50e68;
+    --primary-active: #b00b56;
+    --primary-soft: #fef0f6;
+    --ink: #222222;
+    --muted: #6a6a6a;
+    --hairline: #f0eaec;
+    --hairline-strong: #ebe2e5;
+    --brand-pink: #ed1074;
+    --brand-purple: #9a11c5;
+    --r-card: 22px;
+    --r-button: 17px;
+    --r-inner: 14px;
+    --r-chip: 100px;
+    --sh-card: 0 10px 30px -16px rgb(60 20 35 / 0.28);
+    --sh-button: 0 12px 22px -10px rgb(213 14 104 / 0.45);
+    --sh-chip: 0 4px 12px -4px rgb(60 20 35 / 0.25);
+    --sh-cloud: 0 16px 34px -14px rgb(213 14 104 / 0.36);
+    --screen-x: 20px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #efe7ea;
+    color: var(--ink);
+    font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  /* ── 무대: 데스크톱에서는 폰 틀, 폰에서는 전체화면 ───────── */
+  .stage {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    gap: 20px;
+    grid-template-columns: minmax(0, 390px);
+  }
+
+  .phone {
+    position: relative;
+    width: 100%;
+    height: 844px;
+    max-height: calc(100dvh - 48px);
+    background: var(--canvas);
+    border-radius: 38px;
+    box-shadow: 0 30px 70px -30px rgb(60 20 35 / 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* 앱처럼 굴게 만드는 세 줄 —
+       글자가 끌려 선택되는 것, 꾹 눌렀을 때 뜨는 복사/공유 풍선,
+       두 번 톡톡 쳤을 때의 확대를 전부 막는다. 웹이라 새는 것들이다. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+  .phone img, .phone svg { -webkit-user-drag: none; user-drag: none; }
+
+  @media (max-width: 480px) {
+    .stage { padding: 0; grid-template-columns: 1fr; }
+    .phone { height: 100dvh; max-height: none; border-radius: 0; box-shadow: none; }
+    .desk-note { display: none; }
+  }
+
+  /* ── 머리띠 ─────────────────────────────────────────────── */
+  .appbar {
+    flex: 0 0 auto;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--screen-x);
+    background: var(--canvas);
+    border-bottom: 1px solid var(--hairline);
+    z-index: 5;
+  }
+  .appbar h1 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .reset {
+    appearance: none;
+    border: 1px solid var(--hairline-strong);
+    background: var(--card);
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: var(--r-chip);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .reset:active { background: var(--surface-soft); }
+
+  /* ── 피드 ───────────────────────────────────────────────── */
+  .feed {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px var(--screen-x) 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scrollbar-width: none;
+    /* 위아래 넘기기만 허용한다. 옆으로 끄는 동작은 몽실이 몫이다. */
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+  .feed::-webkit-scrollbar { display: none; }
+
+  .post {
+    background: var(--card);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-card);
+    padding: 16px;
+    transform-origin: 50% 0%;
+  }
+  .post.landing {
+    animation: land 460ms cubic-bezier(0.16, 1.05, 0.3, 1) both;
+  }
+  @keyframes land {
+    0%   { opacity: 0; transform: scale(0.82) translateY(-10px); }
+    55%  { opacity: 1; transform: scale(1.035) translateY(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .avatar {
+    width: 38px; height: 38px; flex: 0 0 auto;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 14px; font-weight: 700; color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .who { font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .when { font-size: 13px; color: var(--muted); line-height: 1.3; }
+  .post-body { font-size: 15px; line-height: 1.65; word-break: keep-all; }
+
+  .post-foot {
+    display: flex; gap: 16px; align-items: center;
+    margin-top: 12px; padding-top: 11px;
+    border-top: 1px solid var(--hairline);
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* 음성 카드 */
+  .voice {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface-soft);
+    border-radius: var(--r-inner);
+    padding: 12px 14px;
+  }
+  .play {
+    width: 40px; height: 40px; flex: 0 0 auto;
+    border-radius: 50%;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .wave { display: flex; align-items: center; gap: 3px; height: 26px; flex: 1 1 auto; }
+  .wave i {
+    display: block; width: 3px; border-radius: 2px;
+    background: var(--primary); opacity: 0.42;
+  }
+  .dur { font-size: 13px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+
+  /* 사진 카드 */
+  .shots { display: grid; gap: 2px; border-radius: var(--r-inner); overflow: hidden; }
+  .shots.n1 { grid-template-columns: 1fr; }
+  .shots.n2 { grid-template-columns: 1fr 1fr; }
+  .shots.n3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
+  .shots.n3 > *:first-child { grid-row: span 2; }
+  .shots.n4 { grid-template-columns: 1fr 1fr; }
+  .shots > * { aspect-ratio: 1; }
+  .shots.n1 > * { aspect-ratio: 4 / 3; }
+  .shots.n3 > *:first-child { aspect-ratio: auto; }
+
+  /* 카드에는 넉 장까지만 보이고 나머지는 마지막 칸에 숫자로 접힌다 */
+  .more-n {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background: rgb(34 34 34 / 0.44);
+    color: #fff; font-size: 20px; font-weight: 700;
+  }
+
+  /* ── 하단 독 (몽실이가 사는 곳) ──────────────────────────── */
+  .dock {
+    position: absolute;
+    left: 0; right: 0; bottom: 66px;
+    height: 124px;
+    pointer-events: none;
+    z-index: 20;
+  }
+  /* 몽실이는 배경이 무엇이 될지 모른다 — 사진 카드 위에 앉으면 형체가 묻힌다.
+     그래서 바닥을 바탕색으로 흐리게 깔아 늘 같은 자리처럼 보이게 한다.
+     (시험 중에 실제로 사진 카드와 겹쳐 안 보이는 것을 확인하고 넣었다) */
+  .dock::before {
+    content: '';
+    position: absolute;
+    inset: -34px 0 0 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgb(251 247 248 / 0.97) 30%,
+      rgb(251 247 248 / 0.82) 56%,
+      rgb(251 247 248 / 0)
+    );
+  }
+
+  .hint {
+    position: absolute;
+    left: 50%; bottom: 108px;
+    transform: translateX(-50%);
+    background: rgb(34 34 34 / 0.88);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: var(--r-chip);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 260ms ease;
+  }
+  .hint.on { opacity: 1; }
+
+  /* 몽실이는 이제 '그릇'이다 — 커지면 그 안에 확인판이 들어앉는다.
+     크기를 transform이 아니라 width/height로 키우는 이유: transform으로 키우면
+     안에 든 글자까지 같이 늘어나 뭉개진다. 그릇만 커지고 내용은 제 크기여야 한다. */
+  #cloud {
+    --cw: 104px;
+    --ch: 74px;
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    width: var(--cw);
+    height: var(--ch);
+    margin-left: calc(var(--cw) / -2);
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+    transition:
+      width 480ms cubic-bezier(0.22, 1.1, 0.32, 1),
+      height 480ms cubic-bezier(0.22, 1.1, 0.32, 1),
+      margin-left 480ms cubic-bezier(0.22, 1.1, 0.32, 1);
+  }
+  #cloud:active { cursor: grabbing; }
+  #cloud.open { cursor: default; }
+  /* 그림자는 구름 모양에만 건다. #cloud에 걸면 안에 든 글자에까지 분홍 그림자가 진다. */
+  #cloud > svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; display: block;
+    filter: drop-shadow(var(--sh-cloud));
+    transition: opacity 240ms ease;
+  }
+  #cloud > svg.big { opacity: 0; }
+  #cloud.open > svg { opacity: 0; }
+  /* 커졌을 때는 바탕색과 맞닿는 면이 넓어져서 윤곽이 흐려진다. 그림자를 더 준다. */
+  #cloud.open > svg.big {
+    opacity: 1;
+    filter: drop-shadow(0 14px 32px rgb(213 14 104 / 0.22));
+  }
+  #cloud circle, #cloud rect { transition: none; }
+
+  /* 커진 몽실이 몸통(y 19~80 / 84) 안에 놓이는 **흰 판**.
+     구름 위에 글자를 바로 얹으면 분홍 바탕이라 읽기 힘들다. 판을 한 겹 깔아
+     글자는 흰 바탕에서 읽고, 구름은 그 판을 감싸는 몸이 된다. */
+  .pouch {
+    position: absolute;
+    left: 8%; right: 8%; top: 27%; bottom: 8%;
+    background: #fff;
+    border-radius: var(--r-inner);
+    padding: 10px 12px;
+    box-shadow: 0 3px 12px -7px rgb(60 20 35 / 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease, visibility 0s linear 180ms;
+  }
+  #cloud.open .pouch {
+    opacity: 1; visibility: visible;
+    transition: opacity 240ms ease 180ms, visibility 0s;
+  }
+  .pouch > div { display: none; height: 100%; flex-direction: column; }
+  .pouch > div.on { display: flex; }
+
+  /* 사진·영상을 담고 있을 때 몽실이 몸에 보이는 것.
+     숫자("3")보다 **담은 것이 겹쳐 보이는 편**이 무엇을 담았는지 바로 알려준다.
+     가장 최근에 고른 셋만 보인다 — 더 많으면 어차피 다 못 알아본다. */
+  .stack {
+    position: absolute;
+    left: 0; right: 0; top: 42%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+  #cloud.photo:not(.open) .stack { display: flex; }
+  .stack { transition: opacity 220ms ease; }
+  .stack .t {
+    width: 28px; height: 28px;
+    flex: 0 0 auto;
+    border-radius: 7px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px -2px rgb(60 20 35 / 0.4);
+    margin-left: -10px;
+  }
+  .stack .t:first-child { margin-left: 0; }
+
+  /* 첫 실행 힌트 — 0.6초 한 번만 튕긴다 */
+  @keyframes nudge {
+    0%   { transform: translateY(0) scale(1, 1); }
+    28%  { transform: translateY(-18px) scale(0.94, 1.07); }
+    56%  { transform: translateY(2px) scale(1.06, 0.95); }
+    100% { transform: translateY(0) scale(1, 1); }
+  }
+  #cloud.nudge { animation: nudge 600ms cubic-bezier(0.3, 0.9, 0.4, 1) both; }
+
+  /* 녹음 중 고리 */
+  .ring {
+    position: absolute;
+    left: 50%; bottom: 14px;
+    width: 104px; height: 74px;
+    margin-left: -52px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .ring.on { animation: ripple 1.5s ease-out infinite; }
+  @keyframes ripple {
+    0%   { opacity: 0.5; transform: scale(1); box-shadow: 0 0 0 0 rgb(213 14 104 / 0.4); }
+    100% { opacity: 0;   transform: scale(1.9); box-shadow: 0 0 0 24px rgb(213 14 104 / 0); }
+  }
+
+  /* 녹음 표시줄 */
+  .rec {
+    position: absolute;
+    left: 50%; bottom: 106px;
+    transform: translateX(-50%) translateY(8px);
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card);
+    box-shadow: var(--sh-card);
+    border-radius: var(--r-chip);
+    padding: 8px 16px 8px 13px;
+    opacity: 0;
+    transition: opacity 180ms ease, transform 180ms cubic-bezier(0.2, 1, 0.3, 1);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .rec.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .rec .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--primary);
+    animation: blink 1s steps(2, start) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  .rec .t { font-size: 15px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+  .rec .live { display: flex; align-items: flex-end; gap: 2.5px; height: 20px; }
+  .rec .live i { width: 3px; border-radius: 2px; background: var(--primary); opacity: 0.5; }
+
+  /* ── 녹음 확인·자르기 판 ────────────────────────────────
+     녹음이 끝나면 바로 담지 않는다. 목소리는 다시 녹음하기 부담스러운 것이라
+     **들어보고 앞뒤를 잘라낼 자리**가 있어야 한다. "어, 어... 밥은 먹었니"에서
+     앞의 "어, 어..."를 지우는 일이 실제로 가장 많이 필요하다. */
+  .pouch h3 {
+    margin: 0 0 9px;
+    font-size: 13px; font-weight: 700; color: var(--primary);
+    text-align: center;
+  }
+
+  /* 파형 + 손잡이 두 개 */
+  /* 손잡이는 양 끝(0%·100%)까지 가야 하는데, 트랙이 잘라내면 반쪽만 보인다.
+     그래서 잘라내는 일은 안쪽 track이 맡고, 손잡이는 그 바깥에 둔다. */
+  .trim {
+    position: relative;
+    height: 54px;
+    touch-action: none;
+  }
+  .trim .track {
+    position: absolute; inset: 0;
+    border-radius: var(--r-inner);
+    /* 몽실이 안은 이미 연분홍이라 --surface-soft 를 쓰면 트랙이 안 보인다 */
+    background: rgb(213 14 104 / 0.08);
+    overflow: hidden;
+  }
+  .trim .bars {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; gap: 2px;
+  }
+  .trim .bars i {
+    flex: 1 1 auto; border-radius: 2px;
+    background: var(--primary);
+    opacity: 0.18;
+    transition: opacity 90ms linear;
+  }
+  .trim .bars i.in { opacity: 0.5; }
+  .trim .bars i.played { opacity: 1; }
+
+  /* 잘려나가는 구간을 덮는 가림막 */
+  .trim .cut {
+    position: absolute; top: 0; bottom: 0;
+    background: rgb(251 247 248 / 0.82);
+    pointer-events: none;
+  }
+  #cutL { left: 0; }
+  #cutR { right: 0; }
+
+  /* 손잡이 — 보이는 것은 6px이지만 잡히는 곳은 44px이다 */
+  .grip {
+    position: absolute; top: 0; bottom: 0;
+    width: 44px; margin-left: -22px;
+    display: grid; place-items: center;
+    cursor: ew-resize;
+    touch-action: none;
+  }
+  .grip::before {
+    content: '';
+    width: 6px; height: 38px;
+    border-radius: 3px;
+    background: var(--primary);
+    box-shadow: 0 2px 6px -2px rgb(60 20 35 / 0.4);
+  }
+  .grip::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: var(--primary); opacity: 0.55;
+  }
+
+  /* 재생 머리 */
+  .head {
+    position: absolute; top: 4px; bottom: 4px; width: 2px;
+    background: var(--ink); border-radius: 2px;
+    opacity: 0; pointer-events: none;
+  }
+  .head.on { opacity: 0.75; }
+
+  .times {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 9px;
+    font-size: 12px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .times b { color: var(--primary); font-size: 13px; }
+
+  .pouch .row { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; }
+  .pouch .row button {
+    flex: 1 1 0; min-height: 44px;
+    border-radius: var(--r-button);
+    font: inherit; font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none;
+    white-space: nowrap;
+  }
+  /* 몽실이 안쪽이 거의 흰색이라, 흰 단추를 두면 단추가 사라진다 */
+  .btn-ghost { background: rgb(34 34 34 / 0.065); color: var(--muted); }
+  .btn-ghost:active { background: rgb(34 34 34 / 0.12); }
+  .btn-line { background: var(--primary-soft); color: var(--primary); }
+  .btn-line:active { background: #fbdcea; }
+  .btn-fill { background: var(--primary); color: #fff; box-shadow: var(--sh-button); }
+  .btn-fill:active { background: var(--primary-active); }
+
+  /* ── 담은 사진·영상 고치기 ──────────────────────────────
+     "고르면 곧바로 올라간다"가 아니라 "골라 담아두고, 던져야 올라간다".
+     담아둔 동안에는 한 장씩 빼거나 더 고를 수 있어야 한다. */
+  .held {
+    display: flex; gap: 6px;
+    overflow-x: auto; overflow-y: hidden;
+    /* 가로 스크롤 칸이라 세로는 반드시 잘린다(CSS 규칙상 visible이 안 된다).
+       그래서 위로 튀어나오는 ✕ 단추만큼 미리 자리를 비워 둔다 —
+       이걸 안 해서 ✕의 윗부분이 잘렸다(사용자 지적 2026-08-24). */
+    padding: 9px 9px 6px;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+  .held::-webkit-scrollbar { display: none; }
+  .held .one {
+    position: relative; flex: 0 0 auto;
+    width: 62px; height: 62px;
+    border-radius: 10px;
+    overflow: visible;
+    /* 옆 칸이 자리를 비켜 주는 움직임. 끌고 있는 칸만 이 전환을 끈다. */
+    transition: transform 220ms cubic-bezier(0.2, 1, 0.3, 1);
+    touch-action: pan-x;
+  }
+  /* 들어 올린 칸 — 손끝을 즉시 따라와야 하므로 전환을 끈다 */
+  .held .one.lift {
+    transition: none;
+    z-index: 5;
+    touch-action: none;
+  }
+  .held .one.lift .img {
+    box-shadow: 0 10px 22px -6px rgb(60 20 35 / 0.5);
+    transform: scale(1.08);
+  }
+  .held .one .img { transition: transform 160ms ease, box-shadow 160ms ease; }
+  .held.reordering { overflow-x: hidden; }
+  .held .one .img {
+    width: 100%; height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px -3px rgb(60 20 35 / 0.4);
+  }
+  .held .one .tag {
+    position: absolute; left: 3px; bottom: 3px;
+    background: rgb(34 34 34 / 0.62); color: #fff;
+    font-size: 9px; font-weight: 700;
+    padding: 1px 4px; border-radius: var(--r-chip);
+  }
+  .held .one button {
+    /* 칸 안쪽으로 당긴다. 밖으로 빼면 옆 칸 위에 얹혀서
+       어느 것을 빼는 단추인지 헷갈린다. */
+    position: absolute; top: -5px; right: -2px;
+    width: 22px; height: 22px; min-height: 22px;
+    padding: 0; border-radius: 50%;
+    border: 1.5px solid #fff;
+    background: var(--ink); color: #fff;
+    font-size: 11px; font-weight: 700; line-height: 1;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .held .one button::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; }
+
+  /* 갤러리 타일의 영상 표시 */
+  .vid {
+    position: absolute; left: 7px; bottom: 7px;
+    display: flex; align-items: center; gap: 4px;
+    background: rgb(34 34 34 / 0.62);
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 3px 7px 3px 5px; border-radius: var(--r-chip);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 착지 지점에 터지는 작은 뭉치들 */
+  .puff {
+    position: absolute;
+    border-radius: 50%;
+    background: #fde4ee;
+    pointer-events: none;
+    z-index: 19;
+  }
+
+  /* ── 탭 ─────────────────────────────────────────────────── */
+  .tabs {
+    flex: 0 0 auto;
+    height: 66px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--card);
+    border-top: 1px solid var(--hairline);
+    z-index: 5;
+  }
+  .tabs div {
+    display: grid; place-items: center; gap: 3px;
+    font-size: 11px; font-weight: 500; color: var(--muted);
+  }
+  .tabs div.sel { color: var(--primary); font-weight: 700; }
+
+  /* ── 갤러리 시트 ─────────────────────────────────────────── */
+  .scrim {
+    position: absolute; inset: 0;
+    background: rgb(34 34 34 / 0.42);
+    opacity: 0; pointer-events: none;
+    transition: opacity 240ms ease;
+    z-index: 30;
+  }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    max-height: 74%;
+    background: var(--card);
+    border-radius: var(--r-card) var(--r-card) 0 0;
+    transform: translateY(100%);
+    transition: transform 320ms cubic-bezier(0.2, 0.95, 0.25, 1);
+    z-index: 31;
+    display: flex; flex-direction: column;
+  }
+  .sheet.on { transform: translateY(0); }
+
+  /* 고르기 창이 **수정창 자리로 작아지며** 옮겨간다.
+     닫았다가 다시 여는 것보다, 같은 창이 줄어드는 편이
+     "고른 것이 그대로 넘어간다"는 걸 눈으로 잇는다. */
+  /* 시트가 줄어드는 동안 **몽실이도 같은 박자로 부풀어 오른다.**
+     전에는 시트만 줄었다가 끝에서 몽실이로 톡 바뀌어서, 빈 흰 상자가
+     한참 오그라드는 것처럼 보였다(사용자 지적 2026-08-24).
+     둘이 같이 움직이면 시트가 몽실이로 녹아드는 하나의 동작으로 읽힌다.
+     그래서 굽이(cubic-bezier)도 몽실이 것과 똑같이 맞춘다. */
+  .sheet.morphing {
+    transition:
+      left 480ms cubic-bezier(0.22, 1.1, 0.32, 1),
+      right 480ms cubic-bezier(0.22, 1.1, 0.32, 1),
+      bottom 480ms cubic-bezier(0.22, 1.1, 0.32, 1),
+      height 480ms cubic-bezier(0.22, 1.1, 0.32, 1),
+      border-radius 480ms ease,
+      opacity 200ms ease;
+  }
+  /* 격자가 통째로 찌그러지면 흉하다. 내용부터 먼저 걷는다. */
+  .sheet.morphing > header,
+  .sheet.morphing > .grid,
+  .sheet.morphing > footer {
+    opacity: 0;
+    transition: opacity 190ms ease;
+    pointer-events: none;
+  }
+  /* 몽실이가 뒤에서 다 자랐을 때쯤 시트가 스르르 걷힌다 */
+  .sheet.morphing.gone { opacity: 0; }
+
+  /* 걷은 시트를 원위치로 되돌릴 때 잠깐 화면에서 빼 둔다.
+     이게 없으면 되돌리는 순간 `on`이 떨어지면서 **다시 보이는 채로 아래로 미끄러지는**
+     애니메이션이 걸린다 — 사라졌던 시트가 되살아나 슉 내려간다(사용자 신고 2026-08-24).
+     display:none 인 동안 바뀐 값에는 전환이 걸리지 않는다. */
+  .sheet.hidden { display: none; }
+  .sheet header {
+    padding: 16px var(--screen-x) 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .sheet h2 { margin: 0; font-size: 16px; font-weight: 700; }
+  .sheet .grid {
+    flex: 1 1 auto; min-height: 0; overflow-y: auto;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+    padding: 6px;
+    /* ⚠ 줄 높이는 JS(sizeGridRows)가 칸 너비와 똑같이 잡아 준다.
+       칸 폭이 1fr 이면 그 폭이 정해지기 전에 줄 높이를 재기 때문에
+       aspect-ratio 가 줄 높이 계산에 반영되지 않는다. 그래서 줄은 96px인데
+       타일은 118px이 되어 **줄마다 16px씩 겹쳤고**, 아래에 붙은 영상 시간이
+       다음 줄에 가려져 잘렸다(사용자 신고 2026-08-24).
+       align-content: start 는 남는 높이를 줄에 나눠 주지 않게 막는다. */
+    align-items: start;
+    align-content: start;
+  }
+  .pick {
+    position: relative; aspect-ratio: 1;
+    border: none; padding: 0; cursor: pointer;
+    background: none;
+    min-height: 0;
+  }
+  /* 사진 자체가 모서리를 가진 한 장으로 보이게 한다 */
+  .thumb {
+    position: relative;
+    display: block;              /* span 이라 이게 없으면 크기가 안 잡힌다 */
+    width: 100%; height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 170ms cubic-bezier(0.2, 1, 0.3, 1);
+  }
+  .pick[aria-pressed="true"] .thumb { transform: scale(0.88); }
+  /* 고른 표시는 사진 위에 얹는 고리. 흰 원을 통째로 얹으면 사진을 가린다. */
+  .badge {
+    position: absolute; top: 9px; right: 9px;
+    width: 23px; height: 23px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+    background: rgb(34 34 34 / 0.26);
+    border: 2px solid #fff;
+    color: transparent;
+    box-shadow: var(--sh-chip);
+    transition: background 140ms ease;
+  }
+  .pick[aria-pressed="true"] .badge { background: var(--primary); color: #fff; }
+
+  .sheet footer { padding: 12px var(--screen-x) 20px; border-top: 1px solid var(--hairline); }
+  .go {
+    width: 100%; min-height: 52px;
+    border: none; border-radius: var(--r-button);
+    background: var(--primary); color: #fff;
+    font: inherit; font-size: 16px; font-weight: 700;
+    box-shadow: var(--sh-button);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .go:disabled { background: var(--hairline-strong); color: var(--muted); box-shadow: none; cursor: default; }
+  .go:not(:disabled):active { background: var(--primary-active); }
+
+  .x {
+    appearance: none; border: none; background: none;
+    font: inherit; font-size: 15px; font-weight: 500; color: var(--muted);
+    cursor: pointer; padding: 4px 6px; min-height: 34px;
+    font-family: inherit;
+  }
+
+  /* 고른 사진이 몽실이로 날아가는 조각 */
+  .flyer {
+    position: absolute;
+    border-radius: 8px;
+    z-index: 40;
+    pointer-events: none;
+    transition: transform 520ms cubic-bezier(0.5, 0, 0.3, 1), opacity 520ms ease, border-radius 520ms ease;
+  }
+
+  /* ── 데스크톱 안내 ───────────────────────────────────────── */
+  .desk-note {
+    max-width: 390px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #6f6268;
+    text-align: center;
+    word-break: keep-all;
+  }
+  .desk-note b { color: #4a3f44; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <header class="appbar">
+      <h1>엄마</h1>
+      <button class="reset" id="reset" type="button">처음부터</button>
+    </header>
+
+    <main class="feed" id="feed"></main>
+
+    <div class="dock">
+      <div class="hint" id="hint">몽실이를 위로 던져보세요</div>
+      <div class="ring" id="ring"></div>
+      <div class="rec" id="rec">
+        <span class="dot"></span>
+        <span class="t" id="rect">0:00</span>
+        <span class="live" id="live"></span>
+      </div>
+      <div id="cloud">
+        <svg viewBox="0 0 120 84" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <radialGradient id="cg" cx="36%" cy="26%" r="82%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="58%" stop-color="#fff1f6"/>
+              <stop offset="100%" stop-color="#fbd9e8"/>
+            </radialGradient>
+          </defs>
+          <g fill="url(#cg)">
+            <rect id="b0" x="14" y="44" width="92" height="28" rx="14"/>
+            <circle id="b1" cx="36" cy="46" r="22"/>
+            <circle id="b2" cx="62" cy="33" r="28"/>
+            <circle id="b3" cx="88" cy="46" r="22"/>
+          </g>
+          <g id="cargo"></g>
+        </svg>
+
+        <!-- 커졌을 때의 몽실이 = **확인판의 테두리**.
+             구름 모양 위에 글자를 얹으면 글자가 묻히고 판이 삐져나온다.
+             그래서 판은 반듯한 흰 판으로 두고, 그 가장자리를 따라 구름 뭉치를 두른다.
+             뭉치는 실제 픽셀 크기에 맞춰 JS가 그린다 — 모양 하나를 늘려 쓰면
+             동그라미가 찌그러져 구름으로 안 보인다. -->
+        <svg class="big" viewBox="0 0 120 84" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <radialGradient id="fg" cx="32%" cy="14%" r="106%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="52%" stop-color="#fdeef5"/>
+              <stop offset="100%" stop-color="#f7c8e0"/>
+            </radialGradient>
+          </defs>
+          <!-- ⚠ 모든 도형이 viewBox(0 0 120 84) 안에 들어와야 한다.
+               전에는 가운데 뭉치가 cy=13 r=18 이라 위로 5만큼 삐져나가
+               윗부분이 잘려 나갔다(사용자 신고 2026-08-24).
+               SVG는 그림틀 밖을 그리지 않는다. -->
+          <g fill="url(#fg)">
+            <rect x="3" y="20" width="114" height="60" rx="24"/>
+            <circle cx="28" cy="22" r="13"/>
+            <circle cx="59" cy="16" r="16"/>
+            <circle cx="90" cy="21" r="12"/>
+          </g>
+        </svg>
+
+        <div class="stack" id="stack" aria-hidden="true"></div>
+
+        <div class="pouch" id="pouch">
+          <!-- 목소리를 담았을 때 -->
+          <div id="pVoice">
+            <h3>들어보고, 필요하면 잘라내세요</h3>
+            <div class="trim" id="trim">
+          <div class="track">
+            <div class="bars" id="tbars"></div>
+            <div class="cut" id="cutL"></div>
+            <div class="cut" id="cutR"></div>
+            <div class="head" id="phead"></div>
+          </div>
+          <div class="grip" id="gripA" role="slider" tabindex="0"
+               aria-label="시작 지점" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0"></div>
+          <div class="grip" id="gripB" role="slider" tabindex="0"
+               aria-label="끝 지점" aria-valuemin="0" aria-valuenow="0" aria-valuemax="0"></div>
+        </div>
+        <div class="times">
+          <span id="tLeft">0:00</span>
+          <span><b id="tKeep">0:00</b> 담김 · <span id="tDrop">0초</span> 잘림</span>
+          <span id="tRight">0:00</span>
+        </div>
+            <div class="row">
+              <button type="button" class="btn-ghost" id="again">다시 녹음</button>
+              <button type="button" class="btn-line" id="play">들어보기</button>
+              <button type="button" class="btn-fill" id="keep">담기</button>
+            </div>
+          </div>
+
+          <!-- 사진·영상을 담았을 때 -->
+          <div id="pPhoto">
+            <div class="held" id="held"></div>
+            <div class="row">
+              <button type="button" class="btn-line" id="more">더 고르기</button>
+              <button type="button" class="btn-fill" id="done">담기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabs">
+      <div class="sel">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+        홈
+      </div>
+      <div>
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m3.8 6.7 8.2 6 8.2-6"/></svg>
+        사서함
+      </div>
+      <div>
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.4-4 4.1-6 7.5-6s6.1 2 7.5 6"/></svg>
+        마이
+      </div>
+    </nav>
+
+    <div class="scrim" id="scrim"></div>
+    <section class="sheet" id="sheet" aria-label="사진 고르기">
+      <header>
+        <button class="x" id="cancel" type="button">닫기</button>
+        <h2>사진 고르기</h2>
+        <span style="width:52px"></span>
+      </header>
+      <div class="grid" id="grid"></div>
+      <footer>
+        <button class="go" id="confirm" type="button" disabled>사진을 골라주세요</button>
+      </footer>
+    </section>
+  </div>
+
+  <p class="desk-note">
+    <b>이건 감촉만 보는 시안입니다.</b> 실제로 올라가지 않고, 저장되지도 않습니다.<br>
+    데스크톱에서는 마우스로 끌어 보시고, <b>폰에서 직접 만져보시는 편</b>이 판단에 맞습니다.
+  </p>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ============================================================
+     감촉을 결정하는 값들. 여기 숫자를 바꾸면 느낌이 바뀐다.
+     ============================================================ */
+  const TAP_MS        = 300;   // 이보다 짧게 톡 치면 "사진 고르기"
+  const TAP_SLOP      = 12;    // 그때 손끝이 이 안에서만 움직였어야 한다
+  const LONG_PRESS_MS = 380;   // 이만큼 누르고 있으면 녹음이 켜진다
+  const THROW_VY      = -0.55; // px/ms. 이보다 빠르게 위로 튕기면 "던졌다"
+  const THROW_DY      = -96;   // 또는 이만큼 위로 끌어올린 채 놓으면 던진 것으로 본다
+  const MAX_REC_MS    = 60000; // 앱과 같은 60초 상한
+  const MIN_KEEP_S    = 1;     // 잘라도 최소 1초는 남긴다
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const phone   = document.getElementById('phone');
+  const feed    = document.getElementById('feed');
+  const cloud   = document.getElementById('cloud');
+  const ring    = document.getElementById('ring');
+  const hintEl  = document.getElementById('hint');
+  const recBar  = document.getElementById('rec');
+  const recTime = document.getElementById('rect');
+  const live    = document.getElementById('live');
+  const cargo   = document.getElementById('cargo');
+  const scrim   = document.getElementById('scrim');
+  const sheet   = document.getElementById('sheet');
+  const grid    = document.getElementById('grid');
+  const confirmBtn = document.getElementById('confirm');
+
+  const blobs = ['b1', 'b2', 'b3'].map((id) => document.getElementById(id));
+  const baseR = blobs.map((b) => +b.getAttribute('r'));
+
+  /* 가짜 사진 12장. 바깥에서 이미지를 못 받아오므로 그라데이션으로 만든다. */
+  const SHOTS = [
+    'linear-gradient(150deg,#ffd9a8,#f6a6c1)',
+    'linear-gradient(150deg,#a8d4ff,#7f9bd6)',
+    'linear-gradient(150deg,#ffc7d9,#d886b7)',
+    'linear-gradient(150deg,#c9e8c0,#7fb99a)',
+    'linear-gradient(150deg,#ffe6a8,#e8a86b)',
+    'linear-gradient(150deg,#d9c7ff,#9a83d6)',
+    'linear-gradient(150deg,#ffd0c4,#e28a7d)',
+    'linear-gradient(150deg,#bfe4e8,#79aebb)',
+    'linear-gradient(150deg,#f7d6e6,#c98fb4)',
+    'linear-gradient(150deg,#e6dcc4,#b3a179)',
+    'linear-gradient(150deg,#cfe1ff,#8ba3cf)',
+    'linear-gradient(150deg,#ffe0d0,#dda07f)',
+  ];
+  /* 번호 → 영상 길이(초). 없는 번호는 사진이다. PRD의 "짧은 영상 2~3초"를 그대로 뒀다. */
+  const VIDEOS = { 2: 3, 7: 2 };
+
+  /* ── 상태 ─────────────────────────────────────────────── */
+  let mode = 'idle';        // idle | drag | rec | carry | busy
+  let carrying = null;      // null | {kind:'voice', sec:n}
+  let raf = 0;
+
+  /* ── 몽실이 위치 ──────────────────────────────────────── */
+  let px = 0, py = 0;       // 집으로부터의 어긋남
+  let vx = 0, vy = 0;
+  let squash = 0;           // -1(납작) ~ 1(길쭉)
+  let scale = 1;
+
+  function paint() {
+    cloud.style.transform =
+      `translate3d(${px.toFixed(2)}px, ${py.toFixed(2)}px, 0)` +
+      ` scale(${(scale * (1 - squash * 0.16)).toFixed(3)}, ${(scale * (1 + squash * 0.2)).toFixed(3)})`;
+  }
+
+  /* ── 몽실이 크기 ──────────────────────────────────────
+     transform이 아니라 width/height를 바꾼다. transform으로 키우면 안에 든
+     글자까지 늘어나 뭉개진다. 그릇만 커지고 내용은 제 크기를 지켜야 한다. */
+  const SMALL_W = 104, SMALL_H = 74;
+  /** 사진 수정창의 높이. 시트가 여기로 작아지므로 한 곳에서만 정한다. */
+  const POUCH_H = 240;
+  function sizeCloud(w, h) {
+    cloud.style.setProperty('--cw', w + 'px');
+    cloud.style.setProperty('--ch', h + 'px');
+  }
+  const bigW = () => Math.min(344, phone.clientWidth - 40);
+
+  /* 판의 테두리를 따라 구름 뭉치를 두른다.
+     viewBox를 실제 픽셀 크기로 잡는 이유: 모양 하나를 늘려 쓰면 동그라미가
+     타원으로 찌그러져 구름으로 안 보인다. 크기마다 새로 그린다.
+     반지름을 하나씩 번갈아 바꾸는 이유: 다 같으면 톱니처럼 보인다. */
+  function showPouch(kind) {
+    document.getElementById('pVoice').classList.toggle('on', kind === 'voice');
+    document.getElementById('pPhoto').classList.toggle('on', kind === 'photo');
+    // 흰 판이 몸통(27%~92%) 안에 들어가야 하므로 높이를 그만큼 넉넉히 준다
+    sizeCloud(bigW(), kind === 'voice' ? 278 : POUCH_H);
+    cloud.classList.add('open');
+    mode = 'busy';
+    // 커지는 480ms 동안 트랙 폭이 계속 바뀐다. 그동안 손잡이 자리를 다시 잡아준다.
+    const t0 = performance.now();
+    const step = () => {
+      if (dur) paintTrim();
+      if (performance.now() - t0 < 560) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  function hidePouch() {
+    stopPlay();
+    cloud.classList.remove('open');
+    sizeCloud(SMALL_W, SMALL_H);
+  }
+
+  /* 담고 있는 것을 한 곳에서만 바꾼다 — 몸에 보이는 표시가 늘 따라간다 */
+  const stack = document.getElementById('stack');
+
+  function setCarrying(next) {
+    carrying = next;
+    cloud.classList.toggle('carrying', !!next);
+    cloud.classList.toggle('photo', !!next && next.kind === 'photo');
+    clearCargo();
+    stack.textContent = '';
+    if (!next) { puffStop(); return; }
+    if (next.kind === 'voice') showCargo('voice');
+    else renderStack(next.idxs);
+    /* 무엇을 담았든 담고 있는 동안에는 잔잔히 몽글거린다.
+       목소리를 품은 몽실이만 가만히 있으면 사진 때와 달라 보인다. */
+    puffStart(1.3);
+  }
+
+  /* 가장 최근에 고른 셋을 겹쳐 보여준다. 마지막에 고른 것이 맨 위로 온다. */
+  function renderStack(idxs) {
+    const tilt = [-9, 1, 9];
+    idxs.slice(-3).forEach((idx, i) => {
+      const t = document.createElement('div');
+      t.className = 't';
+      t.style.background = SHOTS[idx];
+      t.style.transform = `rotate(${tilt[i] ?? 0}deg)`;
+      t.style.zIndex = String(i + 1);
+      stack.appendChild(t);
+    });
+  }
+
+  /* 스프링으로 집에 돌아온다. 뚝 끊기면 고무줄 느낌이 안 난다. */
+  function springHome() {
+    cancelAnimationFrame(raf);
+    if (reduced) { px = py = vx = vy = 0; squash = 0; scale = 1; paint(); return; }
+    const step = () => {
+      vx += -px * 0.24; vy += -py * 0.24;
+      vx *= 0.72; vy *= 0.72;
+      px += vx; py += vy;
+      squash *= 0.86;
+      scale += (1 - scale) * 0.2;
+      paint();
+      if (Math.abs(px) + Math.abs(py) + Math.abs(vx) + Math.abs(vy) > 0.4) {
+        raf = requestAnimationFrame(step);
+      } else {
+        px = py = vx = vy = 0; squash = 0; scale = 1; paint();
+      }
+    };
+    raf = requestAnimationFrame(step);
+  }
+
+  /* ── 몽실몽실 (사진을 품고 부풀 때) ───────────────────── */
+  /* 세기(amp)만 바꾸면 몽글몽글이 끊기지 않고 이어진다.
+     담기는 순간에는 크게, 담고 기다리는 동안에는 잔잔하게 계속 숨쉰다.
+     전에는 다 담고 나서 몽실이가 1.08배에서 1배로 뚝 줄어 "갑자기 작아졌다"고
+     보였다(사용자 지적 2026-08-24). 이제 크기는 건드리지 않고 뭉치만 움직인다. */
+  let puffT = 0, puffRaf = 0, puffAmp = 2.6;
+  function puffStart(amp = 2.6) {
+    puffAmp = amp;
+    if (reduced || puffRaf) return;      // 이미 돌고 있으면 세기만 갈아 끼운다
+    const step = () => {
+      puffT += 0.09;
+      blobs.forEach((b, i) => {
+        b.setAttribute('r', (baseR[i] + Math.sin(puffT + i * 2.1) * puffAmp).toFixed(2));
+      });
+      puffRaf = requestAnimationFrame(step);
+    };
+    puffRaf = requestAnimationFrame(step);
+  }
+  function puffStop() {
+    cancelAnimationFrame(puffRaf);
+    puffRaf = 0;
+    blobs.forEach((b, i) => b.setAttribute('r', baseR[i]));
+  }
+
+  /* ── 손끝 신호: 진동이 없는 기기(아이폰)를 위한 대체 ──── */
+  let audio = null;
+  function tick(freq = 190, ms = 42, gain = 0.055) {
+    if (navigator.vibrate) { try { navigator.vibrate(14); } catch (e) {} }
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === 'suspended') audio.resume();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(gain, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + ms / 1000);
+      o.connect(g).connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + ms / 1000);
+    } catch (e) {}
+  }
+
+  /* ── 끌기 ─────────────────────────────────────────────── */
+  let pressT = 0, pressTimer = 0, samples = [];
+  let startX = 0, startY = 0;
+
+  cloud.addEventListener('pointerdown', (e) => {
+    if (mode === 'busy') return;
+    cloud.setPointerCapture(e.pointerId);
+    cloud.classList.remove('nudge');
+    hideHint();
+    cancelAnimationFrame(raf);
+
+    mode = 'drag';
+    startX = e.clientX; startY = e.clientY;
+    pressT = performance.now();
+    samples = [{ t: pressT, y: 0 }];
+    vx = vy = 0;
+
+    /* 꾹 누르면 녹음 — **단, 빈 몽실이일 때만**.
+       이미 무언가를 담고 있으면 꾹 누르기는 녹음이 아니다. 던지려고 잡은 것이다.
+       (이걸 안 막아서, 사진을 담고 던지려 하면 손을 떼기 전에 녹음이 켜져
+        던지지도 못하고 멈춰 있었다 — 사용자 신고 2026-08-24)
+       담은 것을 목소리로 바꾸고 싶으면 톡 쳐서 판을 열고 [다시 녹음]으로 간다. */
+    if (!carrying) {
+      pressTimer = setTimeout(() => {
+        if (mode !== 'drag') return;
+        if (Math.abs(px) + Math.abs(py) > TAP_SLOP) return;
+        startRec();
+      }, LONG_PRESS_MS);
+    }
+  });
+
+  cloud.addEventListener('pointermove', (e) => {
+    if (mode !== 'drag' && mode !== 'rec') return;
+    const nx = e.clientX - startX;
+    const ny = e.clientY - startY;
+    // 녹음 중에는 몽실이가 손끝을 조금만 따라온다 — 말을 담고 있어 무겁다.
+    const k = mode === 'rec' ? 0.34 : 1;
+    px = nx * k; py = ny * k;
+
+    /* 끌기 시작한 순간 녹음 대기를 끊는다.
+       기다렸다가 "그때 얼마나 움직였나"를 보면, 튕기는 도중에 녹음이 켜졌다
+       꺼지는 일이 생긴다. 움직이기 시작하면 그건 이미 끌기다. */
+    if (mode === 'drag' && Math.abs(px) + Math.abs(py) > TAP_SLOP) clearTimeout(pressTimer);
+
+    const now = performance.now();
+    samples.push({ t: now, y: py });
+    if (samples.length > 6) samples.shift();
+    // 위로 빠르게 끌면 길쭉해진다
+    const recent = samples[0];
+    const dv = (py - recent.y) / Math.max(1, now - recent.t);
+    squash = Math.max(-0.6, Math.min(0.6, -dv * 0.7));
+    paint();
+  });
+
+  function release(e) {
+    clearTimeout(pressTimer);
+    if (mode === 'rec') { stopRec(); return; }
+    if (mode !== 'drag') return;
+
+    const now = performance.now();
+    const held = now - pressT;
+    const moved = Math.abs(px) + Math.abs(py);
+
+    /* 톡 한 번 = 사진·영상 고르기.
+       던지기(올리기)와 완전히 다른 일이므로 동작도 완전히 달라야 한다.
+       누르는 시간과 움직인 거리 둘 다로 가른다 — 시간만 보면 빠른 던지기가 탭으로 잡힌다. */
+    if (held < TAP_MS && moved < TAP_SLOP) {
+      mode = 'idle';
+      springHome();
+      tapPop();
+      // 빈 몽실이면 고르러 가고, 담고 있으면 담은 것을 열어 고친다.
+      if (!carrying) openGallery(false);
+      else if (carrying.kind === 'voice') showPouch('voice');
+      else openPhotoPouch();
+      return;
+    }
+
+    const old = samples[0] || { t: now, y: py };
+    const dt = Math.max(1, now - old.t);
+    const speed = (py - old.y) / dt;   // 음수 = 위로
+
+    if (speed < THROW_VY || py < THROW_DY) throwUp(speed);
+    else { mode = 'idle'; springHome(); }
+  }
+  cloud.addEventListener('pointerup', release);
+  cloud.addEventListener('pointercancel', release);
+
+  /* ── 녹음 ─────────────────────────────────────────────── */
+  let recStart = 0, recRaf = 0;
+  const bars = [];
+  for (let i = 0; i < 14; i++) {
+    const b = document.createElement('i');
+    live.appendChild(b);
+    bars.push(b);
+  }
+
+  function startRec() {
+    mode = 'rec';
+    tick(150, 55, 0.07);
+    ring.classList.add('on');
+    recBar.classList.add('on');
+    recStart = performance.now();
+    scale = 1.18; paint();
+    const step = () => {
+      const ms = performance.now() - recStart;
+      if (ms >= MAX_REC_MS) { stopRec(); return; }
+      const s = Math.floor(ms / 1000);
+      recTime.textContent = `0:${String(s).padStart(2, '0')}`;
+      bars.forEach((b, i) => {
+        const h = 5 + Math.abs(Math.sin(ms / 150 + i * 0.8)) * 15;
+        b.style.height = h.toFixed(1) + 'px';
+      });
+      recRaf = requestAnimationFrame(step);
+    };
+    recRaf = requestAnimationFrame(step);
+  }
+
+  function stopRec() {
+    cancelAnimationFrame(recRaf);
+    ring.classList.remove('on');
+    recBar.classList.remove('on');
+    const sec = Math.max(2, Math.round((performance.now() - recStart) / 1000));
+    tick(320, 60, 0.05);
+    scale = 1;
+    springHome();
+    // 바로 담지 않는다. 들어보고 잘라낼 자리를 먼저 연다.
+    openReview(sec);
+  }
+
+  /* ── 녹음 확인·자르기 ─────────────────────────────────── */
+  const trim   = document.getElementById('trim');
+  const tbars  = document.getElementById('tbars');
+  const gripA  = document.getElementById('gripA');
+  const gripB  = document.getElementById('gripB');
+  const cutL   = document.getElementById('cutL');
+  const cutR   = document.getElementById('cutR');
+  const phead  = document.getElementById('phead');
+
+  let dur = 0, a = 0, b = 0;      // 전체 길이 / 시작 / 끝 (초)
+  let shape = [];                 // 파형 높이. 녹음마다 다르게 생겨야 진짜처럼 보인다
+  let playRaf = 0, playing = false;
+
+  const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.round(s) % 60).padStart(2, '0')}`;
+
+  function openReview(sec) {
+    mode = 'busy';
+    dur = sec; a = 0; b = sec;
+    shape = Array.from({ length: 40 }, (_, i) =>
+      8 + Math.abs(Math.sin(i * 0.7 + sec) * 0.6 + Math.sin(i * 1.9) * 0.4) * 34);
+
+    tbars.textContent = '';
+    shape.forEach((h) => {
+      const i = document.createElement('i');
+      i.style.height = h.toFixed(1) + 'px';
+      tbars.appendChild(i);
+    });
+
+    [gripA, gripB].forEach((g) => g.setAttribute('aria-valuemax', String(sec)));
+    // 확인판은 따로 뜨는 판이 아니라 **몽실이가 커지면서 품는 것**이다.
+    showPouch('voice');
+  }
+
+  function paintTrim() {
+    const w = trim.clientWidth;
+    const pa = a / dur, pb = b / dur;
+    gripA.style.left = (pa * w) + 'px';
+    gripB.style.left = (pb * w) + 'px';
+    cutL.style.width = (pa * w) + 'px';
+    cutR.style.width = ((1 - pb) * w) + 'px';
+
+    [...tbars.children].forEach((el, i) => {
+      const t = ((i + 0.5) / shape.length) * dur;
+      el.classList.toggle('in', t >= a && t <= b);
+    });
+
+    const keep = b - a;
+    document.getElementById('tLeft').textContent = mmss(a);
+    document.getElementById('tRight').textContent = mmss(b);
+    document.getElementById('tKeep').textContent = mmss(keep);
+    document.getElementById('tDrop').textContent = `${Math.round(dur - keep)}초`;
+    gripA.setAttribute('aria-valuenow', a.toFixed(1));
+    gripB.setAttribute('aria-valuenow', b.toFixed(1));
+  }
+
+  /* 손잡이 끌기 */
+  function dragGrip(grip, which) {
+    grip.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      grip.setPointerCapture(e.pointerId);
+      stopPlay();
+      const move = (ev) => {
+        const r = trim.getBoundingClientRect();
+        const t = Math.max(0, Math.min(dur, ((ev.clientX - r.left) / r.width) * dur));
+        if (which === 'a') a = Math.min(t, b - MIN_KEEP_S);
+        else b = Math.max(t, a + MIN_KEEP_S);
+        a = Math.max(0, a); b = Math.min(dur, b);
+        paintTrim();
+      };
+      const up = () => {
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', up);
+        grip.removeEventListener('pointercancel', up);
+        tick(400, 24, 0.03);
+      };
+      grip.addEventListener('pointermove', move);
+      grip.addEventListener('pointerup', up);
+      grip.addEventListener('pointercancel', up);
+    });
+    // 키보드로도 옮길 수 있어야 한다
+    grip.addEventListener('keydown', (e) => {
+      const d = e.key === 'ArrowLeft' ? -0.5 : e.key === 'ArrowRight' ? 0.5 : 0;
+      if (!d) return;
+      e.preventDefault();
+      if (which === 'a') a = Math.max(0, Math.min(a + d, b - MIN_KEEP_S));
+      else b = Math.min(dur, Math.max(b + d, a + MIN_KEEP_S));
+      paintTrim();
+    });
+  }
+  dragGrip(gripA, 'a');
+  dragGrip(gripB, 'b');
+
+  /* 들어보기 — 시안이라 소리는 없고, 머리가 지나간 만큼 파형이 진해진다 */
+  function stopPlay() {
+    cancelAnimationFrame(playRaf);
+    playing = false;
+    phead.classList.remove('on');
+    document.getElementById('play').textContent = '들어보기';
+    [...tbars.children].forEach((el) => el.classList.remove('played'));
+  }
+
+  document.getElementById('play').addEventListener('click', () => {
+    if (playing) { stopPlay(); return; }
+    playing = true;
+    phead.classList.add('on');
+    document.getElementById('play').textContent = '멈추기';
+    const t0 = performance.now();
+    const step = () => {
+      const t = a + (performance.now() - t0) / 1000;
+      if (t >= b) { stopPlay(); return; }
+      const w = trim.clientWidth;
+      phead.style.left = ((t / dur) * w) + 'px';
+      [...tbars.children].forEach((el, i) => {
+        const bt = ((i + 0.5) / shape.length) * dur;
+        el.classList.toggle('played', bt >= a && bt <= t);
+      });
+      playRaf = requestAnimationFrame(step);
+    };
+    playRaf = requestAnimationFrame(step);
+  });
+
+  document.getElementById('again').addEventListener('click', () => {
+    hidePouch();
+    setCarrying(null);
+    dur = 0;
+    mode = 'idle';
+    showHint('몽실이를 다시 꾹 눌러보세요', 2600);
+  });
+
+  document.getElementById('keep').addEventListener('click', () => {
+    hidePouch();
+    setCarrying({ kind: 'voice', sec: Math.max(1, Math.round(b - a)) });
+    tick(300, 55, 0.045);
+    mode = 'idle';
+    showHint('담았어요. 위로 던지면 올라가요 · 톡 치면 고쳐요', 3200);
+  });
+
+  /* ── 담은 사진·영상 고치기 ───────────────────────────── */
+  const held = document.getElementById('held');
+
+  function openPhotoPouch() {
+    renderHeld();
+    showPouch('photo');
+  }
+
+  /** 칸 하나가 차지하는 폭(칸 62 + 사이 6). 자리를 몇 칸 옮겼는지 세는 데 쓴다. */
+  const SLOT = 68;
+  /** 순서를 바꾸려고 들어 올리기까지 눌러야 하는 시간. 이보다 짧게 훑으면 그냥 스크롤이다. */
+  const LIFT_MS = 220;
+
+  function renderHeld() {
+    const idxs = carrying ? carrying.idxs : [];
+    held.textContent = '';
+    idxs.forEach((idx, at) => {
+      const one = document.createElement('div');
+      one.className = 'one';
+      one.innerHTML =
+        `<div class="img" style="background:${SHOTS[idx]}"></div>` +
+        (VIDEOS[idx] ? `<span class="tag">0:0${VIDEOS[idx]}</span>` : '') +
+        `<button type="button" aria-label="이건 빼기">✕</button>`;
+
+      one.querySelector('button').addEventListener('click', (e) => {
+        e.stopPropagation();
+        tick(430, 24, 0.03);
+        const rest = carrying.idxs.filter((_, i) => i !== at);
+        if (!rest.length) {
+          // 마지막 한 장을 빼면 담은 게 없다 — 몽실이를 원래대로 돌린다
+          setCarrying(null);
+          hidePouch();
+          mode = 'idle';
+          showHint('다 뺐어요. 톡 치면 다시 고를 수 있어요', 2800);
+          return;
+        }
+        setCarrying({ kind: 'photo', idxs: rest });
+        renderHeld();
+      });
+
+      armLift(one, at);
+      held.appendChild(one);
+    });
+  }
+
+  /* ── 끌어서 순서 바꾸기 ───────────────────────────────
+     꾹 눌러 들어 올린 뒤에 끈다. 곧바로 끌리게 하면 좌우로 훑어
+     "무엇을 담았나" 보려는 동작이 매번 순서 바꾸기가 되어 버린다.
+     들어 올리는 동안 옆 칸들이 미리 자리를 비켜, 놓으면 어디로 갈지 보인다. */
+  let lift = null;
+
+  function armLift(one, at) {
+    one.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('button')) return;
+      const timer = setTimeout(() => start(e), LIFT_MS);
+      const cancel = () => {
+        clearTimeout(timer);
+        one.removeEventListener('pointerup', cancel);
+        one.removeEventListener('pointercancel', cancel);
+      };
+      one.addEventListener('pointerup', cancel);
+      one.addEventListener('pointercancel', cancel);
+
+      function start(ev) {
+        cancel();
+        one.setPointerCapture(e.pointerId);
+        lift = { el: one, from: at, to: at, x0: e.clientX };
+        one.classList.add('lift');
+        held.classList.add('reordering');
+        tick(520, 26, 0.035);
+
+        const move = (m) => {
+          if (!lift) return;
+          const dx = m.clientX - lift.x0;
+          lift.el.style.transform = `translateX(${dx}px)`;
+          const n = carrying.idxs.length;
+          const to = Math.max(0, Math.min(n - 1, lift.from + Math.round(dx / SLOT)));
+          if (to !== lift.to) { lift.to = to; shuffle(); tick(600, 18, 0.02); }
+        };
+        const drop = () => {
+          one.removeEventListener('pointermove', move);
+          one.removeEventListener('pointerup', drop);
+          one.removeEventListener('pointercancel', drop);
+          if (!lift) return;
+          const next = carrying.idxs.slice();
+          const [moved] = next.splice(lift.from, 1);
+          next.splice(lift.to, 0, moved);
+          held.classList.remove('reordering');
+          lift = null;
+          setCarrying({ kind: 'photo', idxs: next });
+          renderHeld();
+        };
+        one.addEventListener('pointermove', move);
+        one.addEventListener('pointerup', drop);
+        one.addEventListener('pointercancel', drop);
+      }
+    });
+  }
+
+  /** 들린 칸이 갈 자리를 만들어 주려고 나머지가 한 칸씩 비켜난다. */
+  function shuffle() {
+    [...held.children].forEach((child, i) => {
+      if (i === lift.from) return;
+      let d = 0;
+      if (lift.from < lift.to && i > lift.from && i <= lift.to) d = -SLOT;
+      else if (lift.from > lift.to && i >= lift.to && i < lift.from) d = SLOT;
+      child.style.transform = `translateX(${d}px)`;
+    });
+  }
+
+  document.getElementById('more').addEventListener('click', () => {
+    openGallery(true);
+  });
+
+  /* [담기] — 고른 것들이 몽실이 안으로 빨려 들어간다.
+     판이 그냥 닫히면 "어디로 갔지?"가 된다. 담기는 것을 보여줘야
+     그다음 던지기가 "이걸 던진다"로 읽힌다. */
+  document.getElementById('done').addEventListener('click', () => {
+    mode = 'busy';
+    const box = phone.getBoundingClientRect();
+    const idxs = carrying.idxs.slice();
+    const rects = [...held.children].map((c) => c.getBoundingClientRect());
+
+    // 작아진 뒤 몽실이가 앉을 자리 (탭 66 + 아래 여백 14 + 키 74의 절반)
+    const toX = box.width / 2;
+    const toY = box.height - (66 + 14 + SMALL_H / 2);
+
+    stack.style.opacity = '0';
+    hidePouch();
+    tick(250, 40, 0.04);
+
+    rects.forEach((r, i) => {
+      const f = document.createElement('div');
+      f.className = 'flyer';
+      f.style.background = SHOTS[idxs[i]];
+      f.style.width = r.width + 'px';
+      f.style.height = r.height + 'px';
+      f.style.left = (r.left - box.left) + 'px';
+      f.style.top = (r.top - box.top) + 'px';
+      phone.appendChild(f);
+      requestAnimationFrame(() => {
+        f.style.transitionDelay = (i * 45) + 'ms';
+        f.style.transform =
+          `translate(${(toX - (r.left - box.left) - r.width / 2).toFixed(1)}px,` +
+          ` ${(toY - (r.top - box.top) - r.height / 2).toFixed(1)}px)` +
+          ` scale(0.3) rotate(${i % 2 ? 10 : -10}deg)`;
+        f.style.opacity = '0';
+      });
+      setTimeout(() => f.remove(), 900 + i * 45);
+    });
+
+    // 다 들어가면 몽실이 몸에 겹쳐진 썸네일이 떠오른다
+    setTimeout(() => {
+      stack.style.opacity = '';
+      puffStart(3.4);                  // 받아 삼키는 순간은 크게
+      tick(330, 46, 0.04);
+    }, reduced ? 0 : 560);
+
+    setTimeout(() => {
+      // 멈추지 않는다. 담고 기다리는 동안 잔잔히 계속 몽글거린다.
+      puffStart(1.3);
+      mode = 'idle';
+      showHint('담았어요. 위로 던지면 올라가요 · 톡 치면 고쳐요', 3200);
+    }, reduced ? 0 : 1000);
+  });
+
+  // 판 안에서 누르는 것이 몽실이 끌기로 번지지 않게 한다
+  document.getElementById('pouch').addEventListener('pointerdown', (e) => e.stopPropagation());
+
+  /* 몽실이가 무언가를 품고 있음을 몸으로 보여준다 */
+  function showCargo(kind, count) {
+    cargo.textContent = '';
+    if (kind === 'voice') {
+      for (let i = 0; i < 7; i++) {
+        const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const h = 6 + Math.abs(Math.sin(i * 1.4)) * 16;
+        r.setAttribute('x', 44 + i * 7);
+        r.setAttribute('y', 40 - h / 2);
+        r.setAttribute('width', 3.4);
+        r.setAttribute('height', h);
+        r.setAttribute('rx', 1.7);
+        r.setAttribute('fill', '#d50e68');
+        r.setAttribute('opacity', '0.55');
+        cargo.appendChild(r);
+      }
+    } else if (kind === 'photo') {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', '60'); t.setAttribute('y', '46');
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('font-size', '22');
+      t.setAttribute('font-weight', '700');
+      t.setAttribute('fill', '#d50e68');
+      t.setAttribute('opacity', '0.6');
+      t.setAttribute('font-family', "'Noto Sans KR', sans-serif");
+      t.textContent = count;
+      cargo.appendChild(t);
+    }
+  }
+  const clearCargo = () => { cargo.textContent = ''; };
+
+  /* ── 던지기 ───────────────────────────────────────────── */
+  function throwUp(speed) {
+    /* 빈 몽실이를 던지면 아무 일도 일어나지 않는다 — 대신 왜 안 되는지를
+       그 자리에서 알려준다. 조용히 제자리로 돌아가면 고장으로 읽힌다. */
+    if (!carrying) {
+      mode = 'idle';
+      vy = -3.2;              // 살짝 튀어올랐다 돌아온다
+      springHome();
+      showHint('톡 치면 사진, 꾹 누르면 목소리를 담아요', 3000);
+      return;
+    }
+    mode = 'busy';
+    tick(260, 40, 0.04);
+
+    const load = carrying;
+    setCarrying(null);
+    dur = 0;
+
+    const card = load.kind === 'voice'
+      ? makeVoiceCard(load.sec)
+      : makePhotoCard(load.idxs);
+    card.style.visibility = 'hidden';
+    feed.prepend(card);
+    feed.scrollTop = 0;
+
+    const from = cloud.getBoundingClientRect();
+    const to = card.getBoundingClientRect();
+    const dx = (to.left + to.width / 2) - (from.left + from.width / 2);
+    const dy = (to.top + Math.min(60, to.height / 2)) - (from.top + from.height / 2);
+
+    cloud.style.transition = reduced ? 'none'
+      : 'transform 480ms cubic-bezier(0.32, 0, 0.2, 1), opacity 200ms ease 300ms';
+    requestAnimationFrame(() => {
+      cloud.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(0.34)`;
+      cloud.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+      burst(to.left + to.width / 2, to.top + Math.min(60, to.height / 2));
+      card.style.visibility = '';
+      card.classList.add('landing');
+      resetCloud();
+      mode = 'idle';
+    }, reduced ? 0 : 470);
+  }
+
+  /* 톡 쳤을 때의 짧은 반응 — 눌렸다는 것이 손보다 눈에 먼저 닿아야 한다 */
+  function tapPop() {
+    tick(430, 30, 0.035);
+    if (reduced) return;
+    cloud.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(0.9, 1.08)' }, { transform: 'scale(1)' }],
+      { duration: 220, easing: 'cubic-bezier(0.3,0.9,0.4,1)' }
+    );
+  }
+
+  function resetCloud() {
+    cloud.classList.remove('open');
+    sizeCloud(SMALL_W, SMALL_H);
+    cloud.style.transition = 'none';
+    cloud.style.opacity = '';
+    px = py = vx = vy = 0; squash = 0; scale = 1;
+    paint();
+    // 다음 프레임에 transition을 되살린다 (지금 되살리면 되돌아가는 게 보인다)
+    requestAnimationFrame(() => { cloud.style.transition = ''; });
+  }
+
+  /* 착지 자리에서 작은 뭉치들이 터진다 */
+  function burst(cx, cy) {
+    if (reduced) return;
+    const box = phone.getBoundingClientRect();
+    for (let i = 0; i < 7; i++) {
+      const p = document.createElement('div');
+      p.className = 'puff';
+      const s = 6 + Math.random() * 11;
+      p.style.width = p.style.height = s + 'px';
+      p.style.left = (cx - box.left - s / 2) + 'px';
+      p.style.top = (cy - box.top - s / 2) + 'px';
+      p.style.opacity = '0.85';
+      phone.appendChild(p);
+      const a = (Math.PI * 2 * i) / 7 + Math.random() * 0.6;
+      const d = 26 + Math.random() * 34;
+      p.animate(
+        [
+          { transform: 'translate(0,0) scale(0.5)', opacity: 0.85 },
+          { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d}px) scale(1.1)`, opacity: 0 },
+        ],
+        { duration: 520 + Math.random() * 220, easing: 'cubic-bezier(0.2,0.7,0.3,1)' }
+      ).onfinish = () => p.remove();
+    }
+  }
+
+  /* ── 갤러리 ───────────────────────────────────────────── */
+  let picked = [];
+
+  SHOTS.forEach((bg, i) => {
+    const b = document.createElement('button');
+    b.className = 'pick';
+    b.type = 'button';
+    b.setAttribute('aria-pressed', 'false');
+    b.setAttribute('aria-label', `사진 ${i + 1}`);
+    /* 3번째·8번째는 짧은 영상으로 둔다 — 사진과 나란히 놓였을 때의 모양을 보기 위해.
+       영상 시간은 **사진 안쪽**에 넣는다. 밖에 두면 고를 때 사진만 작아지면서
+       시간표가 사진에서 떨어져 나가 허공에 뜬다. */
+    const vid = VIDEOS[i];
+    b.innerHTML =
+      `<span class="thumb" style="background:${bg}">` +
+      (vid ? `<span class="vid"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>0:0${vid}</span>` : '') +
+      `</span>` +
+      `<span class="badge"></span>`;
+    b.addEventListener('click', () => togglePick(i, b));
+    grid.appendChild(b);
+  });
+
+  function togglePick(i, btn) {
+    const at = picked.indexOf(i);
+    if (at >= 0) picked.splice(at, 1);
+    else if (picked.length >= 6) return;   // 시안에서는 6장까지
+    else picked.push(i);
+    tick(420, 26, 0.03);
+    refreshPicks();
+  }
+
+  function refreshPicks() {
+    [...grid.children].forEach((b, i) => {
+      const at = picked.indexOf(i);
+      b.setAttribute('aria-pressed', at >= 0 ? 'true' : 'false');
+      b.querySelector('.badge').textContent = at >= 0 ? String(at + 1) : '';
+    });
+    confirmBtn.disabled = picked.length === 0;
+    confirmBtn.textContent = picked.length
+      ? `${picked.length}장 담기`
+      : '사진을 골라주세요';
+  }
+
+  /* keep=true 면 이미 담아둔 것을 고른 채로 연다 — [더 고르기]가 그렇게 부른다.
+     빈손으로 열면 아까 고른 게 사라진 것처럼 보인다. */
+  /** 줄 높이를 칸 너비와 똑같이 잡아 사진이 정확한 정사각형이 되게 한다. */
+  function sizeGridRows() {
+    const st = getComputedStyle(grid);
+    const padX = parseFloat(st.paddingLeft) + parseFloat(st.paddingRight);
+    const gap = parseFloat(st.columnGap) || 0;
+    const col = (grid.clientWidth - padX - gap * 2) / 3;
+    if (col > 0) grid.style.gridAutoRows = col.toFixed(2) + 'px';
+  }
+
+  let galleryFrom = 'plain';
+
+  function openGallery(keep) {
+    galleryFrom = keep ? 'pouch' : 'plain';
+    picked = keep && carrying && carrying.kind === 'photo' ? carrying.idxs.slice() : [];
+    refreshPicks();
+    if (keep) hidePouch();
+    scrim.classList.add('on');
+    sheet.classList.add('on');
+    sizeGridRows();
+    mode = 'busy';
+  }
+
+  function closeGallery() {
+    scrim.classList.remove('on');
+    sheet.classList.remove('on');
+  }
+
+  /* [닫기]도 가림막도 '이전으로'와 같은 길을 탄다 — 같은 뜻인데 결과가
+     다르면 안 된다. 고치던 중이었으면 고치던 판으로 되돌아간다.
+     (가림막은 바깥 누르기가 이미 처리하므로 여기서 또 하지 않는다) */
+  document.getElementById('cancel').addEventListener('click', () => stepBack());
+
+  /* 고른 사진들이 몽실이로 날아가 뭉친다 → 몽실몽실 → 커지면서 배치 */
+  /* 고르기 창이 그대로 **수정창 자리로 작아진다.**
+     닫았다 다시 여는 것보다, 같은 창이 줄어드는 편이
+     "방금 고른 것이 그대로 넘어간다"를 눈으로 이어 준다. */
+  confirmBtn.addEventListener('click', () => {
+    if (!picked.length) return;
+    const chosen = picked.slice();
+    mode = 'busy';
+    tick(240, 44, 0.045);
+
+    const w = bigW();
+    const side = Math.round((phone.clientWidth - w) / 2);
+
+    scrim.classList.remove('on');
+
+    /* 지금 높이를 숫자로 못 박고 시작한다.
+       시트 높이는 내용에 따라 정해지는 auto라서, auto → 240px 은 전환이 걸리지 않고
+       한 번에 툭 떨어진다(시험에서 실제로 그랬다). 시작값이 숫자여야 이어진다. */
+    const now = sheet.getBoundingClientRect();
+    sheet.style.height = Math.round(now.height) + 'px';
+    sheet.style.maxHeight = 'none';
+    sheet.style.left = '0px';
+    sheet.style.right = '0px';
+    sheet.style.bottom = '0px';
+    void sheet.offsetHeight;                 // 여기까지를 '지금 상태'로 굳힌다
+
+    sheet.classList.add('morphing');
+
+    /* 몽실이를 **지금 같이 키우기 시작한다.** 시트 뒤에서 함께 자라므로,
+       시트가 다 줄었을 때는 이미 같은 크기로 그 자리에 있다.
+       끝에서 한꺼번에 바꿔치기하면 빈 흰 상자만 오그라들다 톡 바뀐다. */
+    setCarrying({ kind: 'photo', idxs: chosen });
+    renderHeld();
+    document.getElementById('pVoice').classList.remove('on');
+    document.getElementById('pPhoto').classList.add('on');
+    cloud.classList.add('open');
+
+    requestAnimationFrame(() => {
+      sheet.style.left = side + 'px';
+      sheet.style.right = side + 'px';
+      sheet.style.bottom = '80px';           // 탭(66) + 몽실이 아래 여백(14)
+      sheet.style.height = POUCH_H + 'px';
+      sheet.style.borderRadius = '30px';
+      sizeCloud(w, POUCH_H);                 // 몽실이도 같은 480ms 동안 부푼다
+    });
+
+    // 다 자랐을 때쯤 시트만 스르르 걷는다
+    setTimeout(() => sheet.classList.add('gone'), reduced ? 0 : 330);
+
+    setTimeout(() => {
+      // 화면에서 뺀 뒤에 원위치시킨다. 순서를 바꾸면 시트가 되살아나 아래로 미끄러진다.
+      sheet.classList.add('hidden');
+      sheet.classList.remove('on', 'morphing', 'gone');
+      sheet.removeAttribute('style');
+      requestAnimationFrame(() => sheet.classList.remove('hidden'));
+      mode = 'busy';                          // 수정창이 열려 있는 상태
+    }, reduced ? 0 : 540);
+  });
+
+  /* ── 카드 만들기 ──────────────────────────────────────── */
+  function head() {
+    return `<div class="post-head">
+      <div class="avatar">나</div>
+      <div><div class="who">나</div><div class="when">방금 전</div></div>
+    </div>`;
+  }
+  function foot() {
+    return `<div class="post-foot">
+      <span>♡ 0</span><span>댓글 0</span>
+    </div>`;
+  }
+
+  function makeVoiceCard(sec) {
+    const el = document.createElement('article');
+    el.className = 'post';
+    const bars = Array.from({ length: 26 }, (_, i) =>
+      `<i style="height:${(5 + Math.abs(Math.sin(i * 0.9)) * 19).toFixed(1)}px"></i>`).join('');
+    el.innerHTML = head() + `
+      <div class="voice">
+        <button class="play" type="button" aria-label="들어보기">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+        </button>
+        <span class="wave">${bars}</span>
+        <span class="dur">0:${String(sec).padStart(2, '0')}</span>
+      </div>` + foot();
+    return el;
+  }
+
+  function makePhotoCard(idxs) {
+    const el = document.createElement('article');
+    el.className = 'post';
+    const n = Math.min(4, idxs.length);
+    const rest = idxs.length - 4;
+    const tiles = idxs.slice(0, 4).map((i, at) =>
+      `<div style="background:${SHOTS[i]};position:relative">` +
+      (VIDEOS[i] ? `<span class="vid"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>0:0${VIDEOS[i]}</span>` : '') +
+      (at === 3 && rest > 0 ? `<span class="more-n">+${rest}</span>` : '') +
+      `</div>`).join('');
+    el.innerHTML = head() + `<div class="shots n${n}">${tiles}</div>` + foot();
+    return el;
+  }
+
+  /* ── 안내 문구 ────────────────────────────────────────── */
+  let hintTimer = 0;
+  function showHint(text, ms) {
+    hintEl.textContent = text;
+    hintEl.classList.add('on');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => hintEl.classList.remove('on'), ms);
+  }
+  function hideHint() {
+    clearTimeout(hintTimer);
+    hintEl.classList.remove('on');
+  }
+
+  /* ── 처음 상태 ────────────────────────────────────────── */
+  function seed() {
+    feed.textContent = '';
+    const a = document.createElement('article');
+    a.className = 'post';
+    a.innerHTML = `<div class="post-head">
+        <div class="avatar" style="background:#eef3fb;color:#5a7fb5">엄</div>
+        <div><div class="who">엄마</div><div class="when">어제</div></div>
+      </div>
+      <p class="post-body" style="margin:0">밥은 먹었니. 오늘 김치 담갔다.</p>` + foot();
+    const b = document.createElement('article');
+    b.className = 'post';
+    b.innerHTML = `<div class="post-head">
+        <div class="avatar">나</div>
+        <div><div class="who">나</div><div class="when">3일 전</div></div>
+      </div>
+      <div class="shots n2">
+        <div style="background:${SHOTS[1]}"></div>
+        <div style="background:${SHOTS[4]}"></div>
+      </div>` + foot();
+    feed.append(a, b);
+  }
+
+  function firstRun() {
+    seed();
+    setCarrying(null);
+    dur = 0;
+    hidePouch();
+    closeGallery();
+    resetCloud();
+    mode = 'idle';
+    // 카카오톡에 없는 동작이므로 첫 실행 때 0.6초 한 번만 알려준다.
+    setTimeout(() => {
+      cloud.classList.add('nudge');
+      showHint('톡 치면 사진, 꾹 누르면 목소리', 3800);
+    }, 500);
+    setTimeout(() => cloud.classList.remove('nudge'), 1300);
+  }
+
+  /* ── 바깥을 누르면 이전으로 ───────────────────────────
+     몽실이 바깥을 톡 치면 **한 단계만** 되돌린다(사용자 지시 2026-08-24).
+     한 번에 처음까지 가면, 판 하나 닫으려다 담아둔 것을 통째로 잃는다.
+
+     되돌아가는 차례:
+       녹음 중        → 녹음을 그만둔다
+       고르기 창      → 닫는다. 고치던 중이었으면 고치던 판으로 되돌린다
+       판이 열려 있음 → 담은 채로 접는다 ([담기]와 같다)
+       담고만 있음    → 그때 비운다 (그 이전이 빈 몽실이다)
+
+     ⚠ 실수로 날리지 않게 두 가지를 지킨다 —
+       (1) **톡 친 것만** 친다. 피드를 넘기려고 쓸어내린 것은 치지 않는다.
+       (2) 조용히 넘어가지 않는다. 무엇이 되돌아갔는지 글자로 알린다. */
+  function stepBack() {
+    // 1) 녹음 중
+    if (mode === 'rec') {
+      cancelAnimationFrame(recRaf);
+      ring.classList.remove('on');
+      recBar.classList.remove('on');
+      clearTimeout(pressTimer);
+      mode = 'idle';
+      scale = 1;
+      springHome();
+      tick(200, 50, 0.04);
+      showHint('녹음을 그만뒀어요', 2000);
+      return;
+    }
+
+    // 2) 고르기 창
+    if (sheet.classList.contains('on')) {
+      closeGallery();
+      tick(200, 50, 0.04);
+      if (galleryFrom === 'pouch' && carrying && carrying.kind === 'photo') {
+        setTimeout(() => openPhotoPouch(), reduced ? 0 : 240);
+      } else {
+        mode = 'idle';
+      }
+      galleryFrom = 'plain';
+      return;
+    }
+
+    // 3) 판이 열려 있음 — 담은 것은 그대로 두고 접기만 한다
+    if (cloud.classList.contains('open')) {
+      if (document.getElementById('pVoice').classList.contains('on')) {
+        setCarrying({ kind: 'voice', sec: Math.max(1, Math.round(b - a)) });
+      }
+      hidePouch();
+      mode = 'idle';
+      tick(200, 50, 0.04);
+      showHint('담은 채로 접었어요. 톡 치면 다시 열려요', 2800);
+      return;
+    }
+
+    // 4) 담고만 있음
+    if (carrying) {
+      setCarrying(null);
+      dur = 0;
+      mode = 'idle';
+      tick(170, 70, 0.045);
+      showHint('비웠어요', 1800);
+    }
+  }
+
+  phone.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('#cloud') || e.target.closest('#sheet')) return;
+    const t0 = performance.now(), x0 = e.clientX, y0 = e.clientY;
+    const up = (u) => {
+      phone.removeEventListener('pointerup', up);
+      phone.removeEventListener('pointercancel', up);
+      // 오래 눌렀거나 손끝이 움직였으면 넘기기·끌기이지 톡 친 것이 아니다
+      if (performance.now() - t0 > 420) return;
+      if (Math.abs(u.clientX - x0) + Math.abs(u.clientY - y0) > TAP_SLOP) return;
+      stepBack();
+    };
+    phone.addEventListener('pointerup', up);
+    phone.addEventListener('pointercancel', up);
+  });
+
+  /* 꾹 누르면 브라우저가 띄우는 복사/공유 메뉴를 막는다.
+     여기서 꾹 누르기는 녹음이지 텍스트 선택이 아니다. */
+  phone.addEventListener('contextmenu', (e) => e.preventDefault());
+  phone.addEventListener('selectstart', (e) => e.preventDefault());
+  phone.addEventListener('dragstart', (e) => e.preventDefault());
+
+  window.addEventListener('resize', () => {
+    if (dur) paintTrim();
+    if (sheet.classList.contains('on')) sizeGridRows();
+  });
+
+  document.getElementById('reset').addEventListener('click', firstRun);
+  firstRun();
+})();
+</script>
+
+</head><body></body></html>
