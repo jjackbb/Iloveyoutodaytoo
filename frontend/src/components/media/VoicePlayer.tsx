@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { formatClock, formatDuration } from '@/lib/format'
 import { BAR_COUNT, levelsFromUrl } from '@/lib/waveform'
@@ -62,6 +62,17 @@ export function VoicePlayer({
   /** 처음 한 번만 알리기 위한 표시. 멈췄다 다시 틀어도 다시 부르지 않는다. */
   const firstPlayDone = useRef(false)
 
+  const trackRef = useRef<HTMLDivElement>(null)
+  const rafRef = useRef(0)
+  /** 지금 손끝으로 위치를 잡는 중인가. 그동안에는 소리 쪽 시간을 따라가지 않는다. */
+  const scrubbingRef = useRef(false)
+  /**
+   * 아직 파일을 안 받아서 옮겨두지 못한 위치.
+   * preload="none" 이라 한 번도 안 튼 소리는 currentTime 을 못 건드린다 —
+   * 그 자리를 기억해 뒀다가 파일이 준비되면 그때 옮긴다.
+   */
+  const pendingSeekRef = useRef<number | null>(null)
+
   /** 파일을 해석해서 얻은 높이. 어느 주소의 것인지 함께 들고 있어야 섞이지 않는다. */
   const [decoded, setDecoded] = useState<{
     src: string
@@ -88,6 +99,59 @@ export function VoicePlayer({
 
   const total = durationSec > 0 ? durationSec : 0
   const progress = total > 0 ? Math.min(1, elapsed / total) : 0
+
+  /*
+    재생 중에는 매 프레임 시간을 다시 읽는다.
+
+    왜: <audio>의 timeupdate 는 **1초에 네 번쯤만** 온다(브라우저가 정하는 값이라
+    우리가 못 바꾼다). 그 값으로 파형을 칠하면 250ms마다 한 칸씩 튀어서
+    소리는 이어지는데 그림만 툭툭 끊긴다(사용자 신고 2026-08-26).
+    화면을 그리는 박자(rAF)에 맞춰 읽으면 손끝과 눈이 같은 속도로 간다.
+
+    멈춰 있을 때는 돌리지 않는다 — 피드에 음성 카드가 여럿이면 그만큼 헛돈다.
+  */
+  useEffect(() => {
+    if (!playing) return
+
+    const step = () => {
+      const audio = audioRef.current
+      // 문지르는 동안에는 손끝이 주인이다. 소리 쪽 시간이 끼어들면 위치가 튄다.
+      if (audio && !scrubbingRef.current) setElapsed(audio.currentTime)
+      rafRef.current = requestAnimationFrame(step)
+    }
+
+    rafRef.current = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(rafRef.current)
+  }, [playing])
+
+  /** 이 자리로 옮긴다. 화면은 즉시 따라가고, 소리는 준비된 만큼 따라간다. */
+  function seekTo(sec: number) {
+    const clamped = Math.max(0, Math.min(total, sec))
+    setElapsed(clamped)
+
+    const audio = audioRef.current
+    if (!audio) return
+
+    // 아직 파일이 없으면 지금은 못 옮긴다. 자리만 기억해 둔다.
+    if (audio.readyState === 0) {
+      pendingSeekRef.current = clamped
+      return
+    }
+    try {
+      audio.currentTime = clamped
+    } catch {
+      pendingSeekRef.current = clamped
+    }
+  }
+
+  /** 손끝 x좌표 → 그 자리의 시간(초). */
+  function timeFromPointer(clientX: number): number {
+    const el = trackRef.current
+    if (!el || total <= 0) return 0
+    const box = el.getBoundingClientRect()
+    if (box.width <= 0) return 0
+    return ((clientX - box.left) / box.width) * total
+  }
 
   /**
    * 파형 해석을 시작한다. 재생을 누른 순간에만 부른다.
@@ -149,7 +213,21 @@ export function VoicePlayer({
           setPlaying(false)
           setElapsed(0)
         }}
-        onTimeUpdate={(event) => setElapsed(event.currentTarget.currentTime)}
+        onLoadedMetadata={(event) => {
+          // 틀기 전에 문질러 둔 자리가 있으면 이제 옮긴다.
+          const wanted = pendingSeekRef.current
+          if (wanted === null) return
+          pendingSeekRef.current = null
+          event.currentTarget.currentTime = wanted
+        }}
+        /*
+          멈춰 있을 때의 보정용으로만 남긴다. 재생 중에는 위의 rAF 루프가 읽는다 —
+          이 이벤트만으로는 1초에 네 번이라 그림이 끊긴다.
+        */
+        onTimeUpdate={(event) => {
+          if (playing || scrubbingRef.current) return
+          setElapsed(event.currentTarget.currentTime)
+        }}
       />
 
       <button
@@ -166,16 +244,64 @@ export function VoicePlayer({
       </button>
 
       {/*
-        파형. 장식이 아니라 "얼마나 남았는지"를 알려주는 진행 표시라
-        낭독기에는 진행률을 값으로 전한다.
+        파형 = 재생 위치를 **잡을 수 있는 손잡이**다(애플 음성 메모와 같은 방식).
+        장식이 아니라 조작 대상이라 progressbar 가 아니라 slider 다 —
+        progressbar 는 "보기만 하는 값"이라는 뜻이라 낭독기가 조작법을 안 알려준다.
+
+        touch-action: pan-y 인 이유: 이 부품은 피드 카드 안에도 들어간다.
+        여기서 세로 넘기기를 막으면 파형 위에 손가락이 닿는 순간 피드가 안 넘어간다.
+        세로는 브라우저에 넘기고, 가로로 움직인 것만 위치 잡기로 받는다.
       */}
       <div
-        role="progressbar"
+        ref={trackRef}
+        role="slider"
+        tabIndex={0}
         aria-label="재생 위치"
         aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(progress * 100)}
-        className="relative min-w-0 flex-1"
+        aria-valuemax={Math.round(total)}
+        aria-valuenow={Math.round(elapsed)}
+        aria-valuetext={`${formatClock(elapsed)} / ${formatClock(total)}`}
+        onPointerDown={(event) => {
+          if (total <= 0) return
+          event.currentTarget.setPointerCapture(event.pointerId)
+          scrubbingRef.current = true
+          // 파형을 누르면 그 자리로 바로 간다. 끌지 않고 톡 쳐도 옮겨져야 한다.
+          seekTo(timeFromPointer(event.clientX))
+        }}
+        onPointerMove={(event) => {
+          if (!scrubbingRef.current) return
+          seekTo(timeFromPointer(event.clientX))
+        }}
+        onPointerUp={() => {
+          scrubbingRef.current = false
+        }}
+        onPointerCancel={() => {
+          scrubbingRef.current = false
+        }}
+        onKeyDown={(event) => {
+          // 굴리거나 끌 수 없는 분(키보드·낭독기)도 같은 일을 할 수 있어야 한다.
+          const step =
+            event.key === 'ArrowLeft'
+              ? -1
+              : event.key === 'ArrowRight'
+                ? 1
+                : 0
+          if (step !== 0) {
+            event.preventDefault()
+            seekTo(elapsed + step)
+            return
+          }
+          if (event.key === 'Home') {
+            event.preventDefault()
+            seekTo(0)
+          } else if (event.key === 'End') {
+            event.preventDefault()
+            seekTo(total)
+          }
+        }}
+        // -my-3/py-3: 보이는 높이는 그대로 두고 **닿는 자리만** 위아래로 넓힌다.
+        // 파형 자체는 32px이라 손끝으로 정확히 짚기 어렵다.
+        className="relative -my-3 min-w-0 flex-1 cursor-pointer py-3 touch-pan-y"
       >
         <Bars levels={levels} className="text-ink/60" />
         {/*
@@ -184,11 +310,22 @@ export function VoicePlayer({
         */}
         <div
           aria-hidden
-          className="absolute inset-0"
+          className="absolute inset-x-0 top-3 bottom-3"
           style={{ clipPath: `inset(0 ${(1 - progress) * 100}% 0 0)` }}
         >
           <Bars levels={levels} className="text-primary" />
         </div>
+
+        {/*
+          재생 머리. 칠해진 부분의 끝이 어디인지 막대만으로는 반 칸 단위로만 보인다 —
+          가는 선이 있어야 지금 자리가 정확히 읽힌다.
+          transform 으로 옮긴다: left 를 매 프레임 바꾸면 레이아웃을 다시 계산한다.
+        */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-2 bottom-2 w-[2px] -translate-x-1/2 rounded-full bg-ink"
+          style={{ left: `${progress * 100}%` }}
+        />
       </div>
 
       {/* 숫자가 1초마다 바뀌어도 폭이 흔들리지 않도록 tabular-nums. */}

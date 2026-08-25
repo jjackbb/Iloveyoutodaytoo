@@ -1,4 +1,4 @@
-<!doctype html><html lang=\"ko\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">
+<meta charset="utf-8">
 <title>몽실이 시안</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,25 +11,25 @@
      새 색을 만들지 않았다. 여기서 확인할 것은 "색"이 아니라 "동작"이다.
      ============================================================ */
   :root {
-    --canvas: #fbf7f8;
+    --canvas: #f7f8fa;
     --card: #ffffff;
-    --surface-soft: #fff6f8;
-    --primary: #d50e68;
-    --primary-active: #b00b56;
-    --primary-soft: #fef0f6;
+    --surface-soft: #f2f4f6;
+    --primary: #5b4be0;
+    --primary-active: #4a3bc4;
+    --primary-soft: #efecff;
     --ink: #222222;
     --muted: #6a6a6a;
-    --hairline: #f0eaec;
-    --hairline-strong: #ebe2e5;
+    --hairline: #e5e8eb;
+    --hairline-strong: #dce0e5;
     --brand-pink: #ed1074;
     --brand-purple: #9a11c5;
     --r-card: 22px;
     --r-button: 17px;
     --r-inner: 14px;
     --r-chip: 100px;
-    --sh-card: 0 10px 30px -16px rgb(60 20 35 / 0.28);
-    --sh-button: 0 12px 22px -10px rgb(213 14 104 / 0.45);
-    --sh-chip: 0 4px 12px -4px rgb(60 20 35 / 0.25);
+    --sh-card: 0 10px 30px -16px rgb(25 31 40 / 0.26);
+    --sh-button: 0 12px 22px -10px rgb(91 75 224 / 0.42);
+    --sh-chip: 0 4px 12px -4px rgb(25 31 40 / 0.24);
     --sh-cloud: 0 16px 34px -14px rgb(213 14 104 / 0.36);
     --screen-x: 20px;
   }
@@ -229,9 +229,9 @@
     pointer-events: none;
     background: linear-gradient(
       to top,
-      rgb(251 247 248 / 0.97) 30%,
-      rgb(251 247 248 / 0.82) 56%,
-      rgb(251 247 248 / 0)
+      rgb(247 248 250 / 0.97) 30%,
+      rgb(247 248 250 / 0.82) 56%,
+      rgb(247 248 250 / 0)
     );
   }
 
@@ -411,7 +411,7 @@
     position: absolute; inset: 0;
     border-radius: var(--r-inner);
     /* 몽실이 안은 이미 연분홍이라 --surface-soft 를 쓰면 트랙이 안 보인다 */
-    background: rgb(213 14 104 / 0.08);
+    background: rgb(91 75 224 / 0.08);
     overflow: hidden;
   }
   .trim .bars {
@@ -431,7 +431,7 @@
   /* 잘려나가는 구간을 덮는 가림막 */
   .trim .cut {
     position: absolute; top: 0; bottom: 0;
-    background: rgb(251 247 248 / 0.82);
+    background: rgb(247 248 250 / 0.86);
     pointer-events: none;
   }
   #cutL { left: 0; }
@@ -508,7 +508,7 @@
   .btn-ghost { background: rgb(34 34 34 / 0.065); color: var(--muted); }
   .btn-ghost:active { background: rgb(34 34 34 / 0.12); }
   .btn-line { background: var(--primary-soft); color: var(--primary); }
-  .btn-line:active { background: #fbdcea; }
+  .btn-line:active { background: #ded8fb; }
   .btn-fill { background: var(--primary); color: #fff; box-shadow: var(--sh-button); }
   .btn-fill:active { background: var(--primary-active); }
   .btn-fill:disabled {
@@ -2227,5 +2227,3 @@
   firstRun();
 })();
 </script>
-
-</head><body></body></html>
