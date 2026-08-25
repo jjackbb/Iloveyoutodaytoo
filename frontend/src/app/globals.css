@@ -82,8 +82,11 @@
   /* 카드 사이 간격 */
   --spacing-card: 14px;
 
-  /* --- 폰트 --- */
-  --font-sans: var(--font-noto-sans-kr), system-ui, sans-serif;
+  /* --- 폰트 (2026-08-25: Noto Sans KR 에서 Pretendard 로) ---
+     실제 파일은 layout.tsx 가 불러온다(dynamic-subset).
+     'Pretendard Variable' 이 먼저다 — 가변 폰트라 굵기를 한 파일로 다 낸다. */
+  --font-sans:
+    'Pretendard Variable', Pretendard, system-ui, -apple-system, sans-serif;
 }
 
 /* 기본 글자 16px. 이 값이 모든 rem 단위의 기준이다 — text-base 가 16px가 된다.

@@ -96,7 +96,7 @@ export default async function RoomHiddenPage({
           <p className="mt-24 text-center text-lg leading-relaxed break-keep text-muted">
             숨긴 추억이 없어요.
             <br />
-            추억의 <strong className="font-extrabold text-ink">⋯</strong>에서 숨기면
+            추억의 <strong className="font-bold text-ink">⋯</strong>에서 숨기면
             <br />
             여기에 모여요.
           </p>

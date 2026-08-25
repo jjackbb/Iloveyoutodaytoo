@@ -338,7 +338,7 @@ function EditCaptionDialog({
 
   return (
     <Dialog labelledBy={labelId} onCancel={onCancel}>
-      <h2 id={labelId} className="text-lg font-extrabold text-ink">
+      <h2 id={labelId} className="text-lg font-bold text-ink">
         문구 고치기
       </h2>
 
@@ -412,7 +412,7 @@ function ConfirmDeleteDialog({
 
   return (
     <Dialog labelledBy={labelId} onCancel={onCancel}>
-      <h2 id={labelId} className="text-lg font-extrabold text-ink">
+      <h2 id={labelId} className="text-lg font-bold text-ink">
         이 추억을 삭제할까요?
       </h2>
       <p className="mt-2 text-base leading-relaxed break-keep text-muted">

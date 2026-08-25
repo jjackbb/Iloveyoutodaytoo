@@ -147,7 +147,7 @@ export default async function RoomGalleryPage({
           <p className="mt-24 text-center text-lg leading-relaxed break-keep text-muted">
             아직 사진이 없어요.
             <br />
-            앨범방에서 <strong className="font-extrabold text-ink">마음 표현하기</strong>
+            앨범방에서 <strong className="font-bold text-ink">마음 표현하기</strong>
             로<br />첫 사진을 남겨보세요 🌷
           </p>
         ) : (

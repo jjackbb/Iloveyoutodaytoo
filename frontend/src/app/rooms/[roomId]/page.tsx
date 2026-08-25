@@ -444,7 +444,7 @@ function EmptyFeed() {
     <p className="mt-24 text-center text-lg leading-relaxed break-keep text-muted">
       아직 추억이 없어요.
       <br />
-      아래 <strong className="font-extrabold text-ink">마음 표현하기</strong>로
+      아래 <strong className="font-bold text-ink">마음 표현하기</strong>로
       <br />첫 번째 추억을 남겨보세요 🌷
     </p>
   )

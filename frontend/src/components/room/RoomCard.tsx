@@ -98,7 +98,7 @@ export function RoomCard({
             // 어느 방으로 부르는 초대인지 링크 이름만 듣고 알 수 있어야 한다(WCAG 2.4.4).
             aria-label={`${name} 앨범방에 초대하기`}
             // z-10: 아래 카드 전체 링크(after:inset-0)보다 위에 있어야 눌린다.
-            className="z-10 inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-chip bg-card/95 px-3.5 text-base font-extrabold text-primary shadow-chip active:bg-primary-soft"
+            className="z-10 inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-chip bg-card/95 px-3.5 text-base font-bold text-primary shadow-chip active:bg-primary-soft"
           >
             <PeopleIcon />
             초대
@@ -131,7 +131,7 @@ export function RoomCard({
           링크 안에 링크가 되면 안 되기 때문이다.
           대신 제목 링크를 카드 전체로 늘려(after:inset-0) 어디를 눌러도 방으로 들어가게 한다.
         */}
-        <h3 className="truncate text-xl font-extrabold text-ink">
+        <h3 className="truncate text-xl font-bold text-ink">
           <Link
             href={`/rooms/${roomId}`}
             className="after:absolute after:inset-0 after:content-['']"

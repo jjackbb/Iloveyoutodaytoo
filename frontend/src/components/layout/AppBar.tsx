@@ -38,8 +38,8 @@ export function AppBar({
             // 프로토타입의 .brand(19px/900) : .pagetitle(17px/800) 관계를 그대로 옮겼다.
             'min-w-0 flex-1 truncate text-ink',
             align === 'center'
-              ? 'text-center text-xl font-extrabold'
-              : 'text-2xl font-black tracking-[-0.02em]',
+              ? 'text-center text-xl font-bold'
+              : 'text-2xl font-bold tracking-[-0.02em]',
           ].join(' ')}
         >
           {title}

@@ -136,7 +136,7 @@ function DrawerDialog({
         }`}
       >
         <div className="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
-          <h2 id={titleId} className="text-xl font-extrabold tracking-[-0.02em] text-ink">
+          <h2 id={titleId} className="text-xl font-bold tracking-[-0.02em] text-ink">
             더보기
           </h2>
           <button
@@ -272,7 +272,7 @@ function DrawerLink({
     <Link
       href={href}
       onClick={onNavigate}
-      className={`flex min-h-[52px] items-center gap-2 px-5 py-3 text-base font-extrabold active:bg-surface-soft ${
+      className={`flex min-h-[52px] items-center gap-2 px-5 py-3 text-base font-bold active:bg-surface-soft ${
         tone === 'danger' ? 'text-primary' : 'text-ink'
       }`}
     >

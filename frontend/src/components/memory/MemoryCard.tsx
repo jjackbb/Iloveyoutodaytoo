@@ -107,12 +107,12 @@ export function MemoryCard({
       <div className="flex items-center gap-3 px-4 pt-4 pb-3">
         <span
           aria-hidden
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-extrabold text-primary"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-bold text-primary"
         >
           {initial(authorName)}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-extrabold text-ink">
+          <p className="truncate text-base font-bold text-ink">
             {authorName}
           </p>
           <p className="text-sm text-muted">
@@ -296,7 +296,7 @@ function PhotoGrid({
               />
               {showMore ? (
                 <span
-                  className="absolute inset-0 flex items-center justify-center bg-black/45 text-xl font-extrabold text-white"
+                  className="absolute inset-0 flex items-center justify-center bg-black/45 text-xl font-bold text-white"
                   aria-label={`사진 ${hiddenPhotoCount}장 더 있음`}
                 >
                   +{Math.min(hiddenPhotoCount, PHOTO_MAX_COUNT)}

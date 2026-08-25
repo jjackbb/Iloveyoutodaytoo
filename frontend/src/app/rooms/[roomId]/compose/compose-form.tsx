@@ -877,7 +877,7 @@ export function ComposeForm({
                     className="sr-only"
                   />
                   <CameraIcon />
-                  <span className="text-sm font-extrabold tabular-nums">
+                  <span className="text-sm font-bold tabular-nums">
                     <span className="sr-only">사진 </span>
                     {photos.length}/{PHOTO_MAX_COUNT}
                   </span>
@@ -929,7 +929,7 @@ export function ComposeForm({
                       끌기 로직은 배열만 바꾸고 배지는 건드리지 않는다.
                     */}
                     {index === 0 ? (
-                      <span className="absolute inset-x-0 bottom-0 bg-ink/85 py-1 text-center text-sm font-extrabold text-white">
+                      <span className="absolute inset-x-0 bottom-0 bg-ink/85 py-1 text-center text-sm font-bold text-white">
                         대표 사진
                       </span>
                     ) : null}
@@ -966,7 +966,7 @@ export function ComposeForm({
 
           {/* 함께 담을 목소리 (캡처 12·16·18) */}
           <section aria-labelledby="voice-label" className="flex flex-col gap-2">
-            <h2 id="voice-label" className="text-base font-extrabold text-ink">
+            <h2 id="voice-label" className="text-base font-bold text-ink">
               함께 담을 목소리
             </h2>
             <VoiceRecorder
@@ -981,7 +981,7 @@ export function ComposeForm({
             <div className="flex items-baseline justify-between gap-3">
               <label
                 htmlFor="memory-caption"
-                className="text-base font-extrabold text-ink"
+                className="text-base font-bold text-ink"
               >
                 문구 <span className="font-medium text-muted">선택</span>
               </label>

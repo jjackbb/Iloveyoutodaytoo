@@ -22,7 +22,7 @@ export function MemberStack({ names }: { names: string[] }) {
         <span
           key={`${name}-${index}`}
           aria-hidden
-          className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-primary-soft text-sm font-extrabold text-primary first:ml-0"
+          className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-primary-soft text-sm font-bold text-primary first:ml-0"
         >
           {initial(name)}
         </span>
@@ -31,7 +31,7 @@ export function MemberStack({ names }: { names: string[] }) {
       {extra > 0 ? (
         <span
           aria-hidden
-          className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-primary text-sm font-extrabold text-white"
+          className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-primary text-sm font-bold text-white"
         >
           +{extra}
         </span>

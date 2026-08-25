@@ -63,7 +63,7 @@ export function NicknameForm({
         aria-live="polite"
         className="rounded-inner bg-surface-soft px-4 py-3.5 text-base leading-relaxed break-keep text-ink"
       >
-        이 방에서 <strong className="font-extrabold">{previewName}</strong>님으로 보여요.
+        이 방에서 <strong className="font-bold">{previewName}</strong>님으로 보여요.
       </p>
 
       <Button type="submit" fullWidth pending={pending} pendingText="저장하는 중…">

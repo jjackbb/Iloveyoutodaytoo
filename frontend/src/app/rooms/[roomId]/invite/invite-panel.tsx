@@ -321,7 +321,7 @@ function RecipientField({
               <div className="relative">
                 <span
                   aria-hidden
-                  className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-xl font-extrabold text-primary"
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-xl font-bold text-primary"
                 >
                   {[...person.name][0] ?? '?'}
                 </span>
@@ -551,7 +551,7 @@ function InviteResultRow({
         <div className="flex items-center gap-3">
           <span
             aria-hidden
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-extrabold text-primary"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-bold text-primary"
           >
             {[...invitation.relationshipLabel][0] ?? '?'}
           </span>

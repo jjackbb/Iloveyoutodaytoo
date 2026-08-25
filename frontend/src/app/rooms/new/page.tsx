@@ -45,7 +45,7 @@ export default async function NewRoomPage() {
             </svg>
           </Link>
 
-          <h1 className="min-w-0 flex-1 truncate text-xl font-extrabold text-ink">
+          <h1 className="min-w-0 flex-1 truncate text-xl font-bold text-ink">
             앨범방 만들기
           </h1>
 
@@ -57,7 +57,7 @@ export default async function NewRoomPage() {
       <RoomForm>
         {/* 캡처 06의 제목 두 줄. 글자뿐이라 서버에서 그려 넘긴다. */}
         <div>
-          <h2 className="text-2xl leading-snug font-black tracking-[-0.02em] break-keep text-ink">
+          <h2 className="text-2xl leading-snug font-bold tracking-[-0.02em] break-keep text-ink">
             새 앨범방을 만들어요
           </h2>
           <p className="mt-1.5 text-base leading-relaxed break-keep text-muted">

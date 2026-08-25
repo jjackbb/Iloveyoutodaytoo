@@ -424,7 +424,7 @@ export function VoiceRecorder({
 
         {/* 시간 — 녹음 중에는 흘러가는 시간, 녹음 후에는 총 길이. */}
         {recording || done ? (
-          <p className="tabular-nums text-3xl font-extrabold text-ink">
+          <p className="tabular-nums text-3xl font-bold text-ink">
             {formatClock(recording ? elapsedSec : (value?.durationSec ?? 0))}
           </p>
         ) : null}
@@ -455,7 +455,7 @@ export function VoiceRecorder({
       <p
         role="status"
         className={[
-          'inline-flex items-center gap-1.5 rounded-chip px-3.5 py-2 text-sm font-extrabold',
+          'inline-flex items-center gap-1.5 rounded-chip px-3.5 py-2 text-sm font-bold',
           satisfied
             ? 'bg-surface-soft text-muted'
             : 'bg-primary-soft text-primary',

@@ -58,7 +58,7 @@ export function RoomAppBar({
           </svg>
         </Link>
 
-        <h1 className="min-w-0 flex-1 truncate px-1 text-xl font-extrabold tracking-[-0.02em] text-ink">
+        <h1 className="min-w-0 flex-1 truncate px-1 text-xl font-bold tracking-[-0.02em] text-ink">
           {title}
         </h1>
 

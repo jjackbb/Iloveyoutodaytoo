@@ -65,7 +65,7 @@ export function EmptyState({
         </div>
       ) : null}
 
-      <p className="text-xl font-extrabold text-ink">{title}</p>
+      <p className="text-xl font-bold text-ink">{title}</p>
 
       {description ? (
         <p className="text-base leading-relaxed text-muted">{description}</p>

@@ -1,24 +1,26 @@
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata, Viewport } from 'next'
-import { Noto_Sans_KR } from 'next/font/google'
 
 import { SignupBeacon } from '@/app/signup-beacon'
 import { GA_ID } from '@/lib/analytics'
 import { readLargeTextCookie } from '@/lib/large-text'
 
+/*
+  Pretendard (2026-08-25: Noto Sans KR 에서 갈아탔다).
+
+  왜 바꿨나: 제목을 900으로 눌러 쓰던 화면이 "공지·커머스"의 목소리로 읽혔다.
+  다루는 감정이 쑥스러움·미안함이라 소리를 낮춰야 했다. Pretendard 는
+  한국 앱(토스 계열)의 사실상 표준이고 획이 곧아 같은 크기에서 덜 시끄럽다.
+  토스 전용 폰트와 애플 SF Pro 는 라이선스 때문에 못 쓴다.
+
+  dynamic-subset 을 쓴다 — 92개 조각으로 쪼개져 있어서 브라우저가
+  **그 화면에 실제로 나온 글자의 조각만** 받는다. 통짜 파일(약 2MB)을 받지 않는다.
+  자체 호스팅이라 외부 CDN에 기대지 않는다.
+*/
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css'
+
 import './globals.css'
 
-/**
- * 800·900은 제목용이다. 프로토타입이 제목을 굵게 눌러 쓰는데, 700까지만 있으면
- * 그 눌린 느낌이 안 나온다. 한글 웹폰트는 유니코드 구간별로 쪼개져 필요한 조각만
- * 받아오므로, 굵기를 늘려도 첫 화면에서 받는 양이 그만큼 늘지는 않는다.
- */
-const notoSansKr = Noto_Sans_KR({
-  variable: '--font-noto-sans-kr',
-  subsets: ['latin'],
-  weight: ['400', '500', '700', '800', '900'],
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: '오늘도 사랑해',
@@ -58,7 +60,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="ko"
-      className={`${notoSansKr.variable} h-full${largeText ? ' large-text' : ''}`}
+      className={`h-full${largeText ? ' large-text' : ''}`}
     >
       <body className="min-h-full flex flex-col font-sans">
         {children}

@@ -176,7 +176,7 @@ export default async function HomePage() {
             오른쪽 알림 종(.iconbtn)은 5-B단계에서 붙였다 — 그전까지는 눌러도
             아무 일이 없는 껍데기라 일부러 비워두고 있었다.
           */}
-          <h1 className="flex min-w-0 flex-1 items-center gap-2 truncate text-2xl font-black tracking-[-0.02em] text-ink">
+          <h1 className="flex min-w-0 flex-1 items-center gap-2 truncate text-2xl font-bold tracking-[-0.02em] text-ink">
             <BrandMark size={24} />
             오늘도 사랑해
           </h1>
@@ -319,7 +319,7 @@ function EmptyHero() {
         캡처는 <br>로 줄을 직접 끊었지만, 글자 크기를 키운 우리 화면에서는
         좁은 기기에서 어색하게 남는다. 끊는 자리는 기기 너비에 맡긴다.
       */}
-      <h2 className="text-2xl leading-snug font-black tracking-[-0.02em] break-keep text-ink">
+      <h2 className="text-2xl leading-snug font-bold tracking-[-0.02em] break-keep text-ink">
         아직 연결된 소중한 공간이 없어요
       </h2>
 

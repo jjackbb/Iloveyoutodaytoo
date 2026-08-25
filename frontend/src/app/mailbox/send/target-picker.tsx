@@ -123,7 +123,7 @@ export function TargetPicker({
 
           <h2
             id={`${baseId}-title`}
-            className="min-w-0 flex-1 truncate text-center text-lg font-extrabold text-ink"
+            className="min-w-0 flex-1 truncate text-center text-lg font-bold text-ink"
           >
             추가하기
           </h2>
@@ -135,7 +135,7 @@ export function TargetPicker({
           <button
             type="button"
             onClick={() => onConfirm(selected)}
-            className="flex h-11 shrink-0 items-center justify-center rounded-full px-3 text-base font-extrabold text-primary active:bg-primary-soft"
+            className="flex h-11 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold text-primary active:bg-primary-soft"
           >
             {selected.length > 0 ? `${selected.length} 확인` : '확인'}
           </button>
@@ -321,7 +321,7 @@ export function CandidateAvatar({
     return (
       <span
         aria-hidden
-        className={`flex shrink-0 items-center justify-center rounded-full bg-primary font-black text-white ${
+        className={`flex shrink-0 items-center justify-center rounded-full bg-primary font-bold text-white ${
           size === 'sm' ? 'h-14 w-14 text-2xl' : 'h-11 w-11 text-xl'
         }`}
       >

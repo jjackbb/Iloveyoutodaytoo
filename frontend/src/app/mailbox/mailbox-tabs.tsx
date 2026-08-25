@@ -247,7 +247,7 @@ export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
                 'min-h-[48px] rounded-[11px] px-4 py-2 text-lg transition-colors',
                 // 고른 칸을 색만으로 알리지 않는다 — 굵기와 그림자까지 함께 바뀐다(WCAG 1.4.1).
                 selected
-                  ? 'bg-card font-extrabold text-primary shadow-pill'
+                  ? 'bg-card font-bold text-primary shadow-pill'
                   : 'bg-transparent font-bold text-muted hover:text-ink',
               ].join(' ')}
             >
@@ -281,7 +281,7 @@ export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
                 'min-h-[44px] shrink-0 rounded-chip border px-4 text-base whitespace-nowrap transition-colors',
                 // 고른 칩은 색뿐 아니라 테두리·굵기까지 바뀐다(WCAG 1.4.1).
                 selected
-                  ? 'border-primary bg-primary font-extrabold text-white'
+                  ? 'border-primary bg-primary font-bold text-white'
                   : 'border-hairline-strong bg-card font-medium text-muted active:bg-surface-soft',
               ].join(' ')}
             >

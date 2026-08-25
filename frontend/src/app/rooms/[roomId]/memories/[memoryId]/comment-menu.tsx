@@ -159,7 +159,7 @@ export function CommentMenu({
           }}
           className="m-auto w-[min(24rem,calc(100vw-40px))] rounded-card bg-card p-5 text-ink shadow-card backdrop:bg-black/45"
         >
-          <h2 id={labelId} className="text-lg font-extrabold text-ink">
+          <h2 id={labelId} className="text-lg font-bold text-ink">
             이 {kind}을 삭제할까요?
           </h2>
           {/*

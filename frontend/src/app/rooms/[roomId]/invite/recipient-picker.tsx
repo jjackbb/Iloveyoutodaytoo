@@ -247,7 +247,7 @@ export function RecipientPicker({
 
           <h2
             id={`${baseId}-title`}
-            className="min-w-0 flex-1 truncate text-center text-lg font-extrabold text-ink"
+            className="min-w-0 flex-1 truncate text-center text-lg font-bold text-ink"
           >
             추가하기
           </h2>
@@ -259,7 +259,7 @@ export function RecipientPicker({
           <button
             type="button"
             onClick={() => onConfirm(checked)}
-            className="flex h-11 shrink-0 items-center justify-center rounded-full px-3 text-base font-extrabold text-primary active:bg-primary-soft"
+            className="flex h-11 shrink-0 items-center justify-center rounded-full px-3 text-base font-bold text-primary active:bg-primary-soft"
           >
             {checked.length > 0 ? `${checked.length} 확인` : '확인'}
           </button>
@@ -430,7 +430,7 @@ function Avatar({ name, size }: { name: string; size: 'sm' | 'md' }) {
   return (
     <span
       aria-hidden
-      className={`flex shrink-0 items-center justify-center rounded-full bg-primary-soft font-extrabold text-primary ${box}`}
+      className={`flex shrink-0 items-center justify-center rounded-full bg-primary-soft font-bold text-primary ${box}`}
     >
       {[...name][0] ?? '?'}
     </span>

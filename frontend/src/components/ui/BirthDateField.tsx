@@ -283,7 +283,7 @@ function BirthWheelSheet({
       <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-screen-x pt-5 pb-screen-b">
         <h2
           id={`${baseId}-title`}
-          className="text-xl font-extrabold text-ink"
+          className="text-xl font-bold text-ink"
         >
           생년월일
         </h2>

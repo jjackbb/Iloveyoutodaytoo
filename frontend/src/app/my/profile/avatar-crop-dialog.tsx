@@ -596,18 +596,18 @@ export function AvatarCropDialog({
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-[44px] rounded-chip px-4 text-base font-extrabold text-white active:bg-white/15"
+            className="min-h-[44px] rounded-chip px-4 text-base font-bold text-white active:bg-white/15"
           >
             취소
           </button>
-          <h2 id="avatar-crop-title" className="text-base font-extrabold text-white">
+          <h2 id="avatar-crop-title" className="text-base font-bold text-white">
             프로필 사진 선택
           </h2>
           <button
             type="button"
             onClick={handleReset}
             disabled={!natural || failed}
-            className="min-h-[44px] rounded-chip px-4 text-base font-extrabold text-white active:bg-white/15 disabled:opacity-50"
+            className="min-h-[44px] rounded-chip px-4 text-base font-bold text-white active:bg-white/15 disabled:opacity-50"
           >
             재설정
           </button>

@@ -106,7 +106,7 @@ export default async function RoomLikedPage({
           <p className="mt-24 text-center text-lg leading-relaxed break-keep text-muted">
             아직 좋아요한 추억이 없어요.
             <br />
-            마음에 드는 추억의 <strong className="font-extrabold text-ink">♡</strong>를
+            마음에 드는 추억의 <strong className="font-bold text-ink">♡</strong>를
             눌러보세요.
           </p>
         ) : (

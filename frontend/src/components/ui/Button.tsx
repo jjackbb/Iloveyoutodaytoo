@@ -26,8 +26,9 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost'
 export type ButtonSize = 'lg' | 'md'
 
 const BASE_CLASS =
-  // 모서리 17px·굵기 800은 프로토타입 값이다. 얇은 글씨로는 그 눌린 느낌이 안 난다.
-  'inline-flex items-center justify-center gap-2 rounded-button font-extrabold ' +
+  // 모서리 17px. 굵기는 600이다 — 2026-08-25에 800에서 내렸다.
+  // Pretendard 는 같은 굵기에서 획이 더 곧아 800이면 소리를 지르는 것처럼 읽힌다.
+  'inline-flex items-center justify-center gap-2 rounded-button font-semibold ' +
   'tracking-[-0.01em] transition-colors select-none ' +
   'disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:opacity-60'
 

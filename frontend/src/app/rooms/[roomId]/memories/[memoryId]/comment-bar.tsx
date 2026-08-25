@@ -430,7 +430,7 @@ function VoiceCommentSheet({
       */
       className="m-0 mt-auto w-full max-w-md rounded-t-card bg-canvas p-5 pb-6 text-ink shadow-card backdrop:bg-black/45 sm:mx-auto"
     >
-      <h2 id="voice-comment-title" className="text-lg font-extrabold text-ink">
+      <h2 id="voice-comment-title" className="text-lg font-bold text-ink">
         음성 댓글 남기기
       </h2>
       <p className="mt-1 mb-4 text-base leading-relaxed break-keep text-muted">

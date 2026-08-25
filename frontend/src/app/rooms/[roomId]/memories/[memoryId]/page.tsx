@@ -70,7 +70,7 @@ export default async function MemoryDetailPage({
             <p className="mt-6 text-center">
               <Link
                 href={`/rooms/${roomId}`}
-                className="inline-flex min-h-[44px] items-center rounded-button px-4 text-base font-extrabold text-primary"
+                className="inline-flex min-h-[44px] items-center rounded-button px-4 text-base font-bold text-primary"
               >
                 {roomName}으로 돌아가기
               </Link>
@@ -110,12 +110,12 @@ export default async function MemoryDetailPage({
           <div className="flex items-center gap-3 pt-1 pb-3">
             <span
               aria-hidden
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-extrabold text-primary"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-bold text-primary"
             >
               {initial(detail.authorName)}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-base font-extrabold text-ink">
+              <p className="truncate text-base font-bold text-ink">
                 {detail.authorName}
               </p>
               <p className="text-sm text-muted">
@@ -172,7 +172,7 @@ export default async function MemoryDetailPage({
             </p>
           </div>
 
-          <h2 className="mt-5 mb-2 text-base font-extrabold text-ink">
+          <h2 className="mt-5 mb-2 text-base font-bold text-ink">
             댓글 {commentCount}
           </h2>
 

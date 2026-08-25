@@ -274,7 +274,7 @@ function MessageCard({
         )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h2 className="truncate text-lg font-extrabold text-ink">{title}</h2>
+          <h2 className="truncate text-lg font-bold text-ink">{title}</h2>
           <p className="truncate text-base text-muted">{meta}</p>
 
           {item.promptUsed ? (

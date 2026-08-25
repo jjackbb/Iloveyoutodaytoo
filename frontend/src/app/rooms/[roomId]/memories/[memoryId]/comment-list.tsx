@@ -48,7 +48,7 @@ function CommentRow({ comment }: { comment: MemoryCommentView }) {
     <li className="flex gap-2.5">
       <span
         aria-hidden
-        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-extrabold text-primary"
+        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary"
       >
         {initial(comment.authorName)}
       </span>
@@ -129,7 +129,7 @@ function initial(name: string): string {
 function CommentHeader({ comment }: { comment: MemoryCommentView }) {
   return (
     <>
-      <p className="min-w-0 truncate text-sm font-extrabold text-ink">
+      <p className="min-w-0 truncate text-sm font-bold text-ink">
         {comment.authorName}
       </p>
       <p className="shrink-0 text-sm text-muted">

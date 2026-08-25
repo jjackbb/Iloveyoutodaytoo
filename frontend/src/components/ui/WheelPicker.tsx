@@ -125,7 +125,7 @@ export function WheelColumn({
                 글자 크기를 바꾸면 줄 높이가 흔들려 scroll-snap 이 가운데를 놓친다.
                 커 보이는 효과는 .wheel-row 의 scale 이 대신 낸다(높이는 그대로 두고).
               */
-              selected ? 'font-extrabold text-ink' : 'text-muted',
+              selected ? 'font-bold text-ink' : 'text-muted',
             ].join(' ')}
           >
             {format(option)}
