@@ -5,7 +5,7 @@ import { useActionState, useEffect, useState } from 'react'
 
 import { BirthDateField } from '@/components/ui/BirthDateField'
 import { Button } from '@/components/ui/Button'
-import { Field } from '@/components/ui/Field'
+import { controlClassName, Field, FieldShell } from '@/components/ui/Field'
 import { RuleList } from '@/components/ui/RuleList'
 import { signUp, type AuthState } from '@/lib/actions/auth'
 import { needsGuardianConsent } from '@/lib/age'
@@ -131,32 +131,41 @@ export function SignupForm({ next }: { next: string }) {
         있어서 한 화면에 둔다 — 같은 것을 두 번 물으면 "아까 적었는데?"가 된다.
         캡처에서 가져온 것은 **[아무거나] 버튼과 규칙 두 줄**이다.
       */}
-      <div className="flex flex-col gap-2">
-        <Field
-          id="name"
-          name="name"
-          label="어떻게 불러드릴까요?"
-          hint={<RuleList rules={nameRules} />}
-          required
-          maxLength={10}
-          autoComplete="name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
+      <FieldShell id="name" label="어떻게 불러드릴까요?">
+        <div className="flex items-stretch gap-2">
+          <input
+            id="name"
+            name="name"
+            required
+            maxLength={10}
+            autoComplete="name"
+            aria-describedby="name-hint"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className={controlClassName({ className: 'min-w-0 flex-1' })}
+          />
 
-        {/*
-          이름 짓기가 막막한 분을 위한 길 (캡처 02의 [랜덤 입력]).
-          아무 이름이나 넣어주는 것이 아니라 **다정한 이름 중 하나**를 넣는다 —
-          이 앱에서 이름은 가족이 서로를 부르는 말이다.
-        */}
-        <button
-          type="button"
-          onClick={() => setName(randomName())}
-          className="min-h-11 self-start px-1 text-base font-medium text-primary underline underline-offset-4"
-        >
-          아무 이름이나 넣어주세요
-        </button>
-      </div>
+          {/*
+            이름 짓기가 막막한 분을 위한 길 (캡처 02의 [랜덤 입력]).
+            아무 이름이나 넣는 것이 아니라 **다정한 이름 중 하나**를 넣는다 —
+            이 앱에서 이름은 서로를 부르는 말이다.
+
+            높이를 입력칸에 맞춰 못 박는다(52px). 버튼 기본값(md=44px)을 쓰면
+            옆의 입력칸보다 낮아서 두 개가 한 줄로 안 읽힌다.
+          */}
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => setName(randomName())}
+            className="min-h-[52px] shrink-0 px-5"
+          >
+            랜덤
+          </Button>
+        </div>
+
+        {/* 규칙은 입력칸 **아래**에 둔다 — 치면서 바로 아래에서 불이 들어와야 눈이 안 흔들린다 */}
+        <RuleList id="name-hint" rules={nameRules} />
+      </FieldShell>
 
       {/*
         생년월일 칸은 버튼이라 브라우저의 required가 걸리지 않는다(누르면 시트가 뜨는 칸이다).
@@ -210,39 +219,51 @@ export function SignupForm({ next }: { next: string }) {
         치는 대로 소문자로 맞춰준다. 지우지는 않는다 — 글자가 조용히 사라지면
         무엇을 잘못했는지 알 수 없으니, 규칙에 어긋나는 글자는 아래 문구로 알린다.
       */}
-      <Field
+      <FieldShell
         id="username"
-        name="username"
         label="아이디"
-        hint={
-          <>
-            <p className="mb-2">로그인할 때 쓰는 이름이에요.</p>
-            <RuleList rules={usernameRules} />
-          </>
-        }
+        hint="로그인할 때 쓰는 이름이에요."
         error={usernameError}
-        autoComplete="username"
-        autoCapitalize="off"
-        spellCheck={false}
-        maxLength={USERNAME_MAX_LENGTH}
-        required
-        value={username}
-        onChange={(event) => setUsername(normalizeUsername(event.target.value))}
-        onBlur={() => setUsernameTouched(true)}
-      />
+      >
+        <input
+          id="username"
+          name="username"
+          autoComplete="username"
+          autoCapitalize="off"
+          spellCheck={false}
+          maxLength={USERNAME_MAX_LENGTH}
+          required
+          aria-describedby={
+            ['username-hint', 'username-rules', usernameError ? 'username-error' : null]
+              .filter(Boolean)
+              .join(' ')
+          }
+          aria-invalid={usernameError ? true : undefined}
+          value={username}
+          onChange={(event) => setUsername(normalizeUsername(event.target.value))}
+          onBlur={() => setUsernameTouched(true)}
+          className={controlClassName({ hasError: Boolean(usernameError) })}
+        />
 
-      <Field
-        id="password"
-        name="password"
-        label="비밀번호"
-        hint={<RuleList rules={passwordRules} />}
-        type="password"
-        autoComplete="new-password"
-        minLength={8}
-        required
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-      />
+        <RuleList id="username-rules" rules={usernameRules} />
+      </FieldShell>
+
+      <FieldShell id="password" label="비밀번호">
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          aria-describedby="password-hint"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          className={controlClassName()}
+        />
+
+        <RuleList id="password-hint" rules={passwordRules} />
+      </FieldShell>
 
       <label className="flex min-h-[44px] items-start gap-3 text-base leading-relaxed text-ink">
         <input
@@ -277,7 +298,7 @@ export function SignupForm({ next }: { next: string }) {
           >
             개인정보 처리방침
           </Link>
-          에 동의합니다. (새 창에서 열려요)
+          에 동의합니다.
         </span>
       </label>
 

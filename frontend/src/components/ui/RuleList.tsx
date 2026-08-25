@@ -28,7 +28,9 @@ export type Rule = {
 
 export function RuleList({ id, rules }: { id?: string; rules: Rule[] }) {
   return (
-    <ul id={id} className="flex flex-col gap-1.5">
+    // 한 줄로 늘어놓는다 — 조건이 두어 개뿐이라 세로로 쌓으면 칸 사이가 멀어져
+    // 입력칸과 규칙이 한 덩어리로 안 읽힌다. 좁은 화면에서는 알아서 접힌다.
+    <ul id={id} className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
       {rules.map((rule) => (
         <li
           key={rule.label}
