@@ -613,7 +613,7 @@ export function CoverCropDialog({
         {/*
           위 도구줄 (참고 이미지와 같은 자리): 왼쪽 취소 · 가운데 제목 · 오른쪽 재설정.
 
-          여기만 Button 부품을 쓰지 않았다. primary(#d50e68)도 secondary(흰 바탕)도
+          여기만 Button 부품을 쓰지 않았다. primary 도 secondary(흰 바탕)도
           검정 위에 놓으라고 만든 색이 아니다. 대신 흰 글자로 대비를 최대로 하고,
           부품이 지키던 것(글자 17px·터치 목표 44px)은 그대로 지킨다.
         */}

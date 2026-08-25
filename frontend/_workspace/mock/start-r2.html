@@ -1,0 +1,650 @@
+<meta charset="utf-8">
+<title>시작 화면 시안 2차</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+
+<style>
+  /* ============================================================
+     시작 화면 리디자인 — 2차 시안 (앨범·몽실이 디벨롭)
+
+     1차 지적: 그림이 다 말하고 나서 글이 같은 말을 한 번 더 한다.
+     그래서 2차는 **글과 그림을 한 덩어리로 묶었다.** 글이 그림을 설명하지 않고,
+     그림이 글의 일부가 되게 했다.
+
+     색·모서리·그림자는 globals.css 토큰 그대로. 새 색은 만들지 않았다.
+     ============================================================ */
+  :root {
+    --canvas: #fbf7f8;
+    --card: #ffffff;
+    --surface-soft: #fff6f8;
+    --primary: #d50e68;
+    --primary-active: #b00b56;
+    --primary-light: #df1670;
+    --primary-soft: #fef0f6;
+    --ink: #222222;
+    --muted: #6a6a6a;
+    --hairline: #f0eaec;
+    --hairline-strong: #ebe2e5;
+    --brand-pink: #ed1074;
+    --brand-purple: #9a11c5;
+    --r-button: 17px;
+    --r-inner: 14px;
+    --r-chip: 100px;
+    --sh-card: 0 10px 30px -16px rgb(60 20 35 / 0.28);
+    --sh-button: 0 12px 22px -10px rgb(213 14 104 / 0.45);
+    --screen-x: 20px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #e9e0e3;
+    color: var(--ink);
+    font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { padding: 30px 24px 60px; max-width: 900px; margin: 0 auto; }
+
+  .page h1.doc {
+    margin: 0 0 8px; font-size: 21px; font-weight: 900; letter-spacing: -0.02em;
+  }
+  .page p.doc {
+    margin: 0 0 30px; font-size: 14.5px; line-height: 1.72; color: #5b5054;
+  }
+  .page h2.grp {
+    margin: 34px 0 16px; padding-top: 22px;
+    border-top: 1px solid #d4c7cb;
+    font-size: 17px; font-weight: 900; letter-spacing: -0.02em;
+  }
+  .page h2.grp small {
+    display: block; margin-top: 5px;
+    font-size: 13.5px; font-weight: 500; color: #5b5054; letter-spacing: 0;
+  }
+
+  .row { display: grid; gap: 26px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .slot > h3 { margin: 0 0 4px; font-size: 15.5px; font-weight: 900; letter-spacing: -0.02em; }
+  .slot > h3 b { color: var(--primary); }
+  .slot > .note {
+    margin: 0 0 13px; min-height: 4.2em;
+    font-size: 13px; line-height: 1.66; color: #5b5054;
+  }
+
+  .phone {
+    position: relative; width: 100%; height: 844px;
+    background: var(--canvas); border-radius: 38px;
+    box-shadow: 0 24px 60px -24px rgb(60 20 35 / 0.42), 0 0 0 1px rgb(60 20 35 / 0.06);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+
+  /* ── 공통 하단 ─────────────────────────────────────────── */
+  .actions { padding: 0 var(--screen-x) 26px; flex-shrink: 0; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 54px; border: 0; border-radius: var(--r-button);
+    font: inherit; font-size: 17px; font-weight: 800; letter-spacing: -0.01em;
+    color: #fff; cursor: pointer;
+    background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    box-shadow: var(--sh-button);
+  }
+  .btn:active { transform: translateY(1px); }
+  .more {
+    display: block; width: 100%; margin: 0; padding: 12px 0 0;
+    background: none; border: 0; font: inherit;
+    font-size: 15px; font-weight: 700; color: var(--muted);
+    text-align: center; cursor: pointer;
+  }
+  .more span { border-bottom: 1px solid #cfc4c8; padding-bottom: 1px; }
+  .soon { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .soon button {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; min-height: 48px; padding: 0 14px;
+    border: 1px solid var(--hairline-strong); border-radius: var(--r-inner);
+    background: var(--card); font: inherit;
+    font-size: 15.5px; font-weight: 700; color: var(--muted); cursor: pointer;
+  }
+  .soon em {
+    font-style: normal; font-size: 12.5px; font-weight: 500;
+    background: var(--surface-soft); color: var(--muted);
+    border-radius: var(--r-chip); padding: 2px 8px;
+  }
+  .signin { margin: 14px 0 0; text-align: center; font-size: 15.5px; color: var(--muted); }
+  .signin a { color: var(--primary); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+  .legal { margin: 15px 0 0; text-align: center; font-size: 12.5px; line-height: 1.6; color: #8d8285; }
+  .legal a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+  .brandrow {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 14.5px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .brandrow svg { color: var(--primary); }
+
+  /* ══════════════════════════════════════════════════════════
+     B-1 「엽서」 — 사진이 화면 밖으로 흘러나가고, 글이 그 위에 얹힌다
+     ══════════════════════════════════════════════════════════ */
+  .b1 { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
+  .b1 .head { padding: 26px var(--screen-x) 0; position: relative; z-index: 3; }
+
+  .b1 .spread { position: absolute; inset: 0; overflow: hidden; }
+  .b1 .spread::before {
+    content: ''; position: absolute; left: -10%; right: -20%; top: -6%; height: 62%;
+    background: radial-gradient(64% 60% at 68% 34%, #fcdfed 0%, rgb(252 223 237 / 0) 72%);
+  }
+
+  /* 사진은 오른쪽에서 화면 밖으로 걸쳐 나간다 — 잘려야 "더 있다"로 읽힌다 */
+  .b1 .p {
+    position: absolute; border-radius: 18px; background: var(--card);
+    padding: 8px 8px 0; box-shadow: 0 18px 36px -18px rgb(60 20 35 / 0.45);
+  }
+  .b1 .p i {
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; font-style: normal; font-size: 40px;
+  }
+  .b1 .p b {
+    display: block; padding: 8px 2px 0;
+    font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .b1 .pA { width: 162px; left: 12px; top: 118px; transform: rotate(-9deg); }
+  .b1 .pA i { height: 128px; background: linear-gradient(150deg, #ffdcc6, #ffb59c); }
+  .b1 .pB { width: 184px; right: -38px; top: 78px; transform: rotate(7deg); }
+  .b1 .pB i { height: 148px; background: linear-gradient(150deg, #cfe3ff, #b3c8f2); }
+
+  /* 목소리 줄이 두 사진 사이에 끼어 화면을 가로지른다 */
+  .b1 .voice {
+    position: absolute; left: 24px; top: 300px; z-index: 2;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border-radius: var(--r-chip);
+    padding: 9px 16px 9px 10px;
+    box-shadow: 0 14px 28px -12px rgb(60 20 35 / 0.34); white-space: nowrap;
+  }
+  .play {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wave { display: flex; align-items: center; gap: 3px; height: 20px; }
+  .wave s { display: block; width: 3px; border-radius: 2px; background: var(--primary); opacity: 0.72; }
+  .lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+
+  .b1 .copy { margin-top: auto; padding: 0 var(--screen-x) 32px; position: relative; z-index: 3; }
+  .b1 .copy h1 {
+    margin: 0; font-size: 32px; font-weight: 900; line-height: 1.36;
+    letter-spacing: -0.038em; word-break: keep-all;
+  }
+  .b1 .copy h1 i {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .b1 .copy p {
+    margin: 14px 0 0; font-size: 16px; line-height: 1.72; font-weight: 500;
+    color: var(--muted); word-break: keep-all;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     B-2 「사서함」 — 도착한 것 한 장. 뒤에 쌓인 게 비친다
+     ══════════════════════════════════════════════════════════ */
+  .b2 { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 0 var(--screen-x); }
+  .b2 .head { padding-top: 26px; display: flex; align-items: center; justify-content: space-between; }
+  .b2 .head .date { font-size: 12.5px; font-weight: 700; color: #a2969a; letter-spacing: 0.02em; }
+
+  .b2 .deck { position: relative; margin: 42px 4px 0; }
+  /* 뒤에 쌓인 것들 — 가장자리만 보인다. "이게 처음이 아니다"를 말한다 */
+  .b2 .deck .back {
+    position: absolute; left: 0; right: 0; background: var(--card);
+    border-radius: 20px; border: 1px solid var(--hairline-strong);
+    box-shadow: 0 10px 22px -14px rgb(60 20 35 / 0.4);
+  }
+  .b2 .deck .back1 { top: -14px; height: 40px; transform: scale(0.94); opacity: 0.95; }
+  .b2 .deck .back2 { top: -26px; height: 40px; transform: scale(0.87); opacity: 0.8; }
+
+  .b2 .letter {
+    position: relative; background: var(--card); border-radius: 20px;
+    padding: 16px 16px 15px; box-shadow: 0 20px 40px -20px rgb(60 20 35 / 0.45);
+  }
+  .b2 .letter .from {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em;
+  }
+  .b2 .letter .from u {
+    width: 26px; height: 26px; border-radius: 50%; text-decoration: none;
+    background: linear-gradient(150deg, #ffd7c4, #ffb9a0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: #8a4a33;
+  }
+  .b2 .letter .from em {
+    font-style: normal; margin-left: auto;
+    font-size: 11.5px; font-weight: 600; color: #a2969a;
+  }
+  .b2 .letter .shot {
+    margin-top: 12px; height: 168px; border-radius: 13px;
+    background: linear-gradient(150deg, #ffdcc6, #ffb59c);
+    display: flex; align-items: center; justify-content: center; font-size: 50px;
+  }
+  .b2 .letter .bar {
+    margin-top: 12px; display: flex; align-items: center; gap: 10px;
+    background: var(--surface-soft); border-radius: var(--r-chip); padding: 8px 14px 8px 8px;
+  }
+
+  .b2 .copy { margin-top: auto; padding-bottom: 30px; }
+  .b2 .copy h1 {
+    margin: 0; font-size: 29px; font-weight: 900; line-height: 1.38;
+    letter-spacing: -0.038em; word-break: keep-all;
+  }
+  .b2 .copy h1 i {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .b2 .copy p {
+    margin: 13px 0 0; font-size: 15.5px; line-height: 1.72; font-weight: 500;
+    color: var(--muted); word-break: keep-all;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     몽실이 (2차 — 다시 그렸다)
+     ══════════════════════════════════════════════════════════ */
+  .c { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center;
+       padding: 0 var(--screen-x);
+       background: radial-gradient(74% 38% at 50% 32%, #fde4f0 0%, rgb(253 228 240 / 0) 70%); }
+  .c .head { align-self: flex-start; padding-top: 26px; }
+  .c .sp { flex: 1; min-height: 0; }
+
+  .bubble {
+    position: relative; background: var(--card); border-radius: 20px;
+    padding: 13px 20px; box-shadow: var(--sh-card);
+    font-size: 16.5px; font-weight: 800; letter-spacing: -0.025em;
+    word-break: keep-all; text-align: center;
+    animation: bob 4.4s ease-in-out infinite;
+  }
+  .bubble::after {
+    content: ''; position: absolute; left: 50%; bottom: -8px;
+    width: 18px; height: 10px; transform: translateX(-50%);
+    background: var(--card); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .mong { width: 250px; animation: bob 4.4s ease-in-out infinite 0.4s; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @media (prefers-reduced-motion: reduce) { .bubble, .mong { animation: none; } }
+
+  .c .copy { text-align: center; padding-bottom: 32px; }
+  .c .copy h1 {
+    margin: 0; font-size: 27px; font-weight: 900; line-height: 1.4;
+    letter-spacing: -0.035em; word-break: keep-all;
+  }
+  .c .copy h1 i {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .c .copy p {
+    margin: 12px 0 0; font-size: 15.5px; line-height: 1.7; font-weight: 500;
+    color: var(--muted); word-break: keep-all;
+  }
+</style>
+
+<div class="page">
+  <h1 class="doc">시작 화면 2차 — 앨범·몽실이 디벨롭</h1>
+  <p class="doc">
+    1차의 문제는 <b>글이 그림을 한 번 더 설명한 것</b>이었습니다. 그림 보고 다 알았는데
+    밑에서 “가족만 볼 수 있는 비밀 감정 사서함”이라고 또 말하니 힘이 빠졌어요.<br>
+    2차는 <b>글과 그림을 한 덩어리로</b> 묶었습니다. 카피도 슬로건을 버리고
+    <b>사람이 하는 말투</b>로 다시 썼습니다. 하단 구조(큰 버튼 하나 + 접힌 준비 중 3개)는 1차와 같습니다.
+  </p>
+
+  <h2 class="grp">앨범 계열
+    <small>사진·목소리를 먼저 보여준다. 무엇이 달라졌나 — 그림이 화면 밖으로 흘러나가고, 글이 그 위에 얹힌다.</small>
+  </h2>
+
+  <div class="row">
+
+    <!-- ══════ B-1 엽서 ══════ -->
+    <section class="slot">
+      <h3>B-1. <b>엽서</b> — 잘려나가는 사진</h3>
+      <p class="note">
+        사진이 화면 밖으로 걸쳐 나가서 “더 있다”로 읽힙니다. 목소리 줄이 두 사진 사이를 가로지르고,
+        큰 글씨가 그 아래를 받칩니다. 세 덩어리가 아니라 <b>한 장면</b>입니다.
+      </p>
+
+      <div class="phone">
+        <div class="b1">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+
+          <div class="spread">
+            <div class="p pA"><i>🎂</i><b>아빠 예순 번째 생일</b></div>
+            <div class="p pB"><i>🌊</i><b>여름, 다 같이</b></div>
+          </div>
+
+          <div class="voice">
+            <span class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+            <span class="wave">
+              <s style="height:6px"></s><s style="height:13px"></s><s style="height:19px"></s>
+              <s style="height:10px"></s><s style="height:16px"></s><s style="height:21px"></s>
+              <s style="height:8px"></s><s style="height:14px"></s>
+            </span>
+            <span class="lbl">엄마가 남긴 한마디 · 0:12</span>
+          </div>
+
+          <div class="copy">
+            <h1>말로는 못 하니까,<br><i>여기 두고 가요.</i></h1>
+            <p>목소리 한마디, 사진 한 장.<br>우리 가족만 열 수 있어요.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ B-2 사서함 ══════ -->
+    <section class="slot">
+      <h3>B-2. <b>사서함</b> — 도착한 것 한 장</h3>
+      <p class="note">
+        “엄마 → 나”로 도착한 추억 한 장을 통째로 보여주고, 뒤에 쌓인 것들의 가장자리를 비칩니다.
+        <b>받는 쪽</b>의 기분이 먼저 옵니다. 사서함이라는 이름과 화면이 처음으로 맞습니다.
+      </p>
+
+      <div class="phone">
+        <div class="b2">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+            <span class="date">우리 가족 사서함</span>
+          </div>
+
+          <div class="deck">
+            <div class="back back2"></div>
+            <div class="back back1"></div>
+
+            <div class="letter">
+              <div class="from">
+                <u>엄</u> 엄마 → 나 <em>어제 오후 9:14</em>
+              </div>
+              <div class="shot">🎂</div>
+              <div class="bar">
+                <span class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+                <span class="wave">
+                  <s style="height:6px"></s><s style="height:14px"></s><s style="height:20px"></s>
+                  <s style="height:9px"></s><s style="height:17px"></s><s style="height:22px"></s>
+                  <s style="height:11px"></s><s style="height:15px"></s><s style="height:7px"></s>
+                  <s style="height:18px"></s><s style="height:10px"></s>
+                </span>
+                <span class="lbl" style="margin-left:auto">0:12</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="copy">
+            <h1>그때 못 했던 말,<br><i>여기서는 해요.</i></h1>
+            <p>가족한테 제일 안 나오는 그 말.<br>목소리로 남기면 우리끼리만 들어요.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <h2 class="grp">몽실이 계열
+    <small>몽실이를 다시 그렸습니다 — 좌우 대칭을 깨고, 바닥 그림자를 넣어 뜨게 하고, 눈에 빛을 넣었습니다. 아래 두 개는 몽실이가 <b>무슨 역할인지</b>가 다릅니다.</small>
+  </h2>
+
+  <div class="row">
+
+    <!-- ══════ C-1 전하는 몽실이 ══════ -->
+    <section class="slot">
+      <h3>C-1. <b>전하는 몽실이</b> — 심부름꾼</h3>
+      <p class="note">
+        몽실이가 마음을 <b>대신 전해주는 존재</b>입니다. 쑥스러워서 직접 못 하는 사람에게
+        “제가 갖다 드릴게요”라고 말합니다. 이 앱이 왜 필요한지를 캐릭터 하나로 말합니다.
+      </p>
+
+      <div class="phone">
+        <div class="c">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+
+          <div class="sp"></div>
+
+          <div class="bubble">직접 말 못 하겠으면,<br>저한테 주세요.</div>
+
+          <svg class="mong" viewBox="0 0 200 150" aria-hidden="true">
+            <defs>
+              <radialGradient id="m1" cx="30%" cy="12%" r="104%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="46%" stop-color="#fdeaf3"/>
+                <stop offset="100%" stop-color="#f6bcd9"/>
+              </radialGradient>
+              <linearGradient id="hl1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+              </linearGradient>
+              <filter id="soft1" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="5"/>
+              </filter>
+            </defs>
+
+            <!-- 바닥 그림자 — 이게 있어야 "떠 있다"로 읽힌다 -->
+            <ellipse cx="100" cy="136" rx="52" ry="8"
+                     fill="#d50e68" opacity="0.16" filter="url(#soft1)"/>
+
+            <!-- 몸통. 왼쪽 뭉치를 오른쪽보다 크게 해 대칭을 깼다 -->
+            <g fill="url(#m1)">
+              <rect x="22" y="62" width="156" height="56" rx="28"/>
+              <circle cx="56" cy="64" r="27"/>
+              <circle cx="98" cy="48" r="35"/>
+              <circle cx="140" cy="66" r="24"/>
+              <circle cx="163" cy="82" r="17"/>
+            </g>
+
+            <!-- 위쪽 빛 -->
+            <ellipse cx="88" cy="34" rx="30" ry="15" fill="url(#hl1)" opacity="0.75"/>
+
+            <!-- 얼굴 -->
+            <g>
+              <ellipse cx="72" cy="84" rx="9" ry="5.5" fill="#f79cc4" opacity="0.72"/>
+              <ellipse cx="126" cy="84" rx="9" ry="5.5" fill="#f79cc4" opacity="0.72"/>
+              <circle cx="86" cy="74" r="5.2" fill="#b8286a"/>
+              <circle cx="112" cy="74" r="5.2" fill="#b8286a"/>
+              <circle cx="87.8" cy="72" r="1.9" fill="#fff"/>
+              <circle cx="113.8" cy="72" r="1.9" fill="#fff"/>
+              <path d="M92 85q7 6.5 14 0" fill="none" stroke="#b8286a"
+                    stroke-width="3" stroke-linecap="round"/>
+            </g>
+
+            <!-- 손에 들고 가는 편지 — 몽실이가 '심부름 중'임을 보여준다 -->
+            <g transform="rotate(-13 168 108)">
+              <rect x="150" y="96" width="36" height="26" rx="6" fill="#ffffff"
+                    stroke="#f2cfe0" stroke-width="1.5"/>
+              <path d="M150 101 168 112 186 101" fill="none" stroke="#e58cba" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M168 89.5c0-3.4 5-4.6 5-.6 0-4 5-2.8 5 .6 0 3.6-5 6.4-5 6.4s-5-2.8-5-6.4z"
+                    fill="#d50e68"/>
+            </g>
+
+            <!-- 떠 있는 기운 -->
+            <g fill="#ed1074" opacity="0.42">
+              <circle cx="34" cy="34" r="3"/>
+              <circle cx="170" cy="40" r="2.4"/>
+              <circle cx="26" cy="98" r="2.2"/>
+            </g>
+          </svg>
+
+          <div class="copy">
+            <h1>쑥스러운 말은<br><i>몽실이한테 맡겨요.</i></h1>
+            <p>목소리로 남기면, 가족한테만 도착해요.</p>
+          </div>
+
+          <div class="sp"></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ C-2 품은 몽실이 ══════ -->
+    <section class="slot">
+      <h3>C-2. <b>품은 몽실이</b> — 담아두는 그릇</h3>
+      <p class="note">
+        몽실이 배에 <b>담긴 것이 비칩니다</b> — 사진 한 장과 목소리 한 줄. 캐릭터의 따뜻함과
+        “안에 뭐가 쌓이는지”를 한 그림에서 다 말합니다. 작성 화면의 몽실이(담는 그릇)와 뜻이 같습니다.
+      </p>
+
+      <div class="phone">
+        <div class="c">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+
+          <div class="sp"></div>
+
+          <div class="bubble">제 안에 담아두세요.</div>
+
+          <svg class="mong" viewBox="0 0 200 150" aria-hidden="true">
+            <defs>
+              <radialGradient id="m2" cx="30%" cy="12%" r="104%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="46%" stop-color="#fdeaf3"/>
+                <stop offset="100%" stop-color="#f6bcd9"/>
+              </radialGradient>
+              <linearGradient id="hl2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="ph2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffdcc6"/>
+                <stop offset="100%" stop-color="#ffb59c"/>
+              </linearGradient>
+              <filter id="soft2" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="5"/>
+              </filter>
+              <clipPath id="pc2"><rect x="62" y="88" width="22" height="20" rx="5"/></clipPath>
+            </defs>
+
+            <ellipse cx="100" cy="138" rx="54" ry="8"
+                     fill="#d50e68" opacity="0.16" filter="url(#soft2)"/>
+
+            <g fill="url(#m2)">
+              <rect x="20" y="58" width="160" height="62" rx="31"/>
+              <circle cx="54" cy="60" r="28"/>
+              <circle cx="98" cy="44" r="36"/>
+              <circle cx="142" cy="62" r="25"/>
+              <circle cx="166" cy="80" r="16"/>
+            </g>
+
+            <ellipse cx="86" cy="30" rx="31" ry="15" fill="url(#hl2)" opacity="0.75"/>
+
+            <!-- 눈은 위로 올렸다 — 배에 주머니가 들어갈 자리를 비운다 -->
+            <g>
+              <circle cx="84" cy="60" r="5" fill="#b8286a"/>
+              <circle cx="116" cy="60" r="5" fill="#b8286a"/>
+              <circle cx="85.7" cy="58.2" r="1.8" fill="#fff"/>
+              <circle cx="117.7" cy="58.2" r="1.8" fill="#fff"/>
+              <path d="M92 70q8 6 16 0" fill="none" stroke="#b8286a"
+                    stroke-width="3" stroke-linecap="round"/>
+              <ellipse cx="68" cy="68" rx="8.5" ry="5" fill="#f79cc4" opacity="0.7"/>
+              <ellipse cx="132" cy="68" rx="8.5" ry="5" fill="#f79cc4" opacity="0.7"/>
+            </g>
+
+            <!-- 배에 비치는 주머니 — 담고 있는 것 -->
+            <g>
+              <rect x="55" y="82" width="90" height="32" rx="12"
+                    fill="#ffffff" opacity="0.86"/>
+              <g clip-path="url(#pc2)">
+                <rect x="62" y="88" width="22" height="20" fill="url(#ph2)"/>
+                <circle cx="68" cy="93" r="2.4" fill="#fff" opacity="0.92"/>
+                <path d="M62 109 l7-7 5 4.6 4-3.4 6 5.8z" fill="#fff" opacity="0.6"/>
+              </g>
+              <g fill="#d50e68" opacity="0.72">
+                <rect x="92" y="95" width="2.6" height="6" rx="1.3"/>
+                <rect x="97.5" y="91" width="2.6" height="14" rx="1.3"/>
+                <rect x="103" y="88" width="2.6" height="20" rx="1.3"/>
+                <rect x="108.5" y="93" width="2.6" height="10" rx="1.3"/>
+                <rect x="114" y="90" width="2.6" height="16" rx="1.3"/>
+                <rect x="119.5" y="94" width="2.6" height="8" rx="1.3"/>
+                <rect x="125" y="92" width="2.6" height="12" rx="1.3"/>
+                <rect x="130.5" y="96" width="2.6" height="5" rx="1.3"/>
+              </g>
+              <path d="M138 96.5c0-2.7 4-3.7 4-.5 0-3.2 4-2.2 4 .5 0 2.9-4 5.1-4 5.1s-4-2.2-4-5.1z"
+                    fill="#d50e68" opacity="0.55"/>
+            </g>
+
+            <g fill="#ed1074" opacity="0.42">
+              <circle cx="32" cy="32" r="3"/>
+              <circle cx="172" cy="38" r="2.4"/>
+              <circle cx="24" cy="100" r="2.2"/>
+            </g>
+          </svg>
+
+          <div class="copy">
+            <h1>가족한테 못 한 말,<br><i>여기 쌓여가요.</i></h1>
+            <p>목소리도 사진도, 우리 가족만 꺼내 봐요.</p>
+          </div>
+
+          <div class="sp"></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const SOON = ['카카오', '휴대폰 번호', 'Google']
+  for (const more of document.querySelectorAll('.more')) {
+    more.addEventListener('click', () => {
+      const actions = more.closest('.actions')
+      const open = actions.querySelector('.soon')
+      if (open) {
+        open.remove()
+        more.querySelector('span').textContent = '다른 방법으로 시작하기'
+        return
+      }
+      const box = document.createElement('div')
+      box.className = 'soon'
+      box.innerHTML = SOON
+        .map((p) => `<button type="button">${p}로 시작하기 <em>준비 중</em></button>`)
+        .join('')
+      more.after(box)
+      more.querySelector('span').textContent = '접기'
+    })
+  }
+</script>

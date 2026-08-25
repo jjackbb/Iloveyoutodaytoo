@@ -151,8 +151,8 @@ export default async function ContactPage() {
         {/*
             글자색을 분홍(text-primary)이 아니라 먹색(text-ink)으로 둔 이유:
 
-            처음 판단은 bg-primary-soft 가 #fdebf3 이던 때 나왔다 — 그 위의 #d50e68 은
-            4.49:1 로 WCAG AA(4.5:1) 미달이었다. 이후 토큰이 #fef0f6 으로 밝아지면서
+            처음 판단은 옛 분홍 토큰 때 나왔다(bg-primary-soft #fdebf3 위의 #d50e68 이
+            4.49:1 로 WCAG AA 미달). 그 뒤 토큰이 #fef0f6 으로 밝아지면서
             4.65:1 이 되어 기준은 넘겼지만, 기준선 바로 위라 여유가 없다.
             그래서 먹색을 그대로 둔다. text-lg(19px)는 '큰 글자' 예외에도 들지 않는다.
             (같은 판단이 src/lib/legal.ts 의 자리표시자에도 적용돼 있다)

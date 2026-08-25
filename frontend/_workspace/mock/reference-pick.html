@@ -1,0 +1,424 @@
+<meta charset="utf-8">
+<title>어떤 DESIGN.md가 맞을까</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap">
+
+<style>
+  /* ============================================================
+     오늘도 사랑해 — 참고할 DESIGN.md 고르기
+
+     사용자 요청: "너가 창조하는 게 아닌, 어떤 서비스의 DESIGN.md가
+     잘 맞을지 탐색 및 분석해봐." + "애플과 Toss의 직관성·깔끔함을 좋아한다"
+
+     getdesign.md(해외 80여 개)와 oh-my-design.kr(국내 440개)에서
+     실제 토큰을 열어 확인했다. 아래 색값은 전부 **그 사이트에서 읽어온 실측치**다.
+     ============================================================ */
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #eceae7; color: #191f28;
+    font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  h1.doc { margin: 0 0 10px; font-size: 27px; font-weight: 700; letter-spacing: -0.035em; }
+  p.doc { margin: 0 0 14px; font-size: 15.5px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  p.doc b { color: #191f28; }
+
+  section { margin-top: 52px; }
+  .sec-h {
+    display: flex; align-items: baseline; gap: 12px;
+    margin: 0 0 8px; padding-top: 24px; border-top: 2px solid #d3d0cb;
+    font-size: 20px; font-weight: 700; letter-spacing: -0.03em;
+  }
+  .sec-h span { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #8b95a1; }
+  .sec-p { margin: 0 0 20px; font-size: 15px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  .sec-p b { color: #191f28; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
+  th, td { text-align: left; padding: 12px 13px; border-bottom: 1px solid #e5e8eb; vertical-align: top; line-height: 1.6; }
+  th { font-weight: 700; background: #f2f4f6; font-size: 13px; }
+  td b { color: #191f28; }
+  .win td { background: #fff5f0; }
+  .win td:first-child { box-shadow: inset 3px 0 0 #be5208; }
+  .out td { color: #8b95a1; }
+  .out td b { color: #4e5968; }
+  code { background: #f2f4f6; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; }
+
+  .sw { display: flex; gap: 4px; }
+  .sw i { display: block; width: 26px; height: 26px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.09); }
+
+  blockquote {
+    margin: 0; font-size: 14px; line-height: 1.62; color: #4e5968;
+  }
+  blockquote b { color: #191f28; }
+
+  .verdict {
+    background: #fff; border: 1px solid #e5e8eb; border-left: 5px solid #be5208;
+    border-radius: 14px; padding: 22px 24px; margin-top: 6px;
+  }
+  .verdict h3 { margin: 0 0 10px; font-size: 19px; font-weight: 700; letter-spacing: -0.03em; }
+  .verdict p { margin: 0 0 12px; font-size: 15px; line-height: 1.76; color: #4e5968; }
+  .verdict p:last-child { margin: 0; }
+  .verdict b { color: #191f28; }
+
+  /* ── 폰 미리보기 ─────────────────────────────────────────── */
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .slot h4 { margin: 0 0 4px; font-size: 15.5px; font-weight: 700; letter-spacing: -0.03em; }
+  .slot .note { margin: 0 0 12px; min-height: 5.4em; font-size: 13px; line-height: 1.66; color: #4e5968; }
+  .slot .note b { color: #191f28; }
+
+  .phone {
+    position: relative; width: 100%; aspect-ratio: 390 / 844; border-radius: 34px;
+    box-shadow: 0 22px 52px -24px rgb(25 31 40 / 0.4), 0 0 0 1px rgb(25 31 40 / 0.07);
+    overflow: hidden; display: flex; flex-direction: column;
+    container-type: inline-size;
+  }
+  /* 폰 안쪽 치수는 컨테이너 폭에 비례시킨다 — 세 개를 나란히 줄여도 비율이 안 깨진다 */
+  .phone * { font-size: inherit; }
+  .scr { flex: 1; display: flex; flex-direction: column; padding: 7.2cqw 5.6cqw 6.8cqw; }
+  .scr .top { display: flex; align-items: center; gap: 2cqw; }
+  .scr .top b { font-size: 3.9cqw; font-weight: 700; letter-spacing: -0.03em; }
+  .scr .top svg { width: 4.4cqw; height: 4.4cqw; }
+  .sp { flex: 1; min-height: 0; }
+
+  .mong { width: 62cqw; margin: 0 auto; }
+  .mong svg { width: 100%; height: auto; display: block; }
+
+  .bub {
+    align-self: center; position: relative; border-radius: 5cqw; padding: 3.1cqw 4.8cqw;
+    font-size: 4.1cqw; font-weight: 600; letter-spacing: -0.035em; text-align: center;
+    word-break: keep-all; line-height: 1.5;
+  }
+  .bub::after {
+    content: ''; position: absolute; left: 50%; bottom: -2cqw; width: 4.6cqw; height: 2.4cqw;
+    transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .scr h1 {
+    margin: 6cqw 0 0; font-size: 7.4cqw; font-weight: 700; line-height: 1.42;
+    letter-spacing: -0.045em; text-align: center; word-break: keep-all;
+  }
+  .scr h1 i { font-style: normal; }
+  .scr .sub {
+    margin: 3.4cqw 0 0; text-align: center; font-size: 3.9cqw; line-height: 1.72;
+    word-break: keep-all;
+  }
+  .scr .cta {
+    width: 100%; padding: 4.4cqw 0; border: 0; border-radius: 4.1cqw;
+    font: inherit; font-size: 4.4cqw; font-weight: 600; letter-spacing: -0.03em;
+    color: #fff; cursor: pointer;
+  }
+  .scr .alt { margin: 3.4cqw 0 0; text-align: center; font-size: 3.6cqw; }
+  .scr .alt u { text-decoration: none; font-weight: 700; }
+
+  /* P-1 당근 그대로 */
+  .p1 { background: #ffffff; color: #212124; }
+  .p1 .top svg, .p1 h1 i { color: #be5208; }
+  .p1 .bub { background: #f7f8fa; color: #212124; }
+  .p1 .bub::after { background: #f7f8fa; }
+  .p1 .sub, .p1 .alt { color: #868b94; }
+  .p1 .cta { background: #be5208; margin-top: 5cqw; }
+  .p1 .alt u { color: #be5208; }
+
+  /* P-2 당근 + 크림 바탕 */
+  .p2 { background: #faf8f3; color: #191714; }
+  .p2 .top svg, .p2 h1 i { color: #be5208; }
+  .p2 .bub { background: #fff; color: #191714; box-shadow: 0 3cqw 6cqw -4cqw rgb(60 40 28 / 0.34); }
+  .p2 .bub::after { background: #fff; }
+  .p2 .sub, .p2 .alt { color: #7c756b; }
+  .p2 .cta { background: #be5208; margin-top: 5cqw; }
+  .p2 .alt u { color: #be5208; }
+
+  /* P-3 토스 그대로 (대조군) */
+  .p3 { background: #ffffff; color: #191f28; }
+  .p3 .top svg, .p3 h1 i { color: #3182f6; }
+  .p3 .bub { background: #f2f4f6; color: #191f28; }
+  .p3 .bub::after { background: #f2f4f6; }
+  .p3 .sub, .p3 .alt { color: #8b95a1; }
+  .p3 .cta { background: #3182f6; margin-top: 5cqw; border-radius: 4.1cqw; }
+  .p3 .alt u { color: #3182f6; }
+</style>
+
+<div class="wrap">
+
+  <h1 class="doc">어떤 서비스의 DESIGN.md가 우리에게 맞을까 — 탐색과 분석</h1>
+  <p class="doc">
+    <b>getdesign.md</b>(해외)와 <b>oh-my-design.kr</b>(국내 440개)에서 파일을 직접 열어
+    토큰과 설명문을 읽었습니다. 아래 색값·수치는 전부 <b>거기서 읽어온 실측치</b>이고,
+    제가 지어낸 값이 아닙니다. 이 문서의 결론은 <b>어느 파일을 가져올지</b>입니다.
+  </p>
+
+  <!-- ═══ 1. 기준 ═══ -->
+  <section>
+    <h2 class="sec-h">우리가 이 파일에서 얻어야 하는 것 <span>01 · 기준</span></h2>
+    <table>
+      <tbody>
+        <tr><td style="width:26%"><b>1. 직관성·깔끔함</b></td>
+          <td>애플·토스를 좋아하신다고 하셨습니다. <b>한 화면 한 목적, 넉넉한 여백, 강조색 하나.</b></td></tr>
+        <tr><td><b>2. 크롬은 물러날 것</b></td>
+          <td>몽실이·목소리·사진이 주인공이어야 합니다. UI가 색을 다 쓰면 몽실이가 묻힙니다.</td></tr>
+        <tr><td><b>3. 강조색이 따뜻할 것</b></td>
+          <td>무거운 감정을 다루는데 <b>차가운 파랑</b>이면 온도가 안 맞습니다.</td></tr>
+        <tr><td><b>4. 한국어 UI를 전제할 것</b></td>
+          <td>한글 자간·줄바꿈·굵기가 맞춰진 시스템이라야 합니다. 영문 기준을 옮기면 어색해집니다.</td></tr>
+        <tr><td><b>5. 실제로 쓸 수 있을 것</b></td>
+          <td>폰트가 비공개면 못 씁니다. 색 대비가 AA 미달이면 고쳐야 합니다.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══ 2. 발견 ═══ -->
+  <section>
+    <h2 class="sec-h">읽다 보니 다섯 곳이 <u>같은 말</u>을 하고 있었습니다 <span>02 · 발견</span></h2>
+    <p class="sec-p">
+      각 파일의 설명문을 그대로 옮깁니다. 서로 다른 업종인데 문장이 겹칩니다.
+    </p>
+    <table>
+      <thead><tr><th style="width:15%">서비스</th><th style="width:85%">설명문 원문 요지</th></tr></thead>
+      <tbody>
+        <tr><td><b>Apple</b></td><td><blockquote>작은 중립 팔레트와 눈에 띄는 파랑 액션이 <b>제품 사진과 지면 구성에 드라마를 맡긴다.</b> 미니멀리즘 자체가 목적이 아니라, <b>절제된 장식</b>이 복잡한 기능을 즉시 쓸 수 있게 만든다.</blockquote></td></tr>
+        <tr><td><b>Toss</b></td><td><blockquote>중대한 <b>돈 결정을 답할 수 있고, 즉각적이고, 시각적으로 차분하게</b> 느끼도록 한다. 강한 파랑 액션, <b>쉬운 말</b>, 넉넉한 위계가 <b>사람들이 금융에서 느끼는 거리감을 줄인다.</b></blockquote></td></tr>
+        <tr><td><b>Notion</b></td><td><blockquote><b>스티커 팔레트가 성격을 다 맡고, 크롬은 조용히 있는다.</b></blockquote></td></tr>
+        <tr><td><b>당근</b></td><td><blockquote>기술이 <b>이웃 관계를 더 사람답게</b> 만들어야 한다는 생각. <b>따뜻한 주황 강조 · 차분한 중립 · 직접적인 말 · 가벼운 인터페이스 크롬</b>으로 <b>커뮤니티 콘텐츠를 계속 주인공으로</b> 둔다.</blockquote></td></tr>
+        <tr><td><b>스테이폴리오</b></td><td><blockquote><b>크롬이 거의 물러나서 사진이 지면을 이끈다.</b> 읽는 글자는 순수 검정이 아니라 <b>정제된 근사-검정(#181818)</b>이라 조용한 편집적 무게가 생긴다.</blockquote></td></tr>
+      </tbody>
+    </table>
+    <p class="sec-p" style="margin-top:18px">
+      <b>다섯이 같은 원리입니다 — “UI는 물러나고, 콘텐츠가 드라마를 맡는다.”</b>
+      우리 콘텐츠는 <b>몽실이·목소리·사진</b>입니다. 지금 우리 화면은 정반대로,
+      UI(바탕·카드·그림자)가 분홍을 다 써버려서 몽실이가 배경에 묻힙니다.
+    </p>
+    <p class="sec-p">
+      그리고 <b>토스의 문장이 우리 문제와 구조가 같습니다.</b>
+      토스는 “돈 앞에서 느끼는 거리감”을 줄입니다. 우리는 <b>“사랑한다고 말하기 전에 느끼는 거리감”</b>을 줄입니다.
+      같은 일입니다.
+    </p>
+  </section>
+
+  <!-- ═══ 3. 후보 ═══ -->
+  <section>
+    <h2 class="sec-h">후보 일곱 — 실제 토큰으로 비교 <span>03 · 비교</span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:12%">DESIGN.md</th><th style="width:13%">색</th>
+          <th style="width:16%">바탕 / 강조</th><th style="width:30%">맞는 점</th><th style="width:29%">안 맞는 점</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="win">
+          <td><b>당근<br>Karrot</b><br><span style="font-size:11.5px;color:#868b94">국내</span></td>
+          <td><div class="sw"><i style="background:#ffffff"></i><i style="background:#f7f8fa"></i><i style="background:#fff5f0"></i><i style="background:#ff6f0f"></i><i style="background:#212124"></i></div></td>
+          <td><code>#ffffff</code><br><code>#ff6f0f</code></td>
+          <td><b>목적 문장이 우리와 같습니다</b> — “관계를 더 사람답게”.
+            토스만큼 깔끔한 구조에 <b>강조색만 따뜻합니다.</b>
+            <code>#fff5f0</code>라는 <b>따뜻한 틴트</b>가 이미 시스템에 있어서 몽실이와 붙습니다.</td>
+          <td>주황이 ‘중고거래’로 읽힐 수 있습니다.<br>
+            <b><code>#ff6f0f</code>는 흰 글자 대비 2.8:1로 AA 미달</b> — 버튼용 어두운 변형이 필요합니다.</td>
+        </tr>
+        <tr>
+          <td><b>Toss</b><br><span style="font-size:11.5px;color:#868b94">국내</span></td>
+          <td><div class="sw"><i style="background:#ffffff"></i><i style="background:#f2f4f6"></i><i style="background:#e8f3ff"></i><i style="background:#3182f6"></i><i style="background:#191f28"></i></div></td>
+          <td><code>#ffffff</code><br><code>#3182f6</code></td>
+          <td><b>직관성의 교과서.</b> 버튼 <code>17px/600</code>·모서리 <code>16px</code>·간격 <code>4·6·8·16·24·32</code>.
+            한국어 UI 기준이 다 잡혀 있습니다. <b>이 규율은 그대로 가져올 만합니다.</b></td>
+          <td><b>파랑이 차갑습니다.</b> 금융의 색이라 감정 서비스에 온기가 없습니다.<br>
+            전용 폰트(Toss Product Sans) <b>비공개</b> — 못 씁니다.</td>
+        </tr>
+        <tr>
+          <td><b>Claude</b><br><span style="font-size:11.5px;color:#868b94">해외</span></td>
+          <td><div class="sw"><i style="background:#faf9f5"></i><i style="background:#f5f0e8"></i><i style="background:#cc785c"></i><i style="background:#e8a55a"></i><i style="background:#141413"></i></div></td>
+          <td><code>#faf9f5</code><br><code>#cc785c</code></td>
+          <td><b>유일하게 바탕 자체가 따뜻합니다.</b> 크림색이 흰색보다 부드러운데
+            사진·캐릭터를 안 눌러줍니다. <b>이 바탕은 가져올 값이 있습니다.</b></td>
+          <td>강조색 <code>#cc785c</code>가 <b>흐릿해서 CTA가 약합니다</b>(흰 글자 3.3:1, AA 미달).
+            영문 세리프 전제라 한글 제목엔 그대로 못 옮깁니다.</td>
+        </tr>
+        <tr>
+          <td><b>Notion</b><br><span style="font-size:11.5px;color:#868b94">해외</span></td>
+          <td><div class="sw"><i style="background:#ffffff"></i><i style="background:#f6f5f4"></i><i style="background:#0075de"></i><i style="background:#ff64c8"></i><i style="background:#dd5b00"></i></div></td>
+          <td><code>#ffffff</code><br><code>#0075de</code></td>
+          <td><b>원리를 줍니다</b> — 조용한 크롬 + 알록달록한 콘텐츠.
+            우리에게 <b>몽실이가 그 스티커</b>입니다.</td>
+          <td>파랑이 우리 색이 아니고, 스티커 팔레트는 <b>문서 편집기용</b>이라 그대로는 안 맞습니다.</td>
+        </tr>
+        <tr class="out">
+          <td><b>Apple</b></td>
+          <td><div class="sw"><i style="background:#f5f5f7"></i><i style="background:#ffffff"></i><i style="background:#0071e3"></i><i style="background:#1d1d1f"></i></div></td>
+          <td><code>#f5f5f7</code><br><code>#0071e3</code></td>
+          <td>여백·계층의 교과서.</td>
+          <td><b>SF Pro가 상업 라이선스</b>라 웹에서 못 씁니다. 그리고 무표정합니다 — 캐릭터와 안 어울립니다.</td>
+        </tr>
+        <tr class="out">
+          <td><b>스테이폴리오</b></td>
+          <td><div class="sw"><i style="background:#ffffff"></i><i style="background:#f2f2f2"></i><i style="background:#181818"></i><i style="background:#6b6b6e"></i></div></td>
+          <td><code>#ffffff</code><br>(강조색 없음)</td>
+          <td>감성적이고 사진이 주인공. <b>근사-검정 <code>#181818</code></b>은 가져올 만합니다.</td>
+          <td><b>강조색이 아예 없습니다.</b> 버튼·상태·알림을 표현할 수단이 없어 앱에는 못 씁니다.</td>
+        </tr>
+        <tr class="out">
+          <td><b>스캐터랩</b><br><span style="font-size:11.5px;color:#868b94">제타·이루다</span></td>
+          <td><div class="sw"><i style="background:#ffffff"></i><i style="background:#f3f4f6"></i><i style="background:#212529"></i><i style="background:#71717a"></i></div></td>
+          <td><code>#ffffff</code><br><code>#212529</code></td>
+          <td>캐릭터 대화 서비스를 만드는 회사인데 <b>무채색으로 절제</b>한 점이 흥미롭습니다.</td>
+          <td>회사 소개 사이트 기준이라 <b>제품 UI 시스템이 아닙니다.</b> 온기가 0입니다.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══ 4. 결론 ═══ -->
+  <section>
+    <h2 class="sec-h">결론 <span>04 · 추천</span></h2>
+    <div class="verdict">
+      <h3>당근(Karrot)을 뼈대로, 토스의 규율과 Claude의 크림을 한 스푼씩</h3>
+      <p>
+        <b>당근이 1순위인 이유는 색이 예뻐서가 아니라 목적 문장이 같아서입니다.</b>
+        “기술이 관계를 더 사람답게 만들어야 한다”, “커뮤니티 콘텐츠를 주인공으로,
+        인터페이스 크롬은 가볍게”. 우리가 몽실이를 만든 이유와 같은 말입니다.
+      </p>
+      <p>
+        구조적으로도 <b>당근은 ‘따뜻한 토스’</b>입니다 — 흰 바탕, 차분한 회색 중립,
+        강조색 하나, 가벼운 크롬. 좋아하신 <b>직관성·깔끔함을 잃지 않으면서</b> 온도만 올립니다.
+        토스에서는 <b>타이포·간격·모서리 규율</b>만 가져오면 됩니다(<code>17px/600</code>,
+        <code>radius 16</code>, <code>4·6·8·16·24·32</code>).
+      </p>
+      <p>
+        <b>단, 그대로 쓰면 안 되는 것이 하나 있습니다.</b> 당근의 <code>#ff6f0f</code>는
+        흰 글자 대비가 <b>2.8:1</b>로 AA(4.5:1) 미달입니다. 버튼·링크에는
+        어둡게 조정한 <code>#BE5208</code>(4.78:1 ✅)를 쓰고,
+        원래 주황은 <b>일러스트·틴트·아이콘</b>에만 남깁니다.
+        이건 당근 시스템 자신도 하고 있는 일입니다 — 제품용 primary와 마케팅용 오렌지가 다른 값입니다.
+      </p>
+      <p>
+        폰트는 <b>Pretendard</b>를 추천합니다. 토스 폰트는 비공개, SF Pro는 상업 라이선스라
+        둘 다 못 씁니다. Pretendard는 <b>무료·오픈소스</b>이면서 두 폰트의 한글 대체재로 가장 널리 쓰입니다.
+        (지금 이 문서가 Pretendard로 쓰여 있습니다.)
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ 5. 입혀본 것 ═══ -->
+  <section>
+    <h2 class="sec-h">우리 화면에 실제로 입혀봤습니다 <span>05 · 미리보기</span></h2>
+    <p class="sec-p">
+      같은 화면·같은 문구에 <b>토큰만 갈아 끼운</b> 것입니다. 오른쪽 파랑은
+      <b>대조군</b>입니다 — 토스를 그대로 쓰면 어떻게 되는지 눈으로 보시라고 넣었습니다.
+    </p>
+
+    <div class="row3">
+      <div class="slot">
+        <h4>P-1. 당근 그대로</h4>
+        <p class="note">흰 바탕 + 회색 중립 + 주황 하나. <b>가장 깔끔하고 가장 앱답습니다.</b>
+          몽실이가 흰 바탕 위에서 제일 또렷합니다. 다만 흰 바탕이라 <b>따뜻함은 몽실이와 버튼에만</b> 있습니다.</p>
+        <div class="phone p1"><div class="scr" data-scr="1"></div></div>
+      </div>
+
+      <div class="slot">
+        <h4>P-2. 당근 + 크림 바탕</h4>
+        <p class="note">당근 구조에 Claude의 <b>크림 바탕</b>만 얹었습니다.
+          깔끔함은 그대로인데 <b>화면 전체에 온기가 한 겹</b> 깔립니다.
+          몽실이도 아직 충분히 또렷합니다.</p>
+        <div class="phone p2"><div class="scr" data-scr="2"></div></div>
+      </div>
+
+      <div class="slot">
+        <h4>P-3. 토스 그대로 <span style="font-weight:500;color:#8b95a1">(대조군)</span></h4>
+        <p class="note">가장 깔끔하고 가장 신뢰감 있습니다. 그런데 <b>남의 앱 같습니다.</b>
+          파랑이 몽실이의 분홍과 싸우고, “쑥스러운 마음”이라는 말과 온도가 안 맞습니다.</p>
+        <div class="phone p3"><div class="scr" data-scr="3"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6. 실무 메모 ═══ -->
+  <section>
+    <h2 class="sec-h">가져올 것 / 고칠 것 / 버릴 것 <span>06 · 실무</span></h2>
+    <table>
+      <thead><tr><th style="width:18%">항목</th><th style="width:24%">출처</th><th style="width:58%">우리 값</th></tr></thead>
+      <tbody>
+        <tr><td><b>바탕</b></td><td>당근 <code>#ffffff</code> 또는 Claude <code>#faf9f5</code></td>
+          <td>P-1이냐 P-2냐가 이 한 줄로 갈립니다. <b>정해주셔야 합니다.</b></td></tr>
+        <tr><td><b>면 / 틴트</b></td><td>당근 <code>#f7f8fa</code> · <code>#fff5f0</code></td>
+          <td>그대로 씁니다. 따뜻한 틴트가 이미 있다는 게 당근의 강점입니다.</td></tr>
+        <tr><td><b>강조색</b></td><td>당근 <code>#ff6f0f</code></td>
+          <td>⚠️ <b>버튼·링크는 <code>#BE5208</code>로 어둡게</b>(AA 4.78:1). 원래 주황은 일러스트·아이콘에만.</td></tr>
+        <tr><td><b>글자색</b></td><td>당근 <code>#212124</code> / 스테이폴리오 <code>#181818</code></td>
+          <td>지금 <code>#222222</code>에서 <code>#212124</code>로. <b>순수 검정은 안 씁니다.</b></td></tr>
+        <tr><td><b>흐린 글자</b></td><td>당근 <code>#868b94</code></td>
+          <td>지금 <code>#6a6a6a</code>보다 차갑지만 회색 계열이 정리됩니다. 대비는 확인 필요.</td></tr>
+        <tr><td><b>타이포</b></td><td>토스 <code>17px / 600</code></td>
+          <td>지금 제목 <b>900 → 700 이하로</b>. 버튼도 800 → 600. <b>소리를 낮춥니다.</b></td></tr>
+        <tr><td><b>간격 · 모서리</b></td><td>토스 <code>4·6·8·16·24·32</code> / <code>radius 16</code></td>
+          <td>지금 <code>22/17/14/11px</code>이 제각각입니다. 토스 눈금으로 정리합니다.</td></tr>
+        <tr><td><b>폰트</b></td><td>—</td>
+          <td><b>Pretendard</b>. 토스 폰트·SF Pro는 라이선스로 못 씁니다. Noto Sans KR에서 갈아탑니다.</td></tr>
+        <tr><td><b>버릴 것</b></td><td>—</td>
+          <td>분홍 바탕(<code>#fbf7f8</code>) · 분홍 카드(<code>#fff6f8</code>) · 분홍 그림자 ·
+            브랜드 그라데이션 버튼. <b>온기는 몽실이가 냅니다.</b></td></tr>
+      </tbody>
+    </table>
+    <p class="sec-p" style="margin-top:18px">
+      <b>주의.</b> 이걸 적용하면 <code>globals.css</code> 토큰이 통째로 바뀌고
+      지금 만들어둔 화면 10개 이상을 전부 다시 맞춰야 합니다. 대비(AA) 재검증도 필요합니다.
+      <b>먼저 시작 화면 하나만</b> 새 토큰으로 만들어 보고, 괜찮으면 나머지로 넓히는 순서를 권합니다.
+    </p>
+  </section>
+</div>
+
+<script>
+/* 몽실이 — 확정된 솜사탕 모양 (상수) */
+const PUFFS = [
+  [119,  84, 48], [ 77,  93, 41], [162,  93, 38], [ 97, 116, 36], [143, 117, 34],
+  [ 53, 108, 28], [187, 107, 26], [ 90,  51, 27], [125,  41, 30], [157,  54, 24],
+  [ 55,  76, 23], [185,  76, 19], [104,  29, 15], [ 71, 126, 22], [171, 126, 21],
+  [120, 132, 26],
+]
+const circles = () => PUFFS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')
+
+function mongsil(uid) {
+  const g = `g-${uid}`, f = `f-${uid}`
+  return `
+  <svg viewBox="0 0 240 190" aria-hidden="true">
+    <defs>
+      <radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="86" cy="44" r="196">
+        <stop offset="0%" stop-color="#ffffff"/><stop offset="32%" stop-color="#fdf0f7"/>
+        <stop offset="64%" stop-color="#f8d4e8"/><stop offset="100%" stop-color="#eda6cd"/>
+      </radialGradient>
+      <filter id="${f}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+    </defs>
+    <ellipse cx="120" cy="171" rx="62" ry="9" fill="#d50e68" opacity="0.14" filter="url(#${f})"/>
+    <g fill="url(#${g})" filter="url(#${f})" opacity="0.7">${circles()}</g>
+    <g fill="url(#${g})">${circles()}</g>
+    <ellipse cx="94" cy="52" rx="40" ry="21" fill="#fff" opacity="0.42" filter="url(#${f})"/>
+    <ellipse cx="81" cy="109" rx="11" ry="6.6" fill="#f79cc4" opacity="0.62"/>
+    <ellipse cx="159" cy="109" rx="11" ry="6.6" fill="#f79cc4" opacity="0.62"/>
+    <circle cx="101" cy="92" r="6.4" fill="#b8286a"/><circle cx="139" cy="92" r="6.4" fill="#b8286a"/>
+    <circle cx="103.4" cy="89.5" r="2.3" fill="#fff"/><circle cx="141.4" cy="89.5" r="2.3" fill="#fff"/>
+    <path d="M110 104 q10 8.5 20 0" fill="none" stroke="#b8286a" stroke-width="3.4" stroke-linecap="round"/>
+  </svg>`
+}
+
+/* 세 미리보기는 마크업이 같다 — 토큰만 다르다. 그걸 보여주는 게 목적이라 한 틀로 찍는다. */
+const HEART = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>`
+
+document.querySelectorAll('[data-scr]').forEach((el) => {
+  const n = el.dataset.scr
+  el.innerHTML = `
+    <div class="top">${HEART}<b>오늘도 사랑해</b></div>
+    <div class="sp"></div>
+    <div class="bub">말 안 나와도 괜찮아요.</div>
+    <div class="mong">${mongsil('s' + n)}</div>
+    <h1>쑥스러운 마음도<br><i>여기서는 편해요.</i></h1>
+    <p class="sub">목소리로 남겨두면, 소중한 사람이<br>언젠가 그 자리에서 들어요.</p>
+    <div class="sp"></div>
+    <button class="cta" type="button">시작하기</button>
+    <p class="alt">이미 함께하고 계신가요? <u>로그인</u></p>`
+})
+</script>

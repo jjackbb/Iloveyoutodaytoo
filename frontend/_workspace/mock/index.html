@@ -1,0 +1,191 @@
+<meta charset="utf-8">
+<title>오늘도 사랑해 — 시안 모음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+
+<style>
+  /* ============================================================
+     시안 목차.
+
+     이 파일을 Chrome 탭으로 열어두면 세션과 무관하게 계속 남는다.
+     클로드 세션 안 패널로 보면 다른 터미널 작업에 밀려난다.
+     ============================================================ */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #f0ece7; color: #201c18;
+    font-family: 'IBM Plex Sans KR', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  h1 { margin: 0 0 6px; font-size: 25px; font-weight: 700; letter-spacing: -0.035em; }
+  .lead { margin: 0 0 6px; font-size: 15px; line-height: 1.72; color: #554d45; }
+  .hint {
+    margin: 18px 0 34px; background: #fff8ef; border: 1px solid #e7d9c6;
+    border-left: 4px solid #be5208; border-radius: 12px; padding: 14px 17px;
+    font-size: 14px; line-height: 1.72; color: #554d45;
+  }
+  .hint b { color: #201c18; }
+
+  ol { list-style: none; margin: 0; padding: 0; counter-reset: n; }
+  li { counter-increment: n; margin-bottom: 12px; }
+
+  a.card {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: #fff; border: 1px solid #e2dbd3; border-radius: 16px;
+    padding: 18px 20px; text-decoration: none; color: inherit;
+    transition: border-color .14s, transform .14s, box-shadow .14s;
+  }
+  a.card:hover {
+    border-color: #be5208; transform: translateY(-2px);
+    box-shadow: 0 12px 26px -16px rgb(60 40 28 / 0.45);
+  }
+  a.card .num {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+    background: #f4ece4; color: #8a6a52;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  a.card .num::before { content: counter(n); }
+  a.card h2 { margin: 0 0 4px; font-size: 16.5px; font-weight: 700; letter-spacing: -0.03em; }
+  a.card p { margin: 0; font-size: 13.5px; line-height: 1.66; color: #6b6259; }
+  a.card .tag {
+    display: inline-block; margin-top: 8px; padding: 3px 9px; border-radius: 100px;
+    font-size: 11.5px; font-weight: 600; background: #f4ece4; color: #8a6a52;
+  }
+  a.card.latest { border-color: #be5208; background: #fffaf6; }
+  a.card.latest .tag { background: #be5208; color: #fff; }
+
+  .sep {
+    margin: 30px 0 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    color: #9a8f84; text-transform: uppercase;
+  }
+  footer { margin-top: 40px; font-size: 13px; line-height: 1.75; color: #6b6259; }
+  code {
+    background: #fff; border: 1px solid #e2dbd3; border-radius: 5px;
+    padding: 2px 6px; font-size: 12.5px;
+  }
+</style>
+
+<div class="wrap">
+  <h1>오늘도 사랑해 — 시안 모음</h1>
+  <p class="lead">디자인 작업 중 만든 시안·분석 문서 전부입니다. 아래로 갈수록 오래된 것입니다.</p>
+
+  <div class="hint">
+    <b>이 탭을 북마크해 두세요.</b> 클로드 세션 안 미리보기 패널은 다른 터미널에서
+    작업을 시작하면 밀려납니다. 이 페이지는 그냥 내 컴퓨터의 파일이라
+    <b>세션과 상관없이 계속 살아 있습니다.</b>
+  </div>
+
+  <ol>
+    <div class="sep">지금 정할 것</div>
+
+    <li>
+      <a class="card latest" href="./violet.html">
+        <span class="num"></span>
+        <span>
+          <h2>포인트색 시안 — 몽실이는 그대로 두고</h2>
+          <p>분홍 몽실이를 <b>손대지 않고</b>, 로고의 마젠타→보라 구간에서 네 개를 뽑았습니다.
+             <b>A 남보라 / B 보라 / C 진보라 / D 자주.</b> 시작 화면 전체(준비중 접기·로그인·약관 포함)로 비교합니다.</p>
+          <span class="tag">최신 · 여기서 A~D 고르기</span>
+        </span>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="./point-color.html">
+        <span class="num"></span>
+        <span>
+          <h2>포인트 색 정하기 — 로고에서 뽑아냅니다</h2>
+          <p><code>logo.png</code> 픽셀을 직접 읽어 <b>#FF3137 → #E7107F → #A211C2</b>를 뽑았습니다.
+             따뜻한 쪽 3개(A 로고빨강 / <b>B 주홍 추천</b> / C 당근주황), 파란 쪽 2개(D 토스파랑 / <b>E 남보라 추천</b>).
+             전부 로고를 얹은 채로 비교합니다.</p>
+          <span class="tag">로고 실측 · 따뜻한 쪽 3 / 파란 쪽 2</span>
+        </span>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="./reference-pick.html">
+        <span class="num"></span>
+        <span>
+          <h2>어떤 DESIGN.md가 맞을까 — 탐색과 분석</h2>
+          <p>getdesign.md · oh-my-design.kr에서 실제 토큰을 읽어와 후보 7개 비교.
+             결론은 <b>당근(Karrot)</b>. 맨 아래 미리보기 3개(P-1 흰 바탕 / P-2 크림 바탕 / P-3 토스 대조군)에서
+             바탕색을 고르시면 됩니다.</p>
+          <span class="tag">DESIGN.md 후보 비교 · 결론 당근</span>
+        </span>
+      </a>
+    </li>
+
+    <div class="sep">그전 탐색</div>
+
+    <li>
+      <a class="card" href="./direction-warm.html">
+        <span class="num"></span>
+        <span>
+          <h2>따뜻하게 품는 방향 3안</h2>
+          <p>W-1 크림 / W-2 해질녘 / W-3 담요. 몽실이를 상수로 두고 <b>방의 온도</b>만 바꿔본 것.
+             문구를 “찌르는” 쪽에서 “받아주는” 쪽으로 고친 표도 여기 있습니다.</p>
+          <span class="tag">색·문구 온도</span>
+        </span>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="./direction.html">
+        <span class="num"></span>
+        <span>
+          <h2>디자인 방향 다시 잡기 — 성격 분석 · 경쟁 비교</h2>
+          <p>우리가 무엇이 <b>아닌지</b> 다섯 가지, 비슷한 서비스 6곳 비교,
+             지금 디자인 진단. 방향 3안(밤편지·보관함·새벽)은 <b>너무 무겁다고 폐기</b>했지만
+             앞쪽 분석은 그대로 유효합니다. 몽실이 A/B/C 비교도 여기.</p>
+          <span class="tag">성격 분석 · 몽실이 3안</span>
+        </span>
+      </a>
+    </li>
+
+    <div class="sep">시작 화면 시안 (구조)</div>
+
+    <li>
+      <a class="card" href="./start-r3.html">
+        <span class="num"></span>
+        <span>
+          <h2>시작 화면 3차 — 몽실이 다시 그리기</h2>
+          <p>몽실이가 곰발바닥이던 <b>원인과 해결</b>(전/후 비교가 맨 위).
+             앨범 피드·목소리줄을 새로 만든 B-1 엽서 / B-1b 필름.</p>
+          <span class="tag">몽실이 전·후 비교</span>
+        </span>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="./start-r2.html">
+        <span class="num"></span>
+        <span>
+          <h2>시작 화면 2차 — 앨범·몽실이 디벨롭</h2>
+          <p>B-1 엽서 / B-2 사서함 / C-1 전하는 몽실이 / C-2 품은 몽실이.</p>
+          <span class="tag">구조 4안</span>
+        </span>
+      </a>
+    </li>
+
+    <li>
+      <a class="card" href="./start.html">
+        <span class="num"></span>
+        <span>
+          <h2>시작 화면 1차 — 첫 시안 3종</h2>
+          <p>A 편지 / B 앨범 / C 몽실이. 준비 중 버튼 3개를 접는 구조 변경이 여기서 나왔습니다.</p>
+          <span class="tag">최초</span>
+        </span>
+      </a>
+    </li>
+  </ol>
+
+  <footer>
+    파일 위치 — <code>frontend/_workspace/mock/</code><br>
+    한글이 안 깨지고 로고까지 보이게 하려면 <code>http://127.0.0.1:5599/frontend/_workspace/mock/</code> 로 보셔도 됩니다.<br>
+    다시 열 때는 터미널에 <code>open /Users/b/Documents/Antigravity/Iloveyoutodaytoo/frontend/_workspace/mock/index.html</code>
+  </footer>
+</div>

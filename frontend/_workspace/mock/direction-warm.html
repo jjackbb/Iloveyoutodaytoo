@@ -1,0 +1,556 @@
+<meta charset="utf-8">
+<title>따뜻하게 품는 방향</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700;800&display=swap">
+
+<style>
+  /* ============================================================
+     오늘도 사랑해 — 따뜻하게 품는 방향 (2차 탐색)
+
+     1차 탐색(밤편지·보관함·새벽)이 어긋난 이유:
+     주제가 무겁다는 것만 보고 **화면까지 무겁게** 만들었다.
+     사용자 정정: "그 주제를 따뜻하게 품고 싶어. 그래서 몽실이도 나온 거야."
+
+     그래서 이번엔 몽실이를 선택지에서 빼고 **상수**로 둔다.
+     고를 것은 몽실이 유무가 아니라 **몽실이를 감싸는 방의 온도**다.
+     ============================================================ */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; background: #e7e2da; color: #201c18;
+    font-family: 'IBM Plex Sans KR', system-ui, sans-serif;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .doc-h1 { margin: 0 0 10px; font-size: 27px; font-weight: 700; letter-spacing: -0.03em; }
+  .doc-lead { margin: 0 0 14px; font-size: 15.5px; line-height: 1.78; color: #4b443c; max-width: 76ch; }
+  .doc-lead b { color: #201c18; }
+
+  .callout {
+    background: #fff8ef; border: 1px solid #e3d5c2; border-left: 4px solid #b0563a;
+    border-radius: 12px; padding: 18px 20px; margin: 0 0 10px; max-width: 76ch;
+  }
+  .callout p { margin: 0 0 10px; font-size: 15px; line-height: 1.78; color: #4b443c; }
+  .callout p:last-child { margin: 0; }
+  .callout b { color: #201c18; }
+  .callout q { font-style: italic; color: #8a4c33; }
+
+  section { margin-top: 54px; }
+  .sec-h {
+    display: flex; align-items: baseline; gap: 12px;
+    margin: 0 0 6px; padding-top: 26px; border-top: 2px solid #cdc4b8;
+    font-size: 20px; font-weight: 700; letter-spacing: -0.025em;
+  }
+  .sec-h span {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #8c8175; text-transform: uppercase;
+  }
+  .sec-p { margin: 0 0 22px; font-size: 15px; line-height: 1.78; color: #4b443c; max-width: 76ch; }
+  .sec-p b { color: #201c18; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #d6cdc2; vertical-align: top; line-height: 1.62; }
+  th { font-weight: 700; background: #ded6cb; }
+  td b { color: #201c18; }
+  tr.now td { background: #fdf0ec; }
+  code { background: #fff; border: 1px solid #d9cec1; border-radius: 5px; padding: 1px 5px; font-size: 12.5px; }
+
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; }
+  .chips i {
+    display: block; width: 30px; height: 30px; border-radius: 7px; font-style: normal;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+  }
+
+  /* 팔레트 */
+  .pal { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .pal i {
+    display: flex; align-items: flex-end; width: 96px; height: 62px; border-radius: 10px;
+    font-style: normal; font-size: 9px; font-weight: 600; white-space: nowrap;
+    padding: 6px; letter-spacing: 0.02em; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.09);
+  }
+
+  .dir { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 32px; align-items: start; }
+  .dir-info h3 { margin: 0 0 4px; font-size: 19px; font-weight: 700; letter-spacing: -0.03em; }
+  .dir-info .tag {
+    display: inline-block; margin-bottom: 12px; padding: 4px 10px; border-radius: 100px;
+    font-size: 12px; font-weight: 600; background: #ded6cb; color: #4b443c;
+  }
+  .dir-info p { margin: 0 0 15px; font-size: 14.5px; line-height: 1.78; color: #4b443c; }
+  .dir-info p b { color: #201c18; }
+  .spec {
+    background: #fdfaf6; border: 1px solid #ddd3c7; border-radius: 14px; padding: 16px 18px; margin-bottom: 16px;
+  }
+  .spec .lbl {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #8c8175;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .spec .t1 { font-size: 26px; letter-spacing: -0.03em; line-height: 1.42; margin-bottom: 3px; }
+  .spec .t2 { font-size: 14px; line-height: 1.7; color: #4b443c; }
+  .spec .meta { margin-top: 10px; font-size: 12.5px; color: #8c8175; }
+
+  .phone {
+    position: relative; width: 390px; height: 844px; border-radius: 38px;
+    box-shadow: 0 26px 64px -26px rgb(40 28 20 / 0.46), 0 0 0 1px rgb(40 28 20 / 0.07);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .phone .brand { display: flex; align-items: center; gap: 8px; }
+  .phone .brand b { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; }
+  .mong { width: 250px; margin: 0 auto; }
+  .mong svg { width: 100%; height: auto; display: block; }
+  .bub {
+    position: relative; align-self: center; border-radius: 20px; padding: 12px 19px;
+    font-size: 16px; font-weight: 600; letter-spacing: -0.022em; text-align: center;
+    word-break: keep-all; max-width: 84%;
+  }
+  .bub::after {
+    content: ''; position: absolute; left: 50%; bottom: -8px; width: 18px; height: 10px;
+    transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  /* ══════ W-1 크림 ══════════════════════════════════════════ */
+  .w1 { background: #faf8f3; color: #191714; padding: 0 24px 30px; }
+  .w1 .brand svg { color: #b0563a; }
+  .w1 .top { padding-top: 30px; }
+  .w1 .sp { flex: 1; min-height: 0; }
+  .w1 .bub { background: #fff; box-shadow: 0 12px 26px -16px rgb(60 40 28 / 0.4); }
+  .w1 .bub::after { background: #fff; }
+  .w1 h1 {
+    margin: 26px 0 0; font-family: 'Gowun Batang', serif; font-weight: 700;
+    font-size: 31px; line-height: 1.5; letter-spacing: -0.02em;
+    text-align: center; word-break: keep-all;
+  }
+  .w1 h1 i { font-style: normal; color: #b0563a; }
+  .w1 .sub {
+    margin: 14px 0 0; text-align: center; font-size: 15px; line-height: 1.8;
+    color: #7c756b; word-break: keep-all;
+  }
+  .w1 .cta {
+    margin-top: 26px; width: 100%; min-height: 56px; border: 0; border-radius: 16px;
+    background: #b0563a; color: #fff; font: inherit;
+    font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+  }
+  .w1 .alt { margin: 14px 0 0; text-align: center; font-size: 14px; color: #7c756b; }
+  .w1 .alt u { color: #b0563a; font-weight: 600; text-decoration: none; border-bottom: 1px solid #ddb9a9; }
+
+  /* ══════ W-2 해질녘 ════════════════════════════════════════ */
+  .w2 { background: #fdf7ef; color: #241c15; padding: 0 24px 30px; }
+  .w2 .glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      /* 몽실이가 앉는 자리(가운데)는 맑게 비운다 — 이 흰 원이 없으면 몽실이가 빛에 녹는다 */
+      radial-gradient(38% 20% at 50% 42%, rgb(255 253 250 / 0.95) 0%, rgb(255 253 250 / 0) 74%),
+      radial-gradient(96% 26% at 50% -4%, #ffcf8e 0%, rgb(255 207 142 / 0) 72%),
+      radial-gradient(72% 22% at 6% 20%, #ffcaa8 0%, rgb(255 202 168 / 0) 66%),
+      radial-gradient(74% 24% at 98% 16%, #ffd9ae 0%, rgb(255 217 174 / 0) 66%),
+      radial-gradient(110% 30% at 50% 104%, #f7d3a6 0%, rgb(247 211 166 / 0) 70%);
+  }
+  .w2 .top { position: relative; padding-top: 30px; }
+  .w2 .brand svg { color: #b25e14; }
+  .w2 .sp { flex: 1; min-height: 0; }
+  .w2 .stack { position: relative; }
+  .w2 .bub { background: rgb(255 255 255 / 0.94); box-shadow: 0 14px 30px -16px rgb(120 74 20 / 0.42); }
+  .w2 .bub::after { background: rgb(255 255 255 / 0.94); }
+  .w2 h1 {
+    position: relative; margin: 24px 0 0; font-family: 'Nanum Myeongjo', serif; font-weight: 800;
+    font-size: 30px; line-height: 1.52; letter-spacing: -0.025em;
+    text-align: center; word-break: keep-all;
+  }
+  .w2 h1 i { font-style: normal; color: #b25e14; }
+  .w2 .sub {
+    position: relative; margin: 14px 0 0; text-align: center;
+    font-size: 15px; line-height: 1.8; color: #7a6b5c; word-break: keep-all;
+  }
+  .w2 .cta {
+    position: relative; margin-top: 26px; width: 100%; min-height: 56px; border: 0; border-radius: 100px;
+    background: #b25e14; color: #fffaf3; font: inherit;
+    font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+    box-shadow: 0 14px 26px -12px rgb(178 94 20 / 0.5);
+  }
+  .w2 .alt { position: relative; margin: 14px 0 0; text-align: center; font-size: 14px; color: #7a6b5c; }
+  .w2 .alt u { color: #b25e14; font-weight: 600; text-decoration: none; border-bottom: 1px solid #dcb182; }
+
+  /* ══════ W-3 담요 ══════════════════════════════════════════ */
+  .w3 {
+    background: #f1ece4; color: #2a211c;
+    font-family: 'Gowun Dodum', sans-serif; padding: 0 20px 28px;
+  }
+  .w3 .top { padding-top: 30px; padding-left: 4px; }
+  .w3 .brand svg { color: #a9553f; }
+  .w3 .sp { flex: 1; min-height: 0; }
+  /* 큰 흰 담요 한 장 — 몽실이가 그 안에 폭 안겨 있다 */
+  .w3 .nest {
+    background: #fff; border-radius: 30px; padding: 26px 22px 28px;
+    box-shadow: 0 20px 44px -26px rgb(60 40 28 / 0.44);
+    text-align: center;
+  }
+  .w3 .bub { background: #f6f1ea; }
+  .w3 .bub::after { background: #f6f1ea; }
+  .w3 .nest h1 {
+    margin: 22px 0 0; font-size: 27px; font-weight: 400; line-height: 1.52;
+    letter-spacing: -0.03em; word-break: keep-all;
+  }
+  .w3 .nest h1 i { font-style: normal; color: #a9553f; }
+  .w3 .nest .sub {
+    margin: 13px 0 0; font-size: 14.5px; line-height: 1.82; color: #79695f; word-break: keep-all;
+  }
+  .w3 .chipsrow { display: flex; gap: 7px; justify-content: center; margin-top: 18px; }
+  .w3 .chipsrow span {
+    font-size: 12.5px; padding: 6px 12px; border-radius: 100px;
+    background: #f2ebe2; color: #79695f;
+  }
+  .w3 .cta {
+    margin-top: 16px; width: 100%; min-height: 58px; border: 0; border-radius: 20px;
+    background: #a9553f; color: #fff; font: inherit;
+    font-size: 16.5px; letter-spacing: -0.01em; cursor: pointer;
+  }
+  .w3 .alt { margin: 13px 0 0; text-align: center; font-size: 14px; color: #79695f; }
+  .w3 .alt u { color: #a9553f; text-decoration: none; border-bottom: 1px solid #d7a898; }
+</style>
+
+<div class="wrap">
+
+  <h1 class="doc-h1">따뜻하게 품는 방향 — 다시 탐색</h1>
+
+  <div class="callout">
+    <p>
+      <b>제가 잘못 짚었습니다.</b> 주제가 무겁다는 것만 보고 <b>화면까지 무겁게</b> 만들었습니다.
+      밤편지는 어둡고, 보관함은 오래됐고, 새벽은 밋밋했습니다. 셋 다 <b>품어주지 않습니다.</b>
+    </p>
+    <p>
+      <q>그 주제를 따뜻하게 품고 싶어. 그래서 몽실이도 나온 거야.</q>
+    </p>
+    <p>
+      그래서 이번에는 <b>몽실이를 선택지에서 빼고 상수로 둡니다.</b>
+      고를 것은 몽실이를 넣을지가 아니라, <b>몽실이를 감싸는 방의 온도</b>입니다.
+    </p>
+  </div>
+
+  <!-- ═══ 참고 ═══ -->
+  <section>
+    <h2 class="sec-h">getdesign.md에서 실제로 읽어온 것 <span>01 · 참고</span></h2>
+    <p class="sec-p">
+      말씀하신 사이트에서 DESIGN.md 파일을 직접 열어 토큰을 확인했습니다.
+      지금 우리 디자인의 출처인 <b>Airbnb</b>와, ‘따뜻함’을 다르게 푼 세 곳입니다.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:13%">출처</th><th style="width:16%">색</th>
+          <th style="width:27%">따뜻함을 어디서 내는가</th><th style="width:44%">우리가 가져올 것 / 버릴 것</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="now">
+          <td><b>Airbnb</b><br><span style="font-size:12px;color:#7a6b5c">지금 우리 출처</span></td>
+          <td><div class="chips">
+            <i style="background:#fbf7f8"></i><i style="background:#fef0f6"></i>
+            <i style="background:#d50e68"></i><i style="background:#ed1074"></i>
+          </div></td>
+          <td>강조색(코랄) + 둥근 UI + 사진</td>
+          <td><b>우리가 뒤틀어 썼습니다.</b> Airbnb는 바탕이 <b>흰색</b>이고 코랄은 버튼에만 씁니다.
+            우리는 <b>바탕까지 분홍</b>으로 칠해서 강조가 사라졌습니다.</td>
+        </tr>
+        <tr>
+          <td><b>Notion</b></td>
+          <td><div class="chips">
+            <i style="background:#ffffff"></i><i style="background:#f6f5f4"></i>
+            <i style="background:#0075de"></i><i style="background:#ff64c8"></i><i style="background:#dd5b00"></i>
+          </div></td>
+          <td>조용한 화면 + <b>알록달록한 스티커</b></td>
+          <td>★ <b>핵심 원리.</b> 문서 원문: “스티커 팔레트가 <b>성격을 다 맡고, 크롬은 조용히 있는다</b>.”
+            우리에게는 <b>몽실이가 그 스티커</b>입니다.</td>
+        </tr>
+        <tr>
+          <td><b>Claude</b></td>
+          <td><div class="chips">
+            <i style="background:#faf9f5"></i><i style="background:#f5f0e8"></i>
+            <i style="background:#cc785c"></i><i style="background:#e8a55a"></i>
+          </div></td>
+          <td>크림 바탕 + 살구코랄 + <b>세리프 제목</b></td>
+          <td>크림 바탕이 <b>흰색보다 따뜻하면서</b> 사진·캐릭터를 안 눌러줍니다. 가져옵니다.</td>
+        </tr>
+        <tr>
+          <td><b>Zapier</b></td>
+          <td><div class="chips">
+            <i style="background:#fffefb"></i><i style="background:#f8f4f0"></i>
+            <i style="background:#201515"></i><i style="background:#ff4f00"></i>
+          </div></td>
+          <td>크림 + <b>진한 커피색 글자</b> + 주황 하나</td>
+          <td>글자를 <b>검정이 아니라 짙은 갈색</b>으로 두면 한결 부드럽습니다. 가져옵니다.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="sec-p" style="margin-top:20px">
+      <b>진단이 바뀝니다.</b> 지금 화면의 문제는 “분홍이라서”가 아니라
+      <b>“분홍을 바탕에까지 칠해서”</b>입니다. Airbnb 원본은 흰 바탕에 코랄을 <b>점으로</b> 씁니다.
+      우리는 면으로 칠했고, 그래서 몽실이가 배경에 묻힙니다.
+    </p>
+  </section>
+
+  <!-- ═══ 원칙 ═══ -->
+  <section>
+    <h2 class="sec-h">세 방향이 공유하는 원칙 <span>02 · 원칙</span></h2>
+    <table>
+      <tbody>
+        <tr>
+          <td style="width:30%"><b>1. 방은 조용하게, 온기는 몽실이가</b></td>
+          <td>바탕은 따뜻한 크림 계열로 <b>차분하게</b> 두고, 화면에서 제일 진한 색은
+            <b>몽실이와 버튼 하나뿐</b>입니다. 그래야 몽실이가 눈에 들어옵니다.</td>
+        </tr>
+        <tr>
+          <td><b>2. 글자는 검정이 아니라 짙은 갈색</b></td>
+          <td><code>#222222</code>는 차갑습니다. 갈색이 섞인 먹색(<code>#191714</code>·<code>#2A211C</code>)은
+            같은 대비를 내면서 <b>훨씬 부드럽습니다.</b></td>
+        </tr>
+        <tr>
+          <td><b>3. 900 굵기를 쓰지 않는다</b></td>
+          <td>제목을 <b>세리프(명조) 또는 400~600 굵기</b>로 내립니다.
+            소리 지르지 않아도 큰 글씨는 충분히 잘 보입니다.</td>
+        </tr>
+        <tr>
+          <td><b>4. 문구가 먼저 안아준다</b></td>
+          <td>“못 한 말이 있죠”로 <b>찌르지</b> 않고, “괜찮아요, 천천히”로 <b>받아줍니다.</b>
+            찌르는 문구는 첫 화면에서 사람을 내보냅니다.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="sec-p" style="margin-top:18px">
+      아래 셋은 이 원칙 위에서 <b>방의 온도</b>만 다릅니다. 색 대비는 전부 WCAG AA(4.5:1) 이상입니다.
+    </p>
+  </section>
+
+  <!-- ═══ W-1 ═══ -->
+  <section class="dir">
+    <div class="dir-info">
+      <h3>W-1. 크림</h3>
+      <span class="tag">차분한 따뜻함 · 세리프 제목</span>
+      <p>
+        <b>가장 어른스러운 따뜻함입니다.</b> 크림색 바탕은 흰색보다 부드럽지만 조용해서,
+        몽실이와 사진이 그 위에서 또렷하게 뜹니다. 제목은 고운바탕(명조)이라
+        <b>말을 건네는 목소리</b>가 됩니다.
+      </p>
+      <p>
+        Claude의 크림+살구 조합에서 가져왔습니다. <b>가장 안전하고 가장 확장성이 좋습니다</b> —
+        사진이 아무리 많이 들어와도 바탕이 싸우지 않습니다.
+        <b>다만</b> 셋 중 인상이 제일 약합니다.
+      </p>
+      <div class="pal">
+        <i style="background:#faf8f3;color:#191714">#FAF8F3 바탕</i>
+        <i style="background:#ffffff;color:#191714">#FFFFFF 면</i>
+        <i style="background:#f5efe6;color:#191714">#F5EFE6 연한면</i>
+        <i style="background:#191714;color:#faf8f3">#191714 글자</i>
+        <i style="background:#7c756b;color:#fff">#7C756B 흐린글</i>
+        <i style="background:#b0563a;color:#fff">#B0563A 강조</i>
+      </div>
+      <div class="spec">
+        <div class="lbl">글씨체</div>
+        <div class="t1" style="font-family:'Gowun Batang',serif;font-weight:700">고운바탕 — 쑥스러워도 괜찮아요</div>
+        <div class="t2">IBM Plex Sans KR — 천천히 해도 돼요. 몽실이가 기다릴게요.</div>
+        <div class="meta">제목 고운바탕 700 / 본문 IBM Plex Sans KR 400 · Google Fonts</div>
+      </div>
+    </div>
+
+    <div class="phone w1">
+      <div class="top">
+        <div class="brand">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+          <b>오늘도 사랑해</b>
+        </div>
+      </div>
+      <div class="sp"></div>
+      <div class="bub">말 안 나와도 괜찮아요.</div>
+      <div class="mong" data-mong="keep"></div>
+      <h1>쑥스러운 마음도<br><i>여기서는 편해요.</i></h1>
+      <p class="sub">목소리로 남겨두면, 소중한 사람이<br>언젠가 그 자리에서 들어요.</p>
+      <div class="sp"></div>
+      <button class="cta" type="button">시작하기</button>
+      <p class="alt">이미 함께하고 계신가요? <u>로그인</u></p>
+    </div>
+  </section>
+
+  <!-- ═══ W-2 ═══ -->
+  <section class="dir">
+    <div class="dir-info">
+      <h3>W-2. 해질녘</h3>
+      <span class="tag">금빛 물감 · 그리움의 온도</span>
+      <p>
+        <b>가장 감성적입니다.</b> 해가 넘어갈 때의 빛을 화면에 깔았습니다.
+        그리움·미안함이 올라오는 시간대가 그때라서, <b>감정과 화면의 시간이 맞습니다.</b>
+        몽실이가 그 빛 한가운데 떠 있습니다.
+      </p>
+      <p>
+        셋 중 <b>제일 기억에 남습니다.</b> 노란빛이라 분홍보다 덜 유아적이면서 더 따뜻합니다.
+        <b>다만</b> 물감이 화면을 많이 차지해서, 사진이 올라오는 화면에서는
+        <b>빛을 옅게 줄이는 규칙</b>이 따로 필요합니다.
+      </p>
+      <div class="pal">
+        <i style="background:#fdf7ef;color:#241c15">#FDF7EF 바탕</i>
+        <i style="background:#ffdca6;color:#241c15">#FFDCA6 빛</i>
+        <i style="background:#ffd0b4;color:#241c15">#FFD0B4 빛2</i>
+        <i style="background:#241c15;color:#fdf7ef">#241C15 글자</i>
+        <i style="background:#7a6b5c;color:#fff">#7A6B5C 흐린글</i>
+        <i style="background:#b25e14;color:#fff">#B25E14 강조</i>
+      </div>
+      <div class="spec">
+        <div class="lbl">글씨체</div>
+        <div class="t1" style="font-family:'Nanum Myeongjo',serif;font-weight:800">나눔명조 — 쑥스러워도 괜찮아요</div>
+        <div class="t2">IBM Plex Sans KR — 천천히 해도 돼요. 몽실이가 기다릴게요.</div>
+        <div class="meta">제목 나눔명조 800 / 본문 IBM Plex Sans KR 400 · Google Fonts</div>
+      </div>
+    </div>
+
+    <div class="phone w2">
+      <div class="glow"></div>
+      <div class="top">
+        <div class="brand">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+          <b>오늘도 사랑해</b>
+        </div>
+      </div>
+      <div class="sp"></div>
+      <div class="bub">오늘 하루, 어땠어요?</div>
+      <div class="mong" data-mong="keep"></div>
+      <h1>하고 싶던 말,<br><i>지금 남겨둘까요.</i></h1>
+      <p class="sub">목소리 한마디면 돼요.<br>소중한 사람이 언젠가 꺼내 들어요.</p>
+      <div class="sp"></div>
+      <button class="cta" type="button">시작하기</button>
+      <p class="alt">이미 함께하고 계신가요? <u>로그인</u></p>
+    </div>
+  </section>
+
+  <!-- ═══ W-3 ═══ -->
+  <section class="dir">
+    <div class="dir-info">
+      <h3>W-3. 담요</h3>
+      <span class="tag">폭 안기는 느낌 · 큰 곡률 · 둥근 글씨</span>
+      <p>
+        <b>‘품는다’를 모양으로 만든 안입니다.</b> 커다란 흰 판 하나가 담요처럼 펼쳐지고
+        몽실이가 그 안에 폭 안겨 있습니다. 모서리를 30px까지 키우고 글씨체도 둥근 것(고운돋움)으로 바꿨습니다.
+      </p>
+      <p>
+        <b>따뜻함이 제일 직접적입니다.</b> 그리고 저 흰 판이 그대로
+        <b>다른 화면의 카드</b>가 되어서 구조를 옮기기 쉽습니다.
+        <b>다만</b> 둥근 글씨 + 큰 곡률은 셋 중 <b>가장 어려 보입니다.</b> 유아틱해질 위험이 있습니다.
+      </p>
+      <div class="pal">
+        <i style="background:#f1ece4;color:#2a211c">#F1ECE4 바탕</i>
+        <i style="background:#ffffff;color:#2a211c">#FFFFFF 담요</i>
+        <i style="background:#f6f1ea;color:#2a211c">#F6F1EA 안쪽</i>
+        <i style="background:#2a211c;color:#f1ece4">#2A211C 글자</i>
+        <i style="background:#79695f;color:#fff">#79695F 흐린글</i>
+        <i style="background:#a9553f;color:#fff">#A9553F 강조</i>
+      </div>
+      <div class="spec">
+        <div class="lbl">글씨체</div>
+        <div class="t1" style="font-family:'Gowun Dodum',sans-serif">고운돋움 — 쑥스러워도 괜찮아요</div>
+        <div class="t2" style="font-family:'Gowun Dodum',sans-serif">고운돋움 — 천천히 해도 돼요. 몽실이가 기다릴게요.</div>
+        <div class="meta">제목·본문 고운돋움 한 벌 · Google Fonts · 획 끝이 둥글어 부드럽다</div>
+      </div>
+    </div>
+
+    <div class="phone w3">
+      <div class="top">
+        <div class="brand">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+          <b>오늘도 사랑해</b>
+        </div>
+      </div>
+      <div class="sp"></div>
+
+      <div class="nest">
+        <div class="bub">천천히 해요.<br>제가 기다릴게요.</div>
+        <div class="mong" data-mong="keep" style="width:230px"></div>
+        <h1>못 한 말은<br><i>몽실이한테 두세요.</i></h1>
+        <p class="sub">목소리로 남기면, 소중한 사람에게만 도착해요.</p>
+        <div class="chipsrow">
+          <span>가족</span><span>연인</span><span>나에게</span>
+        </div>
+      </div>
+
+      <div class="sp"></div>
+      <button class="cta" type="button">시작하기</button>
+      <p class="alt">이미 함께하고 계신가요? <u>로그인</u></p>
+    </div>
+  </section>
+
+  <!-- ═══ 문구 ═══ -->
+  <section>
+    <h2 class="sec-h">문구도 온도를 바꿨습니다 <span>03 · 카피</span></h2>
+    <p class="sec-p">
+      지난번 후보들은 <b>찌르는</b> 쪽이었습니다(“고맙다는 말, 오늘도 못 했죠”).
+      찔린 사람은 첫 화면에서 나갑니다. <b>먼저 받아주고</b> 나서 권하는 쪽으로 바꿨습니다.
+    </p>
+    <table>
+      <thead><tr><th style="width:44%">전 — 찌른다</th><th style="width:56%">후 — 받아준다</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>입 밖으로 안 나오는 말이 있잖아요.</td>
+          <td><b>말 안 나와도 괜찮아요.</b> / 쑥스러운 마음도 여기서는 편해요.</td>
+        </tr>
+        <tr>
+          <td>고맙다는 말, 오늘도 못 했죠.</td>
+          <td><b>오늘 하루, 어땠어요?</b> / 하고 싶던 말, 지금 남겨둘까요.</td>
+        </tr>
+        <tr>
+          <td>못 한 말은 사라지지 않고 여기 남습니다.</td>
+          <td><b>천천히 해요. 제가 기다릴게요.</b> / 못 한 말은 몽실이한테 두세요.</td>
+        </tr>
+        <tr>
+          <td>목소리로 남기면 <b>정한 사람</b>에게만 도착해요.</td>
+          <td>목소리로 남기면 <b>소중한 사람</b>에게만 도착해요.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+/* 몽실이 — 3차에서 확정한 솜사탕 모양 그대로 (A안). 여기서는 상수다. */
+const PUFFS = [
+  [119,  84, 48], [ 77,  93, 41], [162,  93, 38], [ 97, 116, 36], [143, 117, 34],
+  [ 53, 108, 28], [187, 107, 26], [ 90,  51, 27], [125,  41, 30], [157,  54, 24],
+  [ 55,  76, 23], [185,  76, 19], [104,  29, 15], [ 71, 126, 22], [171, 126, 21],
+  [120, 132, 26],
+]
+const circles = () => PUFFS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')
+
+function mongsil(uid) {
+  const g = `g-${uid}`, f = `f-${uid}`
+  return `
+  <svg viewBox="0 0 240 190" aria-hidden="true">
+    <defs>
+      <radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="86" cy="44" r="196">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="32%" stop-color="#fdf0f7"/>
+        <stop offset="64%" stop-color="#f8d4e8"/>
+        <stop offset="100%" stop-color="#eda6cd"/>
+      </radialGradient>
+      <filter id="${f}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+    </defs>
+    <ellipse cx="120" cy="171" rx="62" ry="9" fill="#d50e68" opacity="0.15" filter="url(#${f})"/>
+    <g fill="url(#${g})" filter="url(#${f})" opacity="0.7">${circles()}</g>
+    <g fill="url(#${g})">${circles()}</g>
+    <ellipse cx="94" cy="52" rx="40" ry="21" fill="#fff" opacity="0.42" filter="url(#${f})"/>
+    <ellipse cx="81" cy="109" rx="11" ry="6.6" fill="#f79cc4" opacity="0.62"/>
+    <ellipse cx="159" cy="109" rx="11" ry="6.6" fill="#f79cc4" opacity="0.62"/>
+    <circle cx="101" cy="92" r="6.4" fill="#b8286a"/>
+    <circle cx="139" cy="92" r="6.4" fill="#b8286a"/>
+    <circle cx="103.4" cy="89.5" r="2.3" fill="#fff"/>
+    <circle cx="141.4" cy="89.5" r="2.3" fill="#fff"/>
+    <path d="M110 104 q10 8.5 20 0" fill="none" stroke="#b8286a"
+          stroke-width="3.4" stroke-linecap="round"/>
+    <g fill="#ed1074" opacity="0.34">
+      <circle cx="28" cy="38" r="3.2"/><circle cx="212" cy="46" r="2.6"/>
+      <circle cx="22" cy="142" r="2.3"/><circle cx="218" cy="150" r="2"/>
+    </g>
+  </svg>`
+}
+
+document.querySelectorAll('[data-mong]').forEach((el, i) => { el.innerHTML = mongsil(`w${i}`) })
+</script>

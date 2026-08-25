@@ -1,0 +1,404 @@
+<meta charset="utf-8">
+<title>포인트 색 정하기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+<style>
+  /* ============================================================
+     포인트 색 정하기 — 로고에서 뽑아낸다
+
+     로고(logo.png) 실측: #FF3137 → #E7107F → #A211C2
+     빨강 → 마젠타 → 보라로 흐르는 그라데이션이다.
+
+     핵심 발견: 로고의 빨강은 **마젠타 쪽으로 기운** 빨강(색상각 358°)이고,
+     당근 주황은 **노랑 쪽으로 기운** 빨강(24°)이다. 같은 '따뜻함'인데
+     로고와 반대 방향으로 기울어 있다. 그래서 그대로 가져오면 로고가 겉돈다.
+     ============================================================ */
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #eceae7; color: #191f28;
+    font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  h1.doc { margin: 0 0 10px; font-size: 26px; font-weight: 700; letter-spacing: -0.035em; }
+  p.doc { margin: 0 0 12px; font-size: 15.5px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  p.doc b { color: #191f28; }
+
+  section { margin-top: 50px; }
+  .sec-h {
+    display: flex; align-items: baseline; gap: 12px;
+    margin: 0 0 8px; padding-top: 24px; border-top: 2px solid #d3d0cb;
+    font-size: 20px; font-weight: 700; letter-spacing: -0.03em;
+  }
+  .sec-h span { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #8b95a1; }
+  .sec-p { margin: 0 0 20px; font-size: 15px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  .sec-p b { color: #191f28; }
+
+  /* ── 로고 판 ─────────────────────────────────────────────── */
+  .logobar {
+    display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 26px; align-items: center;
+    background: #fff; border: 1px solid #e5e8eb; border-radius: 18px; padding: 22px 24px;
+  }
+  .logobar img { width: 100%; border-radius: 20px; display: block; }
+  .ramp { display: flex; border-radius: 12px; overflow: hidden; height: 66px; }
+  .ramp i {
+    flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 7px;
+    font-style: normal; font-size: 10.5px; font-weight: 700; color: #fff; letter-spacing: 0.02em;
+  }
+  .rampnote { margin: 12px 0 0; font-size: 13.5px; line-height: 1.7; color: #4e5968; }
+  .rampnote b { color: #191f28; }
+
+  /* ── 색상환 설명 ─────────────────────────────────────────── */
+  .hue { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .hue div {
+    background: #fff; border: 1px solid #e5e8eb; border-radius: 14px; padding: 15px 17px;
+  }
+  .hue .dot { width: 34px; height: 34px; border-radius: 50%; margin-bottom: 10px; }
+  .hue h4 { margin: 0 0 5px; font-size: 14.5px; font-weight: 700; letter-spacing: -0.02em; }
+  .hue p { margin: 0; font-size: 13px; line-height: 1.65; color: #4e5968; }
+  .hue b { color: #191f28; }
+
+  /* ── 후보 ────────────────────────────────────────────────── */
+  .cands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .cands.two { grid-template-columns: repeat(2, 1fr); max-width: 740px; }
+  .cand h4 { margin: 0 0 3px; font-size: 15.5px; font-weight: 700; letter-spacing: -0.03em; }
+  .cand h4 em {
+    font-style: normal; font-size: 11.5px; font-weight: 700; color: #fff;
+    background: #0f7a4a; border-radius: 100px; padding: 2px 8px; margin-left: 6px;
+    vertical-align: 2px;
+  }
+  .cand .note { margin: 0 0 11px; min-height: 5.6em; font-size: 13px; line-height: 1.66; color: #4e5968; }
+  .cand .note b { color: #191f28; }
+
+  .tokens { display: flex; gap: 6px; margin-bottom: 11px; }
+  .tokens i {
+    flex: 1; height: 46px; border-radius: 9px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.09);
+    display: flex; align-items: flex-end; padding: 5px; font-style: normal;
+    font-size: 8.5px; font-weight: 700; letter-spacing: 0.01em; white-space: nowrap; overflow: hidden;
+  }
+  .aa {
+    display: inline-block; margin-bottom: 11px; font-size: 12px; font-weight: 600;
+    background: #eaf6ef; color: #0f7a4a; border-radius: 100px; padding: 3px 10px;
+  }
+  .aa.bad { background: #fdeceb; color: #c0342e; }
+
+  /* ── 폰 ──────────────────────────────────────────────────── */
+  .phone {
+    position: relative; width: 100%; aspect-ratio: 390 / 844; border-radius: 32px;
+    box-shadow: 0 20px 48px -24px rgb(25 31 40 / 0.4), 0 0 0 1px rgb(25 31 40 / 0.07);
+    overflow: hidden; display: flex; flex-direction: column; container-type: inline-size;
+  }
+  .scr { flex: 1; display: flex; flex-direction: column; padding: 7.2cqw 5.6cqw 6.8cqw; }
+  .scr .top { display: flex; align-items: center; gap: 2.2cqw; }
+  .scr .top img { width: 7.4cqw; height: 7.4cqw; border-radius: 2cqw; display: block; }
+  .scr .top b { font-size: 3.9cqw; font-weight: 700; letter-spacing: -0.03em; }
+  .sp { flex: 1; min-height: 0; }
+  .mong { width: 60cqw; margin: 0 auto; }
+  .mong svg { width: 100%; height: auto; display: block; }
+  .bub {
+    align-self: center; position: relative; border-radius: 5cqw; padding: 3.1cqw 4.8cqw;
+    font-size: 4.1cqw; font-weight: 600; letter-spacing: -0.035em; text-align: center;
+    word-break: keep-all; line-height: 1.5;
+  }
+  .bub::after {
+    content: ''; position: absolute; left: 50%; bottom: -2cqw; width: 4.6cqw; height: 2.4cqw;
+    transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .scr h1 {
+    margin: 6cqw 0 0; font-size: 7.2cqw; font-weight: 700; line-height: 1.42;
+    letter-spacing: -0.045em; text-align: center; word-break: keep-all;
+  }
+  .scr h1 i { font-style: normal; }
+  .scr .sub { margin: 3.4cqw 0 0; text-align: center; font-size: 3.9cqw; line-height: 1.72; word-break: keep-all; }
+  .scr .chip {
+    align-self: center; margin-top: 4cqw; border-radius: 100px; padding: 2cqw 4cqw;
+    font-size: 3.3cqw; font-weight: 600; letter-spacing: -0.02em;
+  }
+  .scr .cta {
+    width: 100%; padding: 4.4cqw 0; border: 0; border-radius: 4.1cqw; margin-top: 5cqw;
+    font: inherit; font-size: 4.4cqw; font-weight: 600; letter-spacing: -0.03em;
+    color: #fff; cursor: pointer;
+  }
+  .scr .alt { margin: 3.4cqw 0 0; text-align: center; font-size: 3.6cqw; }
+  .scr .alt u { text-decoration: none; font-weight: 700; }
+
+  /* 밝은(P-1) 계열 공통 */
+  .warm { background: #fff; color: #212124; }
+  .warm .bub { background: #f7f8fa; color: #212124; }
+  .warm .bub::after { background: #f7f8fa; }
+  .warm .sub, .warm .alt { color: #868b94; }
+
+  /* 후보별 포인트색만 다르다 */
+  .cA { --pt: #c0342e; --tint: #fff1ef; }
+  .cB { --pt: #c4451f; --tint: #fff2ec; }
+  .cC { --pt: #be5208; --tint: #fff5f0; }
+  .cD { --pt: #1b64da; --tint: #e8f3ff; }
+  .cE { --pt: #5b4be0; --tint: #efecff; }
+
+  .warm .top b { color: #212124; }
+  .scr h1 i { color: var(--pt); }
+  .scr .cta { background: var(--pt); }
+  .scr .alt u { color: var(--pt); }
+  .scr .chip { background: var(--tint); color: var(--pt); }
+
+  /* 파란(P-3) 계열 */
+  .cool { background: #fff; color: #191f28; }
+  .cool .bub { background: #f2f4f6; color: #191f28; }
+  .cool .bub::after { background: #f2f4f6; }
+  .cool .sub, .cool .alt { color: #8b95a1; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
+  th, td { text-align: left; padding: 11px 13px; border-bottom: 1px solid #e5e8eb; vertical-align: top; line-height: 1.6; }
+  th { font-weight: 700; background: #f2f4f6; font-size: 13px; }
+  td b { color: #191f28; }
+  code { background: #f2f4f6; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; }
+  .pickrow td { background: #f4fbf6; }
+  .pickrow td:first-child { box-shadow: inset 3px 0 0 #0f7a4a; }
+
+  .warnbox {
+    background: #fff; border: 1px solid #e5e8eb; border-left: 5px solid #c0342e;
+    border-radius: 14px; padding: 18px 22px; margin-top: 16px;
+  }
+  .warnbox p { margin: 0 0 10px; font-size: 14.5px; line-height: 1.74; color: #4e5968; }
+  .warnbox p:last-child { margin: 0; }
+  .warnbox b { color: #191f28; }
+</style>
+
+<div class="wrap">
+
+  <h1 class="doc">포인트 색 정하기 — 로고에서 뽑아냅니다</h1>
+  <p class="doc">
+    <code>logo.png</code>의 픽셀을 직접 읽어 그라데이션 값을 뽑았습니다.
+    아래 색값은 <b>로고에서 실제로 나온 값</b>입니다.
+  </p>
+
+  <!-- ═══ 1 ═══ -->
+  <section>
+    <h2 class="sec-h">로고에서 나온 색 <span>01 · 실측</span></h2>
+    <div class="logobar">
+      <img src="../../../logo.png" alt="오늘도 사랑해 로고">
+      <div>
+        <div class="ramp">
+          <i style="background:#FF3137">#FF3137</i>
+          <i style="background:#FB2743">#FB2743</i>
+          <i style="background:#E7107F">#E7107F</i>
+          <i style="background:#C40AA1">#C40AA1</i>
+          <i style="background:#A211C2">#A211C2</i>
+        </div>
+        <p class="rampnote">
+          <b>빨강 → 마젠타 → 보라</b>로 흐릅니다. 사진 두 장이 겹쳐 하트가 되고, 반짝임이 하나.
+          <b>흰 선화</b>라 배경이 무엇이든 얹힙니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 2 ═══ -->
+  <section>
+    <h2 class="sec-h">당근 주황을 그대로 쓰면 안 되는 이유 <span>02 · 색상각</span></h2>
+    <p class="sec-p">
+      같은 ‘따뜻한 색’이라도 <b>어느 쪽으로 기울었는가</b>가 다릅니다.
+      로고의 빨강은 <b>마젠타 쪽</b>으로, 당근 주황은 <b>노랑 쪽</b>으로 기울어 있습니다 —
+      빨강을 사이에 두고 <b>반대 방향</b>입니다. 그래서 나란히 놓으면 로고만 겉돕니다.
+    </p>
+    <div class="hue">
+      <div>
+        <div class="dot" style="background:#FF3137"></div>
+        <h4>로고 빨강 <code>#FF3137</code></h4>
+        <p>색상각 <b>358°</b> — 빨강에서 <b>마젠타 쪽</b>으로 살짝.</p>
+      </div>
+      <div>
+        <div class="dot" style="background:#FF6F0F"></div>
+        <h4>당근 주황 <code>#FF6F0F</code></h4>
+        <p>색상각 <b>24°</b> — 빨강에서 <b>노랑 쪽</b>으로. 로고와 반대편입니다.</p>
+      </div>
+      <div>
+        <div class="dot" style="background:#A211C2"></div>
+        <h4>로고 보라 <code>#A211C2</code></h4>
+        <p>색상각 <b>289°</b>. 파란 계열로 갈 때 <b>여기서 이어받으면</b> 자연스럽습니다.</p>
+      </div>
+      <div>
+        <div class="dot" style="background:#3182F6"></div>
+        <h4>토스 파랑 <code>#3182F6</code></h4>
+        <p>색상각 <b>215°</b>. 로고 보라와 <b>74° 떨어져</b> 있어 남남처럼 보입니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 3 ═══ -->
+  <section>
+    <h2 class="sec-h">P-1 계열 — 따뜻한 포인트색 세 가지 <span>03 · 후보</span></h2>
+    <p class="sec-p">
+      셋 다 <b>흰 바탕 · 회색 중립 · 포인트색 하나</b>로 같습니다. 다른 건 그 하나뿐입니다.
+      상단에 실제 로고를 얹어서 <b>로고와 붙었을 때</b>를 보시라고 했습니다.
+    </p>
+    <div class="cands">
+
+      <div class="cand">
+        <h4>A. 로고 빨강</h4>
+        <p class="note">로고의 빨강을 그대로 어둡게 한 것. <b>로고와 가장 한 몸</b>입니다.
+          다만 <b>빨강은 ‘오류·위험’의 색</b>이라 버튼이 경고처럼 읽힐 수 있습니다.</p>
+        <div class="tokens">
+          <i style="background:#c0342e;color:#fff">#C0342E</i>
+          <i style="background:#a32b26;color:#fff">#A32B26</i>
+          <i style="background:#fff1ef;color:#c0342e">#FFF1EF</i>
+        </div>
+        <span class="aa">흰 글자 대비 5.57:1 · AA 통과</span>
+        <div class="phone warm cA"><div class="scr" data-scr></div></div>
+      </div>
+
+      <div class="cand">
+        <h4>B. 주홍 <em>추천</em></h4>
+        <p class="note">로고 빨강과 당근 주황 <b>사이</b>(색상각 14°). 로고와 한 가족으로 보이면서
+          <b>경고색으로는 안 읽힙니다.</b> 오류 표시에 쓸 빨강도 따로 남습니다.</p>
+        <div class="tokens">
+          <i style="background:#c4451f;color:#fff">#C4451F</i>
+          <i style="background:#a63817;color:#fff">#A63817</i>
+          <i style="background:#fff2ec;color:#c4451f">#FFF2EC</i>
+        </div>
+        <span class="aa">흰 글자 대비 4.98:1 · AA 통과</span>
+        <div class="phone warm cB"><div class="scr" data-scr></div></div>
+      </div>
+
+      <div class="cand">
+        <h4>C. 당근 주황</h4>
+        <p class="note">당근 값을 AA에 맞게 어둡게 한 것. <b>가장 갈색으로 보입니다.</b>
+          차분하고 안정적인데, <b>로고와는 살짝 남남</b>입니다(노랑 쪽으로 기울어서).</p>
+        <div class="tokens">
+          <i style="background:#be5208;color:#fff">#BE5208</i>
+          <i style="background:#9d4306;color:#fff">#9D4306</i>
+          <i style="background:#fff5f0;color:#be5208">#FFF5F0</i>
+        </div>
+        <span class="aa">흰 글자 대비 4.78:1 · AA 통과</span>
+        <div class="phone warm cC"><div class="scr" data-scr></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 4 ═══ -->
+  <section>
+    <h2 class="sec-h">P-3 계열 — 파란 포인트색 두 가지 <span>04 · 후보</span></h2>
+    <div class="warnbox">
+      <p>
+        <b>먼저 짚을 것.</b> 토스의 <code>#3182F6</code>을 흰 글자와 쓰면 대비가 <b>3.72:1</b>로
+        <b>AA(4.5:1) 미달</b>입니다. 토스 버튼 글자가 <code>17px/600</code>인데, WCAG에서 ‘큰 글자’로
+        쳐주는 기준(굵은 18.7px 이상)에 못 미쳐서 예외를 못 받습니다.
+      </p>
+      <p>
+        그래서 아래 D는 <b>토스 팔레트 안에 이미 있는 어두운 파랑</b> <code>#1B64DA</code>를 씁니다.
+        토스 자신이 <code>weak-foreground</code>로 쓰는 값이라 <b>지어낸 색이 아닙니다.</b>
+      </p>
+    </div>
+    <div class="cands two" style="margin-top:20px">
+
+      <div class="cand">
+        <h4>D. 토스 파랑</h4>
+        <p class="note">가장 <b>깔끔하고 신뢰감</b> 있습니다. 익숙해서 아무도 헤매지 않습니다.
+          다만 로고 보라와 <b>74° 떨어져</b> 있어, 로고를 얹으면 둘이 따로 놉니다.</p>
+        <div class="tokens">
+          <i style="background:#1b64da;color:#fff">#1B64DA</i>
+          <i style="background:#1550b4;color:#fff">#1550B4</i>
+          <i style="background:#e8f3ff;color:#1b64da">#E8F3FF</i>
+        </div>
+        <span class="aa">흰 글자 대비 5.41:1 · AA 통과</span>
+        <div class="phone cool cD"><div class="scr" data-scr></div></div>
+      </div>
+
+      <div class="cand">
+        <h4>E. 남보라 <em>추천</em></h4>
+        <p class="note">로고의 <b>보라 끝을 이어받은</b> 파랑(색상각 246°).
+          파랑의 깔끔함은 그대로인데 <b>로고와 이어집니다.</b>
+          몽실이의 분홍과도 덜 싸웁니다.</p>
+        <div class="tokens">
+          <i style="background:#5b4be0;color:#fff">#5B4BE0</i>
+          <i style="background:#4a3bc4;color:#fff">#4A3BC4</i>
+          <i style="background:#efecff;color:#5b4be0">#EFECFF</i>
+        </div>
+        <span class="aa">흰 글자 대비 5.96:1 · AA 통과</span>
+        <div class="phone cool cE"><div class="scr" data-scr></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 5 ═══ -->
+  <section>
+    <h2 class="sec-h">정리 <span>05 · 표</span></h2>
+    <table>
+      <thead>
+        <tr><th style="width:9%">후보</th><th style="width:14%">색</th><th style="width:11%">색상각</th>
+          <th style="width:13%">흰 글자 대비</th><th style="width:53%">한 줄 평</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>A</b></td><td><code>#C0342E</code></td><td>2°</td><td>5.57:1 ✅</td>
+          <td>로고와 가장 한 몸. 단 <b>오류색으로 오해</b>될 수 있음</td></tr>
+        <tr class="pickrow"><td><b>B</b></td><td><code>#C4451F</code></td><td>14°</td><td>4.98:1 ✅</td>
+          <td><b>P-1 추천.</b> 로고 가족으로 보이면서 경고색은 아님. 오류용 빨강이 따로 남음</td></tr>
+        <tr><td><b>C</b></td><td><code>#BE5208</code></td><td>24°</td><td>4.78:1 ✅</td>
+          <td>가장 차분·갈색. 로고와는 살짝 남남</td></tr>
+        <tr><td><b>D</b></td><td><code>#1B64DA</code></td><td>215°</td><td>5.41:1 ✅</td>
+          <td>가장 익숙하고 깔끔. 로고와 따로 놈</td></tr>
+        <tr class="pickrow"><td><b>E</b></td><td><code>#5B4BE0</code></td><td>246°</td><td>5.96:1 ✅</td>
+          <td><b>P-3 추천.</b> 로고 보라를 이어받아 파랑의 깔끔함 + 로고와의 연결</td></tr>
+      </tbody>
+    </table>
+    <p class="sec-p" style="margin-top:18px">
+      <b>참고 — 로고 원색은 버립니다.</b> <code>#FF3137</code>·<code>#E7107F</code>·<code>#A211C2</code>는
+      전부 흰 글자 대비가 AA 미달이라 <b>버튼·글자에는 못 씁니다.</b>
+      로고 자체와 스플래시에만 남기고, UI는 위에서 고른 어두운 값을 씁니다.
+      (지금 <code>globals.css</code>에도 같은 경고가 이미 적혀 있습니다.)
+    </p>
+  </section>
+</div>
+
+<script>
+/* 몽실이 — 확정 모양 (상수) */
+const PUFFS = [
+  [119,  84, 48], [ 77,  93, 41], [162,  93, 38], [ 97, 116, 36], [143, 117, 34],
+  [ 53, 108, 28], [187, 107, 26], [ 90,  51, 27], [125,  41, 30], [157,  54, 24],
+  [ 55,  76, 23], [185,  76, 19], [104,  29, 15], [ 71, 126, 22], [171, 126, 21],
+  [120, 132, 26],
+]
+const circles = () => PUFFS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')
+
+function mongsil(uid) {
+  const g = `g-${uid}`, f = `f-${uid}`
+  return `
+  <svg viewBox="0 0 240 190" aria-hidden="true">
+    <defs>
+      <radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="86" cy="44" r="196">
+        <stop offset="0%" stop-color="#ffffff"/><stop offset="32%" stop-color="#fdf0f7"/>
+        <stop offset="64%" stop-color="#f8d4e8"/><stop offset="100%" stop-color="#eda6cd"/>
+      </radialGradient>
+      <filter id="${f}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+    </defs>
+    <ellipse cx="120" cy="171" rx="62" ry="9" fill="#d50e68" opacity="0.14" filter="url(#${f})"/>
+    <g fill="url(#${g})" filter="url(#${f})" opacity="0.7">${circles()}</g>
+    <g fill="url(#${g})">${circles()}</g>
+    <ellipse cx="94" cy="52" rx="40" ry="21" fill="#fff" opacity="0.42" filter="url(#${f})"/>
+    <ellipse cx="81" cy="109" rx="11" ry="6.6" fill="#f79cc4" opacity="0.62"/>
+    <ellipse cx="159" cy="109" rx="11" ry="6.6" fill="#f79cc4" opacity="0.62"/>
+    <circle cx="101" cy="92" r="6.4" fill="#b8286a"/><circle cx="139" cy="92" r="6.4" fill="#b8286a"/>
+    <circle cx="103.4" cy="89.5" r="2.3" fill="#fff"/><circle cx="141.4" cy="89.5" r="2.3" fill="#fff"/>
+    <path d="M110 104 q10 8.5 20 0" fill="none" stroke="#b8286a" stroke-width="3.4" stroke-linecap="round"/>
+  </svg>`
+}
+
+/* 다섯 화면은 마크업이 같다 — 포인트색 변수만 다르다. 그걸 보여주는 게 목적이다. */
+document.querySelectorAll('[data-scr]').forEach((el, i) => {
+  el.innerHTML = `
+    <div class="top"><img src="../../../logo.png" alt=""><b>오늘도 사랑해</b></div>
+    <div class="sp"></div>
+    <div class="bub">말 안 나와도 괜찮아요.</div>
+    <div class="mong">${mongsil('p' + i)}</div>
+    <h1>쑥스러운 마음도<br><i>여기서는 편해요.</i></h1>
+    <p class="sub">목소리로 남겨두면, 소중한 사람이<br>언젠가 그 자리에서 들어요.</p>
+    <span class="chip">가족 · 연인 · 나에게</span>
+    <div class="sp"></div>
+    <button class="cta" type="button">시작하기</button>
+    <p class="alt">이미 함께하고 계신가요? <u>로그인</u></p>`
+})
+</script>

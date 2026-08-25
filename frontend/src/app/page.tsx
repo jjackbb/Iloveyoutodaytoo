@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { requireUser } from '@/lib/auth'
+import { BrandMark } from '@/components/brand/BrandMark'
 import { createClient } from '@/lib/supabase/server'
 import { RoomCard } from '@/components/room/RoomCard'
 import { ButtonLink } from '@/components/ui/Button'
@@ -176,7 +177,7 @@ export default async function HomePage() {
             아무 일이 없는 껍데기라 일부러 비워두고 있었다.
           */}
           <h1 className="flex min-w-0 flex-1 items-center gap-2 truncate text-2xl font-black tracking-[-0.02em] text-ink">
-            <BrandHeart />
+            <BrandMark size={24} />
             오늘도 사랑해
           </h1>
 
@@ -326,25 +327,6 @@ function EmptyHero() {
         우리만의 첫 번째 앨범방을 만들고 소중한 사람들을 초대해 보세요.
       </p>
     </div>
-  )
-}
-
-/**
- * 앱바 왼쪽의 브랜드 하트(프로토타입 .appbar .brand .hh, 채운 하트).
- * 제목 글자가 이미 "오늘도 사랑해"라고 읽히므로 낭독기에서는 숨긴다.
- */
-function BrandHeart() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden
-      className="shrink-0 text-primary"
-    >
-      <path d="M12 20.5S3.5 15.2 3.5 9.4A4.9 4.9 0 0 1 12 6a4.9 4.9 0 0 1 8.5 3.4c0 5.8-8.5 11.1-8.5 11.1Z" />
-    </svg>
   )
 }
 

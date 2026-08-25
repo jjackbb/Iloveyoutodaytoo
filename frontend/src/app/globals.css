@@ -5,8 +5,10 @@
    근거: PRD/04_PROJECT_SPEC.md "디자인 토큰"
    모양의 출처: PRD/references/prototype-mingyu.html (폐기된 프로토타입)
 
-   톤: 따뜻한 오프화이트 바탕 위에 흰 카드가 떠 있다.
+   톤: 중립 오프화이트 바탕 위에 흰 카드가 떠 있다.
+   색은 캐릭터(몽실이)와 버튼만 낸다 — 바탕은 조용히 있는다.
    프로토타입에서 여백·모서리·그림자·굵기를 가져오고, **색과 글자 크기는 가져오지 않았다** —
+   (강조색은 2026-08-25에 분홍에서 남보라로 옮겼다. 아래 강조색 항목 참고.)
    프로토타입의 분홍(#FF4E74)은 흰 글자 대비 3.18:1로 AA 미달이고,
    글자는 13.5px 기준이라 시니어 사용자에게 너무 작다.
    ============================================================ */
@@ -15,31 +17,38 @@
   /* --- 면 ---
      canvas 는 페이지 바탕, card 는 그 위에 떠 있는 흰 면이다.
      예전에는 반대였다(흰 바탕 + 회색 카드). 그래서 카드가 눌려 보였다. */
-  --color-canvas: #fbf7f8;
+  --color-canvas: #f7f8fa;
   --color-card: #ffffff;
   /* 카드 안에 한 번 더 구분이 필요할 때. 인용·본문 블록·눌림 상태. */
-  --color-surface-soft: #fff6f8;
+  --color-surface-soft: #f2f4f6;
 
-  /* --- 강조색 ---
-     흰 글자 대비 5.13:1 — WCAG AA 통과. 프로토타입 색으로 바꾸지 마라(3.18:1). */
-  --color-primary: #d50e68;
-  --color-primary-active: #b00b56;
-  /* 버튼 그라데이션의 밝은 쪽 끝. 4.68:1 — 여기까지가 AA 한계다.
-     한 톤이라도 밝히면(#e51d76 = 4.40:1) 흰 글자가 미달로 떨어진다. */
-  --color-primary-light: #df1670;
-  /* 이 위에 primary(#d50e68) 글자를 올린다. 4.65:1 — WCAG AA 통과. */
-  --color-primary-soft: #fef0f6;
+  /* --- 강조색 (2026-08-25: 분홍 #d50e68 에서 남보라로 옮겼다) ---
+
+     왜 바꿨나: 바탕까지 분홍으로 칠해 놓으니 강조색이 배경에 묻혔고,
+     분홍 캐릭터(몽실이)와 UI가 같은 색이라 서로 밀어냈다.
+     남보라는 로고(#a211c2 보라 끝)에서 파랑 쪽으로 43도 당긴 값이라
+     로고와 이어지면서 몽실이의 분홍과는 부딪히지 않는다.
+     후보 비교는 _workspace/mock/violet.html 참고.
+
+     흰 글자 대비 5.96:1 — WCAG AA 통과. */
+  --color-primary: #5b4be0;
+  --color-primary-active: #4a3bc4;
+  /* 버튼 그라데이션의 밝은 쪽 끝. 4.70:1 — 여기까지가 AA 한계다.
+     이보다 밝히면 흰 글자가 미달로 떨어진다. */
+  --color-primary-light: #6e5fe8;
+  /* 이 위에 primary(#5b4be0) 글자를 올린다. 5.14:1 — WCAG AA 통과. */
+  --color-primary-soft: #efecff;
 
   /* --- 글자 ---
-     canvas(#fbf7f8) 위 대비: ink 14.97:1, muted 5.09:1 — 둘 다 AA 통과.
+     canvas(#f7f8fa) 위 대비: ink 14.97:1, muted 5.09:1 — 둘 다 AA 통과.
      프로토타입의 세 번째 회색(#A9A6AB)은 2.26:1로 미달이라 가져오지 않았다. */
   --color-ink: #222222;
   --color-muted: #6a6a6a;
 
   /* --- 선 --- */
-  --color-hairline: #f0eaec;
+  --color-hairline: #e5e8eb;
   /* 칩 테두리처럼 조금 더 또렷해야 할 때 */
-  --color-hairline-strong: #ebe2e5;
+  --color-hairline-strong: #dce0e5;
 
   /* --- 브랜드 그라데이션 (로고·스플래시 전용) ---
      ⚠️ 이 색들을 버튼 배경으로 쓰지 마세요. 흰 글자 대비가 AA 미달입니다. */
@@ -57,12 +66,12 @@
   --radius-chip: 100px;
 
   /* --- 그림자 (프로토타입 값, 그림자 색만 우리 강조색으로 바꿈) --- */
-  --shadow-card: 0 10px 30px -16px rgb(60 20 35 / 0.28);
-  --shadow-button: 0 12px 22px -10px rgb(213 14 104 / 0.45);
+  --shadow-card: 0 10px 30px -16px rgb(25 31 40 / 0.26);
+  --shadow-button: 0 12px 22px -10px rgb(91 75 224 / 0.42);
   /* 세그먼트에서 고른 칸처럼, 트랙 위로 살짝만 떠야 하는 것 */
-  --shadow-pill: 0 3px 8px -3px rgb(60 20 35 / 0.2);
+  --shadow-pill: 0 3px 8px -3px rgb(25 31 40 / 0.18);
   /* 사진 위에 얹히는 작은 알약 버튼처럼, 배경이 뭐가 될지 모르는 것 */
-  --shadow-chip: 0 4px 12px -4px rgb(60 20 35 / 0.25);
+  --shadow-chip: 0 4px 12px -4px rgb(25 31 40 / 0.24);
 
   /* --- 화면 여백 (프로토타입 실측) ---
      프로토타입의 앱바·본문·하단버튼이 좌우 20px으로 맞춰져 있어 세로줄이 하나로 보인다.
@@ -121,7 +130,7 @@ input[type='submit'] {
 }
 
 /* 주요 버튼의 면.
-   양쪽 끝 모두 흰 글자 대비 AA를 통과한다 (5.13:1 → 4.68:1).
+   양쪽 끝 모두 흰 글자 대비 AA를 통과한다 (5.96:1 → 4.70:1).
 
    왜 Tailwind 유틸리티가 아니라 여기 있나:
    그라데이션은 background-image이고 hover 색은 background-color라, 유틸리티로 섞으면

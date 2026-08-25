@@ -1,0 +1,722 @@
+<meta charset="utf-8">
+<title>시작 화면 시안 3차</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+
+<style>
+  /* ============================================================
+     시작 화면 3차 — 몽실이 다시 그리기 + 앨범 마감 + '가족' 키워드 제거
+
+     지적 세 가지:
+     1. 몽실이가 곰발바닥 같다 → 솜사탕처럼 몽글몽글하게
+     2. B-1의 앨범 피드·목소리줄이 안 예쁘다
+     3. '가족'은 1순위일 뿐 전부가 아니다(연인·나 자신) → 키워드에서 뺀다
+
+     색·모서리·그림자는 globals.css 토큰 그대로.
+     ============================================================ */
+  :root {
+    --canvas: #fbf7f8;
+    --card: #ffffff;
+    --surface-soft: #fff6f8;
+    --primary: #d50e68;
+    --primary-light: #df1670;
+    --primary-soft: #fef0f6;
+    --ink: #222222;
+    --muted: #6a6a6a;
+    --hairline: #f0eaec;
+    --hairline-strong: #ebe2e5;
+    --brand-pink: #ed1074;
+    --brand-purple: #9a11c5;
+    --r-button: 17px;
+    --r-inner: 14px;
+    --r-chip: 100px;
+    --sh-card: 0 10px 30px -16px rgb(60 20 35 / 0.28);
+    --sh-button: 0 12px 22px -10px rgb(213 14 104 / 0.45);
+    --screen-x: 20px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; background: #e9e0e3; color: var(--ink);
+    font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+
+  .page { padding: 30px 24px 60px; max-width: 900px; margin: 0 auto; }
+  h1.doc { margin: 0 0 8px; font-size: 21px; font-weight: 900; letter-spacing: -0.02em; }
+  p.doc { margin: 0 0 8px; font-size: 14.5px; line-height: 1.72; color: #5b5054; }
+  h2.grp {
+    margin: 40px 0 14px; padding-top: 24px; border-top: 1px solid #d4c7cb;
+    font-size: 17px; font-weight: 900; letter-spacing: -0.02em;
+  }
+  h2.grp small {
+    display: block; margin-top: 5px;
+    font-size: 13.5px; font-weight: 500; color: #5b5054; letter-spacing: 0;
+  }
+  .row { display: grid; gap: 26px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .slot > h3 { margin: 0 0 4px; font-size: 15.5px; font-weight: 900; letter-spacing: -0.02em; }
+  .slot > h3 b { color: var(--primary); }
+  .slot > .note { margin: 0 0 13px; min-height: 4.2em; font-size: 13px; line-height: 1.66; color: #5b5054; }
+
+  .phone {
+    position: relative; width: 100%; height: 844px;
+    background: var(--canvas); border-radius: 38px;
+    box-shadow: 0 24px 60px -24px rgb(60 20 35 / 0.42), 0 0 0 1px rgb(60 20 35 / 0.06);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+
+  /* ── 몽실이 전/후 판 ──────────────────────────────────── */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    background: var(--canvas); border-radius: 26px; padding: 22px;
+    box-shadow: var(--sh-card);
+  }
+  .compare figure { margin: 0; text-align: center; }
+  .compare figcaption {
+    margin-top: 10px; font-size: 13px; line-height: 1.6; color: #5b5054;
+  }
+  .compare figcaption strong { display: block; font-size: 14.5px; color: var(--ink); margin-bottom: 3px; }
+  .compare figcaption b { color: var(--ink); }
+  .compare svg { width: 100%; max-width: 260px; height: auto; }
+
+  /* ── 공통 하단 ─────────────────────────────────────────── */
+  .actions { padding: 0 var(--screen-x) 26px; flex-shrink: 0; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 54px; border: 0; border-radius: var(--r-button);
+    font: inherit; font-size: 17px; font-weight: 800; letter-spacing: -0.01em;
+    color: #fff; cursor: pointer;
+    background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    box-shadow: var(--sh-button);
+  }
+  .btn:active { transform: translateY(1px); }
+  .more {
+    display: block; width: 100%; margin: 0; padding: 12px 0 0;
+    background: none; border: 0; font: inherit;
+    font-size: 15px; font-weight: 700; color: var(--muted); text-align: center; cursor: pointer;
+  }
+  .more span { border-bottom: 1px solid #cfc4c8; padding-bottom: 1px; }
+  .soon { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .soon button {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; min-height: 48px; padding: 0 14px;
+    border: 1px solid var(--hairline-strong); border-radius: var(--r-inner);
+    background: var(--card); font: inherit;
+    font-size: 15.5px; font-weight: 700; color: var(--muted); cursor: pointer;
+  }
+  .soon em {
+    font-style: normal; font-size: 12.5px; font-weight: 500;
+    background: var(--surface-soft); color: var(--muted);
+    border-radius: var(--r-chip); padding: 2px 8px;
+  }
+  .signin { margin: 14px 0 0; text-align: center; font-size: 15.5px; color: var(--muted); }
+  .signin a { color: var(--primary); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+  .legal { margin: 15px 0 0; text-align: center; font-size: 12.5px; line-height: 1.6; color: #8d8285; }
+  .legal a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .brandrow {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 14.5px; font-weight: 800; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .brandrow svg { color: var(--primary); }
+
+  /* ══════════════════════════════════════════════════════════
+     앨범 — 사진을 다시 그렸다.
+     이모지 + 단색 그라데이션을 버렸다. 그게 "자리표시"로 보이게 한 원인이다.
+     대신 **장면**을 그린다 — 노을, 밤의 불빛. 엄지손톱 크기에서 사진처럼 읽힌다.
+     ══════════════════════════════════════════════════════════ */
+  .shot { position: relative; overflow: hidden; border-radius: 13px; }
+
+  /* 노을 */
+  .shot.dusk { background: linear-gradient(179deg, #ffd9a3 0%, #ffb492 38%, #f68d9e 66%, #cf6f94 100%); }
+  .shot.dusk::before {
+    content: ''; position: absolute; left: 50%; top: 34%;
+    width: 34%; aspect-ratio: 1; transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff6de 0%, #ffe6b0 46%, rgb(255 220 160 / 0) 72%);
+  }
+  .shot.dusk::after {
+    content: ''; position: absolute; left: -12%; right: -12%; bottom: -22%;
+    height: 46%; border-radius: 50% 50% 0 0 / 62% 62% 0 0;
+    background: linear-gradient(180deg, #b7628c 0%, #8f4d78 100%);
+    opacity: 0.92;
+  }
+
+  /* 밤의 불빛 */
+  .shot.night { background: linear-gradient(179deg, #4b4272 0%, #7b5581 52%, #b8748a 100%); }
+  .shot.night::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 26% 32%, rgb(255 233 190 / 0.85) 0 3%, rgb(255 233 190 / 0) 9%),
+      radial-gradient(circle at 62% 22%, rgb(255 226 176 / 0.7) 0 2.4%, rgb(255 226 176 / 0) 8%),
+      radial-gradient(circle at 78% 44%, rgb(255 238 205 / 0.8) 0 3.4%, rgb(255 238 205 / 0) 10%),
+      radial-gradient(circle at 40% 58%, rgb(255 220 170 / 0.55) 0 2%, rgb(255 220 170 / 0) 7%),
+      radial-gradient(circle at 14% 66%, rgb(255 232 195 / 0.6) 0 2.6%, rgb(255 232 195 / 0) 8%);
+  }
+  .shot.night::after {
+    content: ''; position: absolute; left: -10%; right: -10%; bottom: -30%;
+    height: 52%; border-radius: 50% 50% 0 0 / 58% 58% 0 0;
+    background: linear-gradient(180deg, #3d3560 0%, #2e2950 100%);
+    opacity: 0.88;
+  }
+
+  /* 아침 */
+  .shot.morning { background: linear-gradient(179deg, #cfe6f7 0%, #ffe4d2 56%, #ffcbb8 100%); }
+  .shot.morning::after {
+    content: ''; position: absolute; left: -14%; right: -14%; bottom: -26%;
+    height: 44%; border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+    background: linear-gradient(180deg, #f0a98f 0%, #d98b7c 100%);
+    opacity: 0.85;
+  }
+
+  /* ── 목소리 줄 ────────────────────────────────────────────
+     전에는 그냥 떠 있는 재생기였다. 이제 **말풍선**이다 — 사진에 목소리가
+     붙어 있다는 뜻이 모양으로 보인다. 파형도 들은 만큼 진하다. */
+  .vnote {
+    position: relative; display: inline-flex; align-items: center; gap: 11px;
+    background: var(--card); border-radius: 19px; padding: 10px 16px 10px 10px;
+    box-shadow: 0 16px 30px -14px rgb(60 20 35 / 0.38);
+    white-space: nowrap;
+  }
+  .vnote.tail::after {
+    content: ''; position: absolute; left: 30px; bottom: -7px;
+    width: 16px; height: 9px; background: var(--card);
+    clip-path: polygon(0 0, 100% 0, 22% 100%);
+  }
+  .vnote .play {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    background-image: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 12px -5px rgb(213 14 104 / 0.6);
+  }
+  .vnote .wave { display: flex; align-items: flex-end; gap: 2.5px; height: 24px; }
+  .vnote .wave s { display: block; width: 3px; border-radius: 2px; background: #f4cbdd; }
+  .vnote .wave s.on { background: var(--primary); }
+  .vnote .lbl { font-size: 12.5px; font-weight: 700; color: var(--muted); letter-spacing: -0.01em; }
+  .vnote .lbl u { text-decoration: none; color: var(--ink); }
+
+  /* ══════════════════════════════════════════════════════════
+     B-1 「엽서」
+     ══════════════════════════════════════════════════════════ */
+  .b1 { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; }
+  .b1 .head { padding: 26px var(--screen-x) 0; position: relative; z-index: 3; }
+  .b1 .spread { position: absolute; inset: 0; overflow: hidden; }
+  .b1 .spread::before {
+    content: ''; position: absolute; left: -10%; right: -20%; top: -8%; height: 60%;
+    background: radial-gradient(62% 58% at 66% 34%, #fcdcec 0%, rgb(252 220 236 / 0) 74%);
+  }
+  .b1 .p {
+    position: absolute; border-radius: 18px; background: var(--card);
+    padding: 8px; box-shadow: 0 20px 38px -18px rgb(60 20 35 / 0.46);
+  }
+  .b1 .p .shot { height: 132px; }
+  .b1 .p b {
+    display: block; padding: 9px 3px 1px;
+    font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .b1 .pA { width: 158px; left: 10px; top: 122px; transform: rotate(-8deg); }
+  .b1 .pB { width: 176px; right: -34px; top: 82px; transform: rotate(6.5deg); }
+  .b1 .pB .shot { height: 150px; }
+
+  .b1 .vnote { position: absolute; left: 22px; top: 314px; z-index: 4; }
+
+  .b1 .copy { margin-top: auto; padding: 0 var(--screen-x) 32px; position: relative; z-index: 3; }
+  .b1 .copy h1 {
+    margin: 0; font-size: 32px; font-weight: 900; line-height: 1.36;
+    letter-spacing: -0.038em; word-break: keep-all;
+  }
+  .b1 .copy h1 i {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .b1 .copy p {
+    margin: 14px 0 0; font-size: 16px; line-height: 1.72; font-weight: 500;
+    color: var(--muted); word-break: keep-all;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     B-1b 「필름」 — 사진을 흩뿌리지 않고 한 줄로 흐르게 한다
+     ══════════════════════════════════════════════════════════ */
+  .b1b { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .b1b .head { padding: 26px var(--screen-x) 0; }
+  .b1b .strip {
+    display: flex; gap: 12px; margin-top: 36px; padding-left: var(--screen-x);
+    overflow: hidden;
+  }
+  .b1b .strip .p {
+    flex-shrink: 0; width: 138px; border-radius: 18px;
+    background: var(--card); padding: 8px;
+    box-shadow: 0 16px 30px -16px rgb(60 20 35 / 0.4);
+  }
+  .b1b .strip .p .shot { height: 168px; }
+  .b1b .strip .p b {
+    display: block; padding: 9px 3px 1px;
+    font-size: 11.5px; font-weight: 700; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .b1b .strip .p:nth-child(1) { transform: rotate(-2.5deg); }
+  .b1b .strip .p:nth-child(2) { transform: rotate(1.5deg) translateY(-8px); }
+  .b1b .strip .p:nth-child(3) { transform: rotate(-1deg) translateY(4px); }
+
+  .b1b .vwrap { padding: 30px var(--screen-x) 0; }
+  .b1b .copy { margin-top: auto; padding: 0 var(--screen-x) 32px; }
+  .b1b .copy h1 {
+    margin: 0; font-size: 32px; font-weight: 900; line-height: 1.36;
+    letter-spacing: -0.038em; word-break: keep-all;
+  }
+  .b1b .copy h1 i {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .b1b .copy p {
+    margin: 14px 0 0; font-size: 16px; line-height: 1.72; font-weight: 500;
+    color: var(--muted); word-break: keep-all;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     몽실이 화면
+     ══════════════════════════════════════════════════════════ */
+  .c {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center;
+    padding: 0 var(--screen-x);
+    background: radial-gradient(72% 36% at 50% 34%, #fde4f0 0%, rgb(253 228 240 / 0) 72%);
+  }
+  .c .head { align-self: flex-start; padding-top: 26px; }
+  .c .sp { flex: 1; min-height: 0; }
+  .bubble {
+    position: relative; background: var(--card); border-radius: 20px;
+    padding: 13px 20px; box-shadow: var(--sh-card);
+    font-size: 16.5px; font-weight: 800; letter-spacing: -0.025em;
+    word-break: keep-all; text-align: center;
+    animation: bob 4.6s ease-in-out infinite;
+  }
+  .bubble::after {
+    content: ''; position: absolute; left: 50%; bottom: -8px;
+    width: 18px; height: 10px; transform: translateX(-50%);
+    background: var(--card); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .mongwrap { width: 272px; margin-top: 10px; animation: bob 4.6s ease-in-out infinite 0.4s; }
+  .mongwrap svg { width: 100%; height: auto; display: block; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @media (prefers-reduced-motion: reduce) { .bubble, .mongwrap { animation: none; } }
+
+  .c .copy { text-align: center; padding-bottom: 32px; }
+  .c .copy h1 {
+    margin: 0; font-size: 27px; font-weight: 900; line-height: 1.4;
+    letter-spacing: -0.035em; word-break: keep-all;
+  }
+  .c .copy h1 i {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .c .copy p {
+    margin: 12px 0 0; font-size: 15.5px; line-height: 1.7; font-weight: 500;
+    color: var(--muted); word-break: keep-all;
+  }
+</style>
+
+<div class="page">
+  <h1 class="doc">시작 화면 3차 — 몽실이 다시 그리기 · 앨범 마감 · ‘가족’ 빼기</h1>
+  <p class="doc">
+    <b>‘가족’을 문구에서 뺐습니다.</b> 1순위이긴 하지만 연인·나 자신도 쓰는 서비스라,
+    첫 화면이 “가족 앱”이라고 못 박으면 나머지가 남의 얘기가 됩니다.
+    대신 <b>‘우리’, ‘그 사람’, ‘소중한 사람’</b>으로 바꿔 폭을 열어뒀습니다.
+  </p>
+
+  <h2 class="grp">1. 몽실이를 다시 그렸습니다
+    <small>곰발바닥으로 보인 원인이 있었습니다 — 아래 왼쪽/오른쪽을 비교해 보세요.</small>
+  </h2>
+
+  <div class="compare">
+    <figure>
+      <svg viewBox="0 0 240 190" aria-hidden="true" id="oldMong"></svg>
+      <figcaption>
+        <strong>전 — 곰발바닥</strong>
+        같은 크기 원 3개를 가로로 나란히. 게다가 <b>그라데이션이 원마다 따로</b> 걸려서
+        뭉치 하나하나가 <b>별개의 공</b>으로 읽혔습니다. 그게 발가락입니다.
+      </figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 240 190" aria-hidden="true" id="newMong"></svg>
+      <figcaption>
+        <strong>후 — 솜사탕</strong>
+        원 16개를 <b>크기를 제각각으로</b>, 위아래로 흩어 얹었습니다. 그라데이션은
+        <b>덩어리 전체에 하나만</b> 걸어 경계를 지웠고, 뒤에 흐릿한 겹을 깔아 <b>가장자리를 보풀</b>지게 했습니다.
+      </figcaption>
+    </figure>
+  </div>
+
+  <h2 class="grp">2. 앨범 계열 — 피드와 목소리줄을 다시 만들었습니다
+    <small>이모지 + 단색 그라데이션이 “자리표시”로 보이게 한 원인이었습니다. 이제 <b>장면</b>을 그립니다(노을·밤의 불빛·아침). 목소리줄은 재생기가 아니라 <b>말풍선</b>이 됐고, 파형은 들은 만큼만 진합니다.</small>
+  </h2>
+
+  <div class="row">
+
+    <!-- ══════ B-1 엽서 ══════ -->
+    <section class="slot">
+      <h3>B-1. <b>엽서</b> — 흩어놓기 (기존 안 마감)</h3>
+      <p class="note">
+        고르셨던 구조 그대로, 사진과 목소리줄만 새로 만들었습니다.
+        목소리 말풍선의 꼬리가 사진을 가리켜 “이 사진에 목소리가 붙어 있다”가 모양으로 보입니다.
+      </p>
+
+      <div class="phone">
+        <div class="b1">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+
+          <div class="spread">
+            <div class="p pA"><div class="shot dusk"></div><b>그날 저녁, 둘이서</b></div>
+            <div class="p pB"><div class="shot night"></div><b>2026. 8. 12</b></div>
+          </div>
+
+          <div class="vnote tail" data-wave="9">
+            <span class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+            <span class="wave"></span>
+            <span class="lbl"><u>남겨둔 한마디</u> · 0:12</span>
+          </div>
+
+          <div class="copy">
+            <h1>말로는 못 하니까,<br><i>여기 두고 가요.</i></h1>
+            <p>목소리 한마디, 사진 한 장.<br>우리끼리만 열어봐요.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ B-1b 필름 ══════ -->
+    <section class="slot">
+      <h3>B-1b. <b>필름</b> — 한 줄로 흐르기</h3>
+      <p class="note">
+        흩뿌리는 대신 <b>한 줄로 흘려</b> 옆으로 이어지게 했습니다. 셋 다 보이면서
+        오른쪽이 잘려나가 “계속된다”로 읽힙니다. 목소리줄은 사진 아래 제자리에 놓입니다.
+      </p>
+
+      <div class="phone">
+        <div class="b1b">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+
+          <div class="strip">
+            <div class="p"><div class="shot dusk"></div><b>그날 저녁, 둘이서</b></div>
+            <div class="p"><div class="shot night"></div><b>2026. 8. 12</b></div>
+            <div class="p"><div class="shot morning"></div><b>아무것도 아닌 아침</b></div>
+          </div>
+
+          <div class="vwrap">
+            <div class="vnote" data-wave="13">
+              <span class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+              <span class="wave"></span>
+              <span class="lbl"><u>남겨둔 한마디</u> · 0:12</span>
+            </div>
+          </div>
+
+          <div class="copy">
+            <h1>말로는 못 하니까,<br><i>여기 두고 가요.</i></h1>
+            <p>목소리 한마디, 사진 한 장.<br>우리끼리만 열어봐요.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <h2 class="grp">3. 몽실이 계열 — 새 몽실이를 얹었습니다
+    <small>둘의 차이는 <b>몽실이가 무슨 역할인가</b>입니다. 문구에서 ‘가족’은 뺐습니다.</small>
+  </h2>
+
+  <div class="row">
+
+    <!-- ══════ C-1 ══════ -->
+    <section class="slot">
+      <h3>C-1. <b>전하는 몽실이</b> — 심부름꾼</h3>
+      <p class="note">
+        마음을 <b>대신 전해주는 존재</b>입니다. 쑥스러워서 직접 못 하는 사람에게
+        “제가 갖다 드릴게요”라고 말합니다. 이 앱이 왜 필요한지를 캐릭터 하나로 말합니다.
+      </p>
+
+      <div class="phone">
+        <div class="c">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+          <div class="sp"></div>
+
+          <div class="bubble">직접 말 못 하겠으면,<br>저한테 주세요.</div>
+          <div class="mongwrap" data-mong="letter"></div>
+
+          <div class="copy">
+            <h1>쑥스러운 말은<br><i>몽실이한테 맡겨요.</i></h1>
+            <p>목소리로 남기면, 정한 사람에게만 도착해요.</p>
+          </div>
+
+          <div class="sp"></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ C-2 ══════ -->
+    <section class="slot">
+      <h3>C-2. <b>품은 몽실이</b> — 담아두는 그릇</h3>
+      <p class="note">
+        배에 <b>담긴 것이 비칩니다</b> — 사진 한 장과 목소리 한 줄. 캐릭터의 따뜻함과
+        “안에 뭐가 쌓이는지”를 한 그림에서 다 말합니다. 작성 화면의 몽실이(담는 그릇)와 뜻이 같습니다.
+      </p>
+
+      <div class="phone">
+        <div class="c">
+          <div class="head">
+            <div class="brandrow">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13.2a4.7 4.7 0 0 1 6.6-6.7l.8.8.8-.8a4.7 4.7 0 0 1 6.6 6.7z"/></svg>
+              오늘도 사랑해
+            </div>
+          </div>
+          <div class="sp"></div>
+
+          <div class="bubble">제 안에 담아두세요.</div>
+          <div class="mongwrap" data-mong="pouch"></div>
+
+          <div class="copy">
+            <h1>못 한 말이<br><i>여기 쌓여가요.</i></h1>
+            <p>목소리도 사진도, 우리끼리만 꺼내 봐요.</p>
+          </div>
+
+          <div class="sp"></div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button">아이디로 시작하기</button>
+          <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+          <p class="signin">이미 함께하고 계신가요? <a href="#">로그인</a></p>
+          <p class="legal">시작하면 <a href="#">이용약관</a>과 <a href="#">개인정보 처리방침</a>에 동의하는 것으로 봐요.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   몽실이 — 솜사탕으로 다시 그리기
+
+   곰발바닥이 된 세 가지 원인과 처방:
+   1) 같은 크기 원이 가로로 나란히      → 크기를 제각각으로, 위아래로 흩어 얹는다
+   2) 그라데이션이 원마다 따로 걸림      → gradientUnits="userSpaceOnUse" 로
+                                          **덩어리 전체에 하나만** 건다. 경계가 사라진다.
+   3) 가장자리가 칼같이 떨어짐          → 같은 모양을 흐리게 깐 겹을 뒤에 둔다(보풀)
+   ══════════════════════════════════════════════════════════════ */
+
+/** 솜뭉치. [cx, cy, r] — 크기가 제각각인 것이 핵심이다. 나란히 두면 발가락이 된다. */
+const PUFFS = [
+  [119,  84, 48], [ 77,  93, 41], [162,  93, 38], [ 97, 116, 36], [143, 117, 34],
+  [ 53, 108, 28], [187, 107, 26], [ 90,  51, 27], [125,  41, 30], [157,  54, 24],
+  [ 55,  76, 23], [185,  76, 19], [104,  29, 15], [ 71, 126, 22], [171, 126, 21],
+  [120, 132, 26],
+]
+
+const puffCircles = (id) =>
+  PUFFS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')
+
+/** 얼굴. 눈 높이를 옵션으로 받는다 — 품은 몽실이는 배를 비워야 해서 눈이 위로 간다. */
+const face = (eyeY, mouthY) => `
+  <ellipse cx="76" cy="${eyeY + 17}" rx="11" ry="6.4" fill="#f79cc4" opacity="0.62"/>
+  <ellipse cx="164" cy="${eyeY + 17}" rx="11" ry="6.4" fill="#f79cc4" opacity="0.62"/>
+  <circle cx="102" cy="${eyeY}" r="6.4" fill="#b8286a"/>
+  <circle cx="140" cy="${eyeY}" r="6.4" fill="#b8286a"/>
+  <circle cx="104.3" cy="${eyeY - 2.3}" r="2.3" fill="#fff"/>
+  <circle cx="142.3" cy="${eyeY - 2.3}" r="2.3" fill="#fff"/>
+  <path d="M111 ${mouthY} q10 8.5 20 0" fill="none" stroke="#b8286a"
+        stroke-width="3.4" stroke-linecap="round"/>`
+
+/** 몽실이 한 마리. kind: 'plain' | 'letter' | 'pouch' */
+function mongsil(kind, uid) {
+  const g = `mg-${uid}`
+  const f = `fz-${uid}`
+  const s = `sd-${uid}`
+  const p = `pc-${uid}`
+
+  const extra = {
+    /* 편지를 들고 간다 — '심부름 중'이 보인다 */
+    letter: `
+      <g transform="rotate(-13 196 122)">
+        <rect x="176" y="110" width="40" height="29" rx="7" fill="#fff"
+              stroke="#f2cfe0" stroke-width="1.6"/>
+        <path d="M176 116 196 128 216 116" fill="none" stroke="#e58cba"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M196 102c0-3.8 5.6-5.1 5.6-.7 0-4.4 5.6-3.1 5.6.7 0 4-5.6 7.1-5.6 7.1s-5.6-3.1-5.6-7.1z"
+              fill="#d50e68"/>
+      </g>`,
+    /* 배에 담긴 것이 비친다 — 사진 한 장 + 목소리 한 줄 */
+    pouch: `
+      <g>
+        <rect x="62" y="96" width="116" height="38" rx="15" fill="#fff" opacity="0.84"/>
+        <g clip-path="url(#${p})">
+          <rect x="70" y="103" width="26" height="24" fill="#ffc3a8"/>
+          <rect x="70" y="103" width="26" height="24" fill="url(#${s})"/>
+          <circle cx="77" cy="110" r="3" fill="#fff" opacity="0.9"/>
+          <path d="M70 129 l8-8 6 5.4 5-4 8 6.6z" fill="#fff" opacity="0.6"/>
+        </g>
+        <g fill="#d50e68" opacity="0.7">
+          ${[6, 14, 22, 11, 18, 9, 15, 7]
+            .map((h, i) =>
+              `<rect x="${104 + i * 6}" y="${115 - h / 2}" width="3" height="${h}" rx="1.5"/>`)
+            .join('')}
+        </g>
+        <path d="M160 112c0-3 4.4-4 4.4-.6 0-3.4 4.4-2.4 4.4.6 0 3.2-4.4 5.6-4.4 5.6s-4.4-2.4-4.4-5.6z"
+              fill="#d50e68" opacity="0.5"/>
+      </g>`,
+    plain: '',
+  }[kind]
+
+  const eyeY = kind === 'pouch' ? 74 : 92
+  const mouthY = kind === 'pouch' ? 86 : 104
+
+  return `
+  <svg viewBox="0 0 240 190" aria-hidden="true">
+    <defs>
+      <!-- ★ userSpaceOnUse — 이것 하나가 발바닥과 솜사탕을 가른다.
+           빼면 원 16개가 각자 자기 그라데이션을 갖고 알알이 흩어진다. -->
+      <radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="86" cy="44" r="196">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="32%" stop-color="#fdf0f7"/>
+        <stop offset="64%" stop-color="#f8d4e8"/>
+        <stop offset="100%" stop-color="#eda6cd"/>
+      </radialGradient>
+      <linearGradient id="${s}" x1="0" y1="0" x2="0.4" y2="1">
+        <stop offset="0%" stop-color="#ffd9a3"/>
+        <stop offset="100%" stop-color="#f68d9e"/>
+      </linearGradient>
+      <filter id="${f}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+      <clipPath id="${p}"><rect x="70" y="103" width="26" height="24" rx="6"/></clipPath>
+    </defs>
+
+    <!-- 바닥 그림자 — 이게 있어야 떠 있는 것으로 읽힌다 -->
+    <ellipse cx="120" cy="171" rx="62" ry="9" fill="#d50e68" opacity="0.15" filter="url(#${f})"/>
+
+    <!-- 보풀 겹: 같은 뭉치를 흐리게 깔아 가장자리를 부드럽게 만든다 -->
+    <g fill="url(#${g})" filter="url(#${f})" opacity="0.7">${puffCircles()}</g>
+    <!-- 본체 -->
+    <g fill="url(#${g})">${puffCircles()}</g>
+
+    <!-- 위쪽 빛 -->
+    <ellipse cx="94" cy="52" rx="40" ry="21" fill="#fff" opacity="0.42" filter="url(#${f})"/>
+
+    ${face(eyeY, mouthY)}
+    ${extra}
+
+    <g fill="#ed1074" opacity="0.4">
+      <circle cx="28" cy="38" r="3.2"/>
+      <circle cx="212" cy="46" r="2.6"/>
+      <circle cx="22" cy="142" r="2.3"/>
+      <circle cx="218" cy="150" r="2"/>
+    </g>
+  </svg>`
+}
+
+/** 예전 몽실이 — 무엇이 문제였는지 눈으로 보라고 그대로 다시 그린다. */
+function oldMongsil() {
+  return `
+  <svg viewBox="0 0 240 190" aria-hidden="true">
+    <defs>
+      <!-- 원마다 따로 걸리는 그라데이션(기본값). 이게 알알이 흩어져 보이게 한다. -->
+      <radialGradient id="old-g" cx="32%" cy="14%" r="106%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="52%" stop-color="#fdeef5"/>
+        <stop offset="100%" stop-color="#f7c8e0"/>
+      </radialGradient>
+    </defs>
+    <g fill="url(#old-g)">
+      <rect x="32" y="86" width="176" height="62" rx="31"/>
+      <circle cx="72" cy="88" r="30"/>
+      <circle cx="120" cy="70" r="38"/>
+      <circle cx="168" cy="88" r="30"/>
+    </g>
+    <g>
+      <circle cx="104" cy="102" r="6" fill="#b8286a"/>
+      <circle cx="136" cy="102" r="6" fill="#b8286a"/>
+      <ellipse cx="82" cy="116" rx="10" ry="6" fill="#f79cc4" opacity="0.7"/>
+      <ellipse cx="158" cy="116" rx="10" ry="6" fill="#f79cc4" opacity="0.7"/>
+      <path d="M112 113 q8 7 16 0" fill="none" stroke="#b8286a"
+            stroke-width="3.2" stroke-linecap="round"/>
+    </g>
+  </svg>`
+}
+
+/* ── 그리기 ─────────────────────────────────────────────── */
+document.getElementById('oldMong').outerHTML = oldMongsil()
+document.getElementById('newMong').outerHTML = mongsil('plain', 'cmp')
+
+document.querySelectorAll('[data-mong]').forEach((el, i) => {
+  el.innerHTML = mongsil(el.dataset.mong, `m${i}`)
+})
+
+/* ── 파형 ────────────────────────────────────────────────
+   들은 만큼(on)은 진하게, 남은 만큼은 연하게. 높이는 자연스러운 굽이를 준다. */
+const HEIGHTS = [6, 11, 17, 22, 14, 19, 24, 12, 8, 15, 21, 17, 10, 6, 13, 18, 23, 16, 9, 12, 7, 5]
+
+document.querySelectorAll('.vnote').forEach((note) => {
+  const played = Number(note.dataset.wave)
+  note.querySelector('.wave').innerHTML = HEIGHTS
+    .map((h, i) => `<s class="${i < played ? 'on' : ''}" style="height:${h}px"></s>`)
+    .join('')
+})
+
+/* ── 준비 중 펼치개 ──────────────────────────────────────── */
+const SOON = ['카카오', '휴대폰 번호', 'Google']
+for (const more of document.querySelectorAll('.more')) {
+  more.addEventListener('click', () => {
+    const actions = more.closest('.actions')
+    const open = actions.querySelector('.soon')
+    if (open) {
+      open.remove()
+      more.querySelector('span').textContent = '다른 방법으로 시작하기'
+      return
+    }
+    const box = document.createElement('div')
+    box.className = 'soon'
+    box.innerHTML = SOON
+      .map((p) => `<button type="button">${p}로 시작하기 <em>준비 중</em></button>`)
+      .join('')
+    more.after(box)
+    more.querySelector('span').textContent = '접기'
+  })
+}
+</script>

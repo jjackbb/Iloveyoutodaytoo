@@ -1,0 +1,373 @@
+<meta charset="utf-8">
+<title>포인트색 시안 — 기존 몽실이 기준</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+<style>
+  /* ============================================================
+     포인트색 시안 — **기존 몽실이(분홍)를 그대로 두고** 고른다
+
+     결정된 것:
+     · 따뜻한 계열(주황·벽돌)은 전부 반려 — 분홍 몽실이와 싸운다
+     · 토스 파랑도 반려 — "너무 토스 같다"
+     · 남보라 방향으로 간다
+
+     그래서 이 문서는 **로고의 마젠타→보라 구간**에서 색을 네 개 뽑아
+     손대지 않은 분홍 몽실이 옆에 나란히 놓는다.
+     (몽실이 색을 옮겨본 실험은 맨 아래에 참고로만 남겨둔다)
+     ============================================================ */
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #edecf0; color: #191f28;
+    font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  h1.doc { margin: 0 0 10px; font-size: 26px; font-weight: 700; letter-spacing: -0.035em; }
+  p.doc { margin: 0 0 12px; font-size: 15.5px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  p.doc b { color: #191f28; }
+
+  section { margin-top: 50px; }
+  .sec-h {
+    display: flex; align-items: baseline; gap: 12px;
+    margin: 0 0 8px; padding-top: 24px; border-top: 2px solid #d5d3da;
+    font-size: 20px; font-weight: 700; letter-spacing: -0.03em;
+  }
+  .sec-h span { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #8b95a1; }
+  .sec-p { margin: 0 0 20px; font-size: 15px; line-height: 1.76; color: #4e5968; max-width: 80ch; }
+  .sec-p b { color: #191f28; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
+  th, td { text-align: left; padding: 11px 13px; border-bottom: 1px solid #e5e8eb; vertical-align: top; line-height: 1.6; }
+  th { font-weight: 700; background: #f2f4f6; font-size: 13px; }
+  td b { color: #191f28; }
+  code { background: #f2f4f6; border-radius: 4px; padding: 1px 5px; font-size: 12.5px; }
+  .pickrow td { background: #f3f1fe; }
+  .pickrow td:first-child { box-shadow: inset 3px 0 0 #5b4be0; }
+
+  /* ── 로고 띠 ─────────────────────────────────────────────── */
+  .ramp { display: flex; border-radius: 12px; overflow: hidden; height: 58px; margin-bottom: 8px; }
+  .ramp i {
+    flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
+    font-style: normal; font-size: 10px; font-weight: 700; color: #fff; letter-spacing: 0.02em;
+  }
+  .rampcap { margin: 0 0 22px; font-size: 13px; color: #8b95a1; display: flex; justify-content: space-between; }
+
+  /* ── 후보 줄 ─────────────────────────────────────────────── */
+  .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .cand h4 { margin: 0 0 3px; font-size: 15px; font-weight: 700; letter-spacing: -0.03em; }
+  .cand h4 em {
+    font-style: normal; font-size: 11px; font-weight: 700; color: #fff;
+    background: #5b4be0; border-radius: 100px; padding: 2px 7px; margin-left: 5px; vertical-align: 2px;
+  }
+  .cand .meta { margin: 0 0 9px; font-size: 12px; color: #8b95a1; }
+  .cand .note { margin: 0 0 11px; min-height: 6.4em; font-size: 12.5px; line-height: 1.66; color: #4e5968; }
+  .cand .note b { color: #191f28; }
+  .tokens { display: flex; gap: 5px; margin-bottom: 10px; }
+  .tokens i {
+    flex: 1; height: 40px; border-radius: 8px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.09);
+    display: flex; align-items: flex-end; padding: 4px; font-style: normal;
+    font-size: 8px; font-weight: 700; white-space: nowrap; overflow: hidden;
+  }
+  .aa {
+    display: inline-block; margin-bottom: 10px; font-size: 11.5px; font-weight: 600;
+    background: #eaf6ef; color: #0f7a4a; border-radius: 100px; padding: 3px 9px;
+  }
+
+  /* ── 폰 ──────────────────────────────────────────────────── */
+  .phone {
+    position: relative; width: 100%; aspect-ratio: 390 / 844; border-radius: 30px;
+    background: #fff; color: #191f28;
+    box-shadow: 0 18px 44px -22px rgb(25 31 40 / 0.4), 0 0 0 1px rgb(25 31 40 / 0.07);
+    overflow: hidden; display: flex; flex-direction: column; container-type: inline-size;
+  }
+  .scr { flex: 1; display: flex; flex-direction: column; padding: 7cqw 5.6cqw 6cqw; }
+  .scr .top { display: flex; align-items: center; gap: 2.2cqw; }
+  .scr .top img { width: 7.4cqw; height: 7.4cqw; border-radius: 2cqw; display: block; }
+  .scr .top b { font-size: 3.9cqw; font-weight: 700; letter-spacing: -0.03em; }
+  .sp { flex: 1; min-height: 0; }
+  .scr .mong { width: 62cqw; margin: 0 auto; }
+  .scr .mong svg { width: 100%; height: auto; display: block; }
+  .bub {
+    align-self: center; position: relative; background: var(--soft); color: #191f28;
+    border-radius: 5cqw; padding: 3cqw 4.6cqw;
+    font-size: 4cqw; font-weight: 600; letter-spacing: -0.035em; text-align: center;
+    word-break: keep-all; line-height: 1.5;
+  }
+  .bub::after {
+    content: ''; position: absolute; left: 50%; bottom: -2cqw; width: 4.4cqw; height: 2.3cqw;
+    transform: translateX(-50%); background: var(--soft); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .scr h1 {
+    margin: 5.4cqw 0 0; font-size: 7.2cqw; font-weight: 700; line-height: 1.42;
+    letter-spacing: -0.045em; text-align: center; word-break: keep-all;
+  }
+  .scr h1 i { font-style: normal; color: var(--pt); }
+  .scr .sub {
+    margin: 3.2cqw 0 0; text-align: center; font-size: 3.9cqw; line-height: 1.72;
+    color: #8b95a1; word-break: keep-all;
+  }
+  .scr .cta {
+    width: 100%; padding: 4.4cqw 0; border: 0; border-radius: 4.1cqw;
+    background: var(--pt); color: #fff; font: inherit;
+    font-size: 4.4cqw; font-weight: 600; letter-spacing: -0.03em; cursor: pointer;
+  }
+  .scr .more {
+    display: block; width: 100%; margin: 3.4cqw 0 0; padding: 0; background: none; border: 0;
+    font: inherit; font-size: 3.7cqw; font-weight: 600; color: #8b95a1; cursor: pointer;
+  }
+  .scr .more span { border-bottom: 1px solid #c9ced6; padding-bottom: 1px; }
+  .scr .signin { margin: 3.4cqw 0 0; text-align: center; font-size: 3.7cqw; color: #8b95a1; }
+  .scr .signin u { text-decoration: none; font-weight: 700; color: var(--pt); }
+  .scr .legal {
+    margin: 3.6cqw 0 0; text-align: center; font-size: 3.1cqw; line-height: 1.6; color: #a8b0ba;
+  }
+  .scr .legal u { text-decoration: underline; text-underline-offset: 2px; }
+
+  /* 후보별로 이 두 줄만 다르다 */
+  .vA { --pt: #5b4be0; --soft: #efecff; }
+  .vB { --pt: #7433d6; --soft: #f2ebfe; }
+  .vC { --pt: #8a18a6; --soft: #f8eafb; }
+  .vD { --pt: #a61390; --soft: #fce9f7; }
+
+  /* ── 참고: 몽실이 색 실험 ────────────────────────────────── */
+  .aside {
+    background: #fff; border: 1px solid #e5e8eb; border-radius: 18px; padding: 24px 26px; margin-top: 10px;
+  }
+  .aside > p { margin: 0 0 18px; font-size: 14.5px; line-height: 1.74; color: #4e5968; }
+  .aside > p b { color: #191f28; }
+  .mongs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .mcell { border: 1px solid #e5e8eb; border-radius: 14px; overflow: hidden; }
+  .mcell .white { background: #fff; padding: 8px 12px 0; }
+  .mcell .tinted { background: #efecff; padding: 0 12px 4px; }
+  .mcell svg { width: 100%; height: auto; display: block; }
+  .mcell .cap { padding: 11px 14px 14px; }
+  .mcell h5 { margin: 0 0 6px; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
+  .mcell p { margin: 0; font-size: 12.5px; line-height: 1.66; color: #4e5968; }
+  .mcell b { color: #191f28; }
+</style>
+
+<div class="wrap">
+
+  <h1 class="doc">포인트색 시안 — 몽실이는 그대로 두고</h1>
+  <p class="doc">
+    <b>몽실이는 손대지 않았습니다.</b> 네 화면 모두 지금의 분홍 몽실이 그대로입니다.
+    로고의 <b>마젠타 → 보라</b> 구간에서 색을 네 개 뽑아, 그 분홍 옆에 나란히 놓았습니다.
+    <b>바뀌는 건 버튼·강조 글자·연한 면, 이 세 가지뿐</b>입니다.
+  </p>
+
+  <!-- ═══ 1 ═══ -->
+  <section>
+    <h2 class="sec-h">로고의 어느 지점에서 뽑았나 <span>01 · 출처</span></h2>
+    <div class="ramp">
+      <i style="background:#FF3137">#FF3137</i>
+      <i style="background:#FB2743">#FB2743</i>
+      <i style="background:#E7107F">#E7107F</i>
+      <i style="background:#C40AA1">#C40AA1</i>
+      <i style="background:#A211C2">#A211C2</i>
+    </div>
+    <p class="rampcap"><span>← 빨강 (따뜻한 쪽, 반려)</span><span>보라 (여기서 뽑습니다) →</span></p>
+    <p class="sec-p">
+      따뜻한 쪽(왼쪽 절반)은 분홍 몽실이와 싸워서 반려됐습니다.
+      그래서 <b>오른쪽 절반</b>만 씁니다. 아래 D → C → B → A 순서로
+      <b>로고 원색에서 점점 파랑 쪽으로</b> 당긴 값입니다.
+    </p>
+  </section>
+
+  <!-- ═══ 2 ═══ -->
+  <section>
+    <h2 class="sec-h">네 가지 <span>02 · 시안</span></h2>
+    <div class="four">
+
+      <div class="cand">
+        <h4>A. 남보라 <em>선택</em></h4>
+        <p class="meta">색상각 246° · 로고에서 43° 당김</p>
+        <p class="note">가장 <b>UI 색으로 읽힙니다.</b> 버튼·링크·선택 상태가 자연스럽고,
+          몽실이 분홍과 <b>충분히 멀어서 서로 안 건드립니다.</b> 대신 로고와의 연결은 넷 중 가장 약합니다.</p>
+        <div class="tokens">
+          <i style="background:#5b4be0;color:#fff">#5B4BE0</i>
+          <i style="background:#4a3bc4;color:#fff">#4A3BC4</i>
+          <i style="background:#efecff;color:#5b4be0">#EFECFF</i>
+        </div>
+        <span class="aa">흰 글자 5.96:1 ✅</span>
+        <div class="phone vA"><div class="scr" data-scr></div></div>
+      </div>
+
+      <div class="cand">
+        <h4>B. 보라</h4>
+        <p class="meta">색상각 268° · 로고에서 21° 당김</p>
+        <p class="note">A와 C의 <b>중간</b>. 아직 UI 색으로 읽히면서 로고 쪽으로 한 걸음 갔습니다.
+          몽실이 분홍과 <b>은근히 이어지는 느낌</b>이 A보다 낫습니다.</p>
+        <div class="tokens">
+          <i style="background:#7433d6;color:#fff">#7433D6</i>
+          <i style="background:#5f28b3;color:#fff">#5F28B3</i>
+          <i style="background:#f2ebfe;color:#7433d6">#F2EBFE</i>
+        </div>
+        <span class="aa">흰 글자 6.59:1 ✅</span>
+        <div class="phone vB"><div class="scr" data-scr></div></div>
+      </div>
+
+      <div class="cand">
+        <h4>C. 진보라</h4>
+        <p class="meta">색상각 289° · <b>로고 보라 직계</b></p>
+        <p class="note">로고의 <code>#A211C2</code>를 <b>어둡게만</b> 한 것. 로고와 완전히 한 몸입니다.
+          다만 자주에 가까워서 <b>버튼이 조금 무겁습니다.</b></p>
+        <div class="tokens">
+          <i style="background:#8a18a6;color:#fff">#8A18A6</i>
+          <i style="background:#711389;color:#fff">#711389</i>
+          <i style="background:#f8eafb;color:#8a18a6">#F8EAFB</i>
+        </div>
+        <span class="aa">흰 글자 7.68:1 ✅</span>
+        <div class="phone vC"><div class="scr" data-scr></div></div>
+      </div>
+
+      <div class="cand">
+        <h4>D. 자주</h4>
+        <p class="meta">색상각 313° · <b>로고 마젠타 쪽</b></p>
+        <p class="note">몽실이 분홍과 <b>제일 가깝습니다</b> — 한 가족으로 보입니다.
+          그런데 그게 문제이기도 합니다. <b>지금의 분홍(<code>#d50e68</code>)과 크게 다르지 않아</b>
+          “바꿨다”는 느낌이 안 납니다.</p>
+        <div class="tokens">
+          <i style="background:#a61390;color:#fff">#A61390</i>
+          <i style="background:#880f76;color:#fff">#880F76</i>
+          <i style="background:#fce9f7;color:#a61390">#FCE9F7</i>
+        </div>
+        <span class="aa">흰 글자 6.74:1 ✅</span>
+        <div class="phone vD"><div class="scr" data-scr></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 3 ═══ -->
+  <section>
+    <h2 class="sec-h">정리 <span>03 · 표</span></h2>
+    <table>
+      <thead><tr>
+        <th style="width:8%">후보</th><th style="width:13%">색</th><th style="width:10%">색상각</th>
+        <th style="width:12%">흰 글자</th><th style="width:57%">분홍 몽실이 옆에 놓았을 때</th>
+      </tr></thead>
+      <tbody>
+        <tr class="pickrow"><td><b>A 남보라</b></td><td><code>#5B4BE0</code></td><td>246°</td><td>5.96:1 ✅</td>
+          <td>서로 <b>안 건드립니다.</b> 몽실이가 제일 또렷하게 보이는 안. 로고 연결은 가장 약함</td></tr>
+        <tr><td><b>B 보라</b></td><td><code>#7433D6</code></td><td>268°</td><td>6.59:1 ✅</td>
+          <td><b>은근히 이어집니다.</b> UI 색과 로고 사이의 균형점. A가 너무 남남 같으면 여기</td></tr>
+        <tr><td><b>C 진보라</b></td><td><code>#8A18A6</code></td><td>289°</td><td>7.68:1 ✅</td>
+          <td>로고와 <b>한 몸.</b> 대신 자주라 버튼이 무겁고, 화면 전체가 진해 보임</td></tr>
+        <tr><td><b>D 자주</b></td><td><code>#A61390</code></td><td>313°</td><td>6.74:1 ✅</td>
+          <td>몽실이와 <b>한 가족.</b> 단 지금 분홍과 비슷해서 <b>바뀐 티가 안 남</b></td></tr>
+      </tbody>
+    </table>
+    <p class="sec-p" style="margin-top:18px">
+      <b>A와 B 사이에서 고르시면 됩니다.</b> C·D는 화면을 보시면 알겠지만
+      몽실이와 색이 겹쳐서 <b>화면 전체가 한 덩어리 보라</b>가 됩니다 —
+      “UI는 조용히, 몽실이가 주인공”이라는 원칙과 어긋납니다.
+    </p>
+  </section>
+
+  <!-- ═══ 4 ═══ -->
+  <section>
+    <h2 class="sec-h">참고 — 몽실이 색을 옮겨본 것 <span>04 · 안 써도 됨</span></h2>
+    <div class="aside">
+      <p>
+        <b>이건 제가 요청을 잘못 알아듣고 만든 것입니다.</b> 몽실이 몸 색을 남보라 쪽으로
+        옮겨본 실험이에요. <b>지금은 필요 없지만</b>, 나중에 화면이 늘어나서
+        분홍이 걸리면 꺼내 볼 수 있어 남겨둡니다. 각 칸은 <b>위가 흰 바탕, 아래가 연보라 틴트</b>입니다.
+      </p>
+      <div class="mongs">
+        <div class="mcell">
+          <div class="white"><div data-m="pink" data-bg="w"></div></div>
+          <div class="tinted"><div data-m="pink" data-bg="t"></div></div>
+          <div class="cap"><h5>지금 것 (분홍)</h5>
+            <p>기준점. 위 네 시안이 전부 이걸 씁니다.</p></div>
+        </div>
+        <div class="mcell">
+          <div class="white"><div data-m="grad" data-bg="w"></div></div>
+          <div class="tinted"><div data-m="grad" data-bg="t"></div></div>
+          <div class="cap"><h5>분홍 → 라일락</h5>
+            <p>로고 그라데이션을 몸에 옮긴 것. 왼쪽 위는 분홍, 오른쪽 아래로 라일락.
+              <b>분홍을 잃지 않으면서</b> 보라와 손을 잡습니다.</p></div>
+        </div>
+        <div class="mcell">
+          <div class="white"><div data-m="lilac" data-bg="w"></div></div>
+          <div class="tinted"><div data-m="lilac" data-bg="t"></div></div>
+          <div class="cap"><h5>라일락</h5>
+            <p>보라와 완전히 한 가족. 정돈되지만 <b>온기가 같이 빠집니다.</b></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   몽실이 — 위 네 시안은 전부 'pink'(지금 것)를 그대로 쓴다.
+   grad·lilac은 맨 아래 참고용에서만 쓴다.
+   ══════════════════════════════════════════════════════════════ */
+
+const PUFFS = [
+  [119,  84, 48], [ 77,  93, 41], [162,  93, 38], [ 97, 116, 36], [143, 117, 34],
+  [ 53, 108, 28], [187, 107, 26], [ 90,  51, 27], [125,  41, 30], [157,  54, 24],
+  [ 55,  76, 23], [185,  76, 19], [104,  29, 15], [ 71, 126, 22], [171, 126, 21],
+  [120, 132, 26],
+]
+const circles = () => PUFFS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')
+
+const SKINS = {
+  pink:  { stops: ['#ffffff', '#fdf0f7', '#f8d4e8', '#eda6cd'], eye: '#b8286a', blush: '#f79cc4', shadow: '#d50e68' },
+  grad:  { stops: ['#ffffff', '#fdf1f8', '#f4d3ea', '#c9a5e6'], eye: '#8b2e86', blush: '#f4a2cb', shadow: '#8a3ab0' },
+  lilac: { stops: ['#ffffff', '#f5f2fe', '#ded5fa', '#b3a2f0'], eye: '#4a3bc4', blush: '#efa9cd', shadow: '#5b4be0' },
+}
+
+function mongsil(kind, uid) {
+  const s = SKINS[kind]
+  const g = `g-${kind}-${uid}`, f = `f-${kind}-${uid}`
+  return `
+  <svg viewBox="0 0 240 190" aria-hidden="true">
+    <defs>
+      <!-- userSpaceOnUse — 덩어리 전체에 그라데이션 하나.
+           빼면 뭉치 16개가 각자 그라데이션을 갖고 알알이 흩어진다(= 곰발바닥). -->
+      <radialGradient id="${g}" gradientUnits="userSpaceOnUse" cx="86" cy="44" r="196">
+        <stop offset="0%" stop-color="${s.stops[0]}"/>
+        <stop offset="32%" stop-color="${s.stops[1]}"/>
+        <stop offset="64%" stop-color="${s.stops[2]}"/>
+        <stop offset="100%" stop-color="${s.stops[3]}"/>
+      </radialGradient>
+      <filter id="${f}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+    </defs>
+    <ellipse cx="120" cy="171" rx="62" ry="9" fill="${s.shadow}" opacity="0.15" filter="url(#${f})"/>
+    <g fill="url(#${g})" filter="url(#${f})" opacity="0.7">${circles()}</g>
+    <g fill="url(#${g})">${circles()}</g>
+    <ellipse cx="94" cy="52" rx="40" ry="21" fill="#fff" opacity="0.42" filter="url(#${f})"/>
+    <ellipse cx="81" cy="109" rx="11" ry="6.6" fill="${s.blush}" opacity="0.62"/>
+    <ellipse cx="159" cy="109" rx="11" ry="6.6" fill="${s.blush}" opacity="0.62"/>
+    <circle cx="101" cy="92" r="6.4" fill="${s.eye}"/>
+    <circle cx="139" cy="92" r="6.4" fill="${s.eye}"/>
+    <circle cx="103.4" cy="89.5" r="2.3" fill="#fff"/>
+    <circle cx="141.4" cy="89.5" r="2.3" fill="#fff"/>
+    <path d="M110 104 q10 8.5 20 0" fill="none" stroke="${s.eye}" stroke-width="3.4" stroke-linecap="round"/>
+  </svg>`
+}
+
+/* 네 화면은 마크업도 몽실이도 같다 — 포인트색 변수 두 개만 다르다. */
+document.querySelectorAll('[data-scr]').forEach((el, i) => {
+  el.innerHTML = `
+    <div class="top"><img src="../../../logo.png" alt=""><b>오늘도 사랑해</b></div>
+    <div class="sp"></div>
+    <div class="bub">말 안 나와도 괜찮아요.</div>
+    <div class="mong">${mongsil('pink', 'v' + i)}</div>
+    <h1>쑥스러운 마음도<br><i>여기서는 편해요.</i></h1>
+    <p class="sub">목소리로 남겨두면, 소중한 사람이<br>언젠가 그 자리에서 들어요.</p>
+    <div class="sp"></div>
+    <button class="cta" type="button">시작하기</button>
+    <button class="more" type="button"><span>다른 방법으로 시작하기</span></button>
+    <p class="signin">이미 함께하고 계신가요? <u>로그인</u></p>
+    <p class="legal">시작하면 <u>이용약관</u>과 <u>개인정보 처리방침</u>에<br>동의하는 것으로 봐요.</p>`
+})
+
+document.querySelectorAll('[data-m]').forEach((el, i) => {
+  el.innerHTML = mongsil(el.dataset.m, `${el.dataset.bg}${i}`)
+})
+</script>
