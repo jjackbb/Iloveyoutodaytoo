@@ -25,7 +25,9 @@ import { createClient } from '@/lib/supabase/client'
  * 마음 표현하기 — 작성 화면 (캡처 12~21).
  *
  * 사진 타일 줄 / "함께 담을 목소리" 카드 / "문구 선택" / 아래 고정 [♥ 표현하기].
- * **사진 1장 이상 + 음성 3초 이상**을 모두 담아야 버튼이 켜진다(캡처 12의 안내문).
+ * **음성 3초 이상**만 있으면 버튼이 켜진다. 사진은 넣어도 되고 안 넣어도 된다.
+ * (2026-08-25 사용자 결정: 전에는 사진 1장 이상도 필수였다. 목소리가 중심인 앱인데
+ *  사진을 강제하면 "지금 찍을 사진이 없어서" 마음을 못 남기는 일이 생긴다.)
  *
  * 잔여데이터가 남지 않는 이유:
  * 담아둔 사진·녹음·문구는 전부 이 컴포넌트의 상태다. 화면을 떠나면 함께 사라진다.
@@ -603,9 +605,7 @@ export function ComposeForm({
   }, [initial])
 
   const canSubmit =
-    photos.length > 0 &&
-    recording !== null &&
-    caption.trim().length <= CAPTION_MAX_LENGTH
+    recording !== null && caption.trim().length <= CAPTION_MAX_LENGTH
 
   /*
     올릴 준비가 처음 끝난 순간. 몽실이의 "담기"에 해당한다.
@@ -1006,14 +1006,6 @@ export function ComposeForm({
               className={controlClassName({ className: 'leading-relaxed' })}
             />
           </section>
-
-          {/*
-            안내문 (캡처 12). 왜 버튼이 아직 안 켜지는지를 말해준다.
-            버튼을 잠가만 두고 이유를 안 적으면 "고장났나" 하고 멈춘다.
-          */}
-          <p className="text-center text-base break-keep text-muted">
-            사진과 음성 녹음을 모두 담아야 표현할 수 있어요
-          </p>
 
           {/*
             고치기로 들어와 원래 목소리를 아직 받아오는 중. 이 동안 [저장하기]가 꺼져 있는데

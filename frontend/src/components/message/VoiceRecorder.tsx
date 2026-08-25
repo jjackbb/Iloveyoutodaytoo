@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { VoicePlayer } from '@/components/media/VoicePlayer'
+import { RuleList } from '@/components/ui/RuleList'
 import { formatClock } from '@/lib/format'
 // 길이 제한은 @/lib/limits 한 곳에만 둔다. 서버 검증(memories.ts)도 같은 값을 본다.
 import { VOICE_MAX_SEC, VOICE_MIN_SEC } from '@/lib/limits'
@@ -15,7 +16,7 @@ import { toBarLevels } from '@/lib/waveform'
  *   눌기 전  — 빨간 마이크 원 + "마이크를 눌러 녹음을 시작하세요"
  *   녹음 중  — 빨간 원(‖) + 0:00 카운트 + "녹음 중… 마이크를 눌러 멈추기"
  *   녹음 후  — 빨간 마이크 원 + 총 길이 + "녹음 완료 · 아래에서 들어볼 수 있어요" + 재생바
- * 카드 아래에는 상태 배지가 붙는다: ✕ 3초 이상 녹음해 주세요(빨강) → ✓ 3초 이상 충족 완료(초록).
+ * 카드 아래에는 조건 한 줄이 붙는다(RuleList): 3초를 채우면 색이 살아나며 체크가 켜진다.
  *
  * 규칙:
  * - 3초 미만은 저장할 수 없다. 60초를 넘길 수 없다(DB CHECK와 같은 값).
@@ -339,7 +340,7 @@ export function VoiceRecorder({
       const levels = measured.length > 0 ? toBarLevels(measured) : null
 
       if (elapsed < VOICE_MIN_SEC) {
-        // 배지가 이미 "3초 이상 녹음해 주세요"라고 말하고 있다.
+        // 아래 조건 줄이 이미 "3초 이상 녹음"이라고 말하고 있다.
         // 같은 말을 빨간 글씨로 한 번 더 하지 않고, 처음 상태로 돌려 다시 누르게 한다.
         onChange(null)
         setPhase('idle')
@@ -448,24 +449,16 @@ export function VoiceRecorder({
       </div>
 
       {/*
-        상태 배지 (캡처 12 빨강 / 캡처 18 초록).
-        초록은 토큰에 없는 색이라 우리 팔레트로 표현한다 — 아래 주석 참고.
-        모양(✕/✓)이 함께 바뀌므로 색을 구분하기 어려운 분도 알아볼 수 있다(WCAG 1.4.1).
+        조건 표시 (2026-08-25에 ✕/✓ 배지에서 바꿨다).
+
+        전에는 아직 녹음을 시작도 안 했는데 **✕가 붙어 있어서 실패한 것처럼** 보였다.
+        지금은 가입 폼과 같은 체크 목록이다 — 못 채운 것은 조용히 회색이고,
+        채우면 색이 살아나며 체크가 켜진다. 모양이 함께 바뀌므로 색을 구분하기
+        어려운 분도 알아볼 수 있다(WCAG 1.4.1).
       */}
-      <p
-        role="status"
-        className={[
-          'inline-flex items-center gap-1.5 rounded-chip px-3.5 py-2 text-sm font-bold',
-          satisfied
-            ? 'bg-surface-soft text-muted'
-            : 'bg-primary-soft text-primary',
-        ].join(' ')}
-      >
-        <span aria-hidden>{satisfied ? '✓' : '✕'}</span>
-        {satisfied
-          ? `${VOICE_MIN_SEC}초 이상 충족 완료`
-          : `${VOICE_MIN_SEC}초 이상 녹음해 주세요`}
-      </p>
+      <RuleList
+        rules={[{ label: `${VOICE_MIN_SEC}초 이상 녹음`, met: satisfied }]}
+      />
 
       {stoppedAtMax ? (
         <p role="status" className="text-base leading-relaxed break-keep text-muted">

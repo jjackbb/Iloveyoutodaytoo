@@ -3,6 +3,11 @@
 /**
  * 추억 게시물 저장·관리 (Server Action) — 캡처 12~23의 [♥ 표현하기], 피드 카드의 ♡ 와 ⋯.
  *
+ * 사진은 **선택 사항**이다(2026-08-25 사용자 결정). 전에는 한 장 이상을 요구했는데,
+ * 목소리가 중심인 앱에서 사진을 강제하면 "지금 찍을 사진이 없어서" 마음을 못 남기는
+ * 일이 생긴다. DB에는 사진 필수 제약이 없고(memory_photos 는 별도 테이블),
+ * 목록·상세도 사진 0장을 이미 처리한다(MemoryCard 의 photos.length === 0 갈래).
+ *
  * 이 파일이 하는 일: memories 한 줄 + memory_photos 여러 줄을 넣는 것,
  * 그리고 피드 카드에서 누르는 것들(좋아요·고정·수정·숨기기·저장·삭제).
  *
@@ -98,9 +103,6 @@ export async function createMemory(
   // --- 사진 ---
   const photoPaths = (input.photoPaths ?? []).map((path) => path.trim())
 
-  if (photoPaths.length === 0) {
-    return fail('사진을 한 장 이상 담아주세요.')
-  }
   if (photoPaths.length > PHOTO_MAX_COUNT) {
     return fail(`사진은 ${PHOTO_MAX_COUNT}장까지 담을 수 있어요.`)
   }
@@ -457,9 +459,6 @@ export async function updateMemory(
 
   // --- 사진 --- (createMemory와 같은 규칙)
   const photoPaths = (input.photoPaths ?? []).map((path) => path.trim())
-  if (photoPaths.length === 0) {
-    return fail('사진을 한 장 이상 담아주세요.')
-  }
   if (photoPaths.length > PHOTO_MAX_COUNT) {
     return fail(`사진은 ${PHOTO_MAX_COUNT}장까지 담을 수 있어요.`)
   }
