@@ -5,9 +5,12 @@
  * 부품으로 뺐다. 한쪽만 고쳐지는 일을 없애려는 것이다.
  * (원래 src/app/my/avatar-circle.tsx에 있던 것을 사서함에서도 쓰게 되면서 여기로 옮겼다)
  *
- * 사진이 없으면 **브랜드 하트**를 기본 그림으로 쓴다(캡처 그대로).
- * 사람 실루엣 아이콘을 쓰지 않은 이유: 하트는 이미 앱바·스플래시에서 쓰는 우리 표시라
- * 처음 보는 그림이 아니다.
+ * 사진이 없으면 **이름 첫 글자**를 쓴다.
+ *
+ * 2026-08-25까지는 하트를 그렸는데, 하트는 로고도 기능 아이콘도 아닌 어중간한 자리였다.
+ * 게다가 사람이 여럿 있는 화면에서는 **모두가 같은 하트**라 누가 누군지 구분이 안 됐다.
+ * 첫 글자는 사람마다 달라서 목록에서 눈이 바로 짚는다.
+ * 같은 규칙을 MemberStack도 쓴다(@/lib/member-name 의 nameInitial).
  *
  * 앨범방을 가리키는 자리(마음 보내기의 "ㅇㅇ (전체)")에는 사람 사진이 없다.
  * 그때는 방 커버 그라데이션을 대신 깔 수 있게 `fallbackGradient`를 열어 뒀다 —
@@ -15,6 +18,8 @@
  *
  * 서버·브라우저 어느 쪽에서 그려도 되도록 상태를 두지 않았다. props만 받는다.
  */
+
+import { nameInitial } from '@/lib/member-name'
 
 type AvatarSize = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -26,15 +31,16 @@ const BOX_CLASS: Record<AvatarSize, string> = {
   lg: 'h-[120px] w-[120px]',
 }
 
-const HEART_CLASS: Record<AvatarSize, string> = {
-  xs: 'h-6 w-6',
-  sm: 'h-8 w-8',
-  md: 'h-10 w-10',
-  lg: 'h-[68px] w-[68px]',
+/** 첫 글자의 크기. 동그라미 지름의 절반쯤이라야 갇힌 느낌 없이 앉는다. */
+const INITIAL_CLASS: Record<AvatarSize, string> = {
+  xs: 'text-lg',
+  sm: 'text-2xl',
+  md: 'text-[28px]',
+  lg: 'text-5xl',
 }
 
 export function AvatarCircle({
-  /** 서명된 사진 주소. 없으면 기본 하트(또는 fallbackGradient)를 그린다. */
+  /** 서명된 사진 주소. 없으면 이름 첫 글자(또는 fallbackGradient)를 그린다. */
   url,
   /** 낭독기에서 누구의 사진인지 말해주기 위해 받는다. */
   name,
@@ -45,7 +51,7 @@ export function AvatarCircle({
   url: string | null
   name: string
   size?: AvatarSize
-  /** 사진이 없을 때 하트 대신 깔 CSS 그라데이션(방 커버). */
+  /** 사진이 없을 때 첫 글자 대신 깔 CSS 그라데이션(방 커버). */
   fallbackGradient?: string | null
   /**
    * 낭독기에 읽힐 그림 설명. 안 주면 "○○님의 프로필 사진".
@@ -77,16 +83,18 @@ export function AvatarCircle({
           className="h-full w-full object-cover"
         />
       ) : fallbackGradient ? null : (
-        <span className="flex h-full w-full items-center justify-center">
-          {/* 글자가 이미 이름을 말해주므로 낭독기에서는 숨긴다. */}
-          <svg
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden
-            className={['text-primary', HEART_CLASS[size]].join(' ')}
-          >
-            <path d="M12 20.5S3.5 15.2 3.5 9.4A4.9 4.9 0 0 1 12 6a4.9 4.9 0 0 1 8.5 3.4c0 5.8-8.5 11.1-8.5 11.1Z" />
-          </svg>
+        /*
+          옆에 이름이 이미 적혀 있는 자리가 대부분이라 낭독기에서는 숨긴다 —
+          안 숨기면 "민 민규"처럼 두 번 읽힌다.
+        */
+        <span
+          aria-hidden
+          className={[
+            'flex h-full w-full items-center justify-center font-bold text-primary',
+            INITIAL_CLASS[size],
+          ].join(' ')}
+        >
+          {nameInitial(name)}
         </span>
       )}
     </div>

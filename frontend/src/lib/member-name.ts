@@ -35,3 +35,20 @@ export function roomMemberName(input: {
 
   return UNKNOWN
 }
+
+/**
+ * 이름에서 동그라미(아바타)에 넣을 한 글자.
+ *
+ * 한글은 첫 글자가 곧 성이라 그대로 쓰고, 이름을 못 읽는 경우(방을 떠났거나 탈퇴)에는
+ * 물음표 대신 가운뎃점을 쓴다 — 물음표는 오류처럼 보인다.
+ *
+ * 이모지처럼 두 칸을 차지하는 글자가 첫 글자면 잘려서 깨지므로 코드 포인트 단위로 자른다.
+ *
+ * AvatarCircle 과 MemberStack 이 같은 것을 써야 한다 — 한쪽만 고쳐지면
+ * 같은 사람이 화면마다 다른 글자로 보인다.
+ */
+export function nameInitial(name: string): string {
+  const trimmed = name.trim()
+  if (!trimmed) return '·'
+  return [...trimmed][0] ?? '·'
+}
