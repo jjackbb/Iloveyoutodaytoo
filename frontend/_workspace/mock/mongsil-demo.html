@@ -289,10 +289,11 @@
     filter: drop-shadow(0 14px 32px rgb(213 14 104 / 0.22));
   }
   #cloud circle, #cloud rect { transition: none; }
-  /* 무언가 담으면 몸이 담은 것을 보여준다 — 그 자리에 눈이 있으면 겹쳐서 지저분하다.
-     빈 몽실이일 때만 얼굴을 보인다. */
+  /* 담고 있어도 **얼굴은 보인다.** 전에는 담으면 얼굴을 숨겼는데, 그러면
+     담은 순간 몽실이가 그냥 덩어리로 돌아가 "얘가 걔 맞나" 싶어진다.
+     대신 담은 것을 **배 쪽으로 내려** 눈과 겹치지 않게 했다.
+     커졌을 때(open)는 작은 몽실이 자체가 사라지므로 따로 숨길 필요가 없다. */
   #cloud .face { transition: opacity 200ms ease; }
-  #cloud.carrying .face, #cloud.open .face { opacity: 0; }
 
   /* 커진 몽실이 몸통(y 19~80 / 84) 안에 놓이는 **흰 판**.
      구름 위에 글자를 바로 얹으면 분홍 바탕이라 읽기 힘들다. 판을 한 겹 깔아
@@ -320,7 +321,8 @@
      가장 최근에 고른 셋만 보인다 — 더 많으면 어차피 다 못 알아본다. */
   .stack {
     position: absolute;
-    left: 0; right: 0; top: 42%;
+    /* 눈(높이의 약 48%) 아래, 배 자리. 얼굴과 겹치지 않는다. */
+    left: 0; right: 0; top: 64%;
     display: none;
     justify-content: center;
     align-items: center;
@@ -910,24 +912,22 @@
              그래서 판은 반듯한 흰 판으로 두고, 그 가장자리를 따라 구름 뭉치를 두른다.
              뭉치는 실제 픽셀 크기에 맞춰 JS가 그린다 — 모양 하나를 늘려 쓰면
              동그라미가 찌그러져 구름으로 안 보인다. -->
-        <svg class="big" viewBox="0 0 120 84" preserveAspectRatio="none" aria-hidden="true">
+        <!-- 커졌을 때의 몽실이 = **확인판의 테두리**.
+             구름 위에 글자를 얹으면 글자가 묻히므로, 판은 반듯한 흰 판으로 두고
+             그 가장자리를 따라 뭉치를 두른다.
+
+             ⚠ 모양을 **JS가 실제 픽셀 크기로 다시 그린다**(paintBigCloud).
+             하나를 만들어 늘려 쓰면 동그라미가 타원으로 찌그러져 솜사탕으로 안 보인다. -->
+        <svg class="big" aria-hidden="true">
           <defs>
-            <radialGradient id="fg" cx="32%" cy="14%" r="106%">
+            <radialGradient id="fg" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1">
               <stop offset="0%" stop-color="#ffffff"/>
-              <stop offset="52%" stop-color="#fdeef5"/>
-              <stop offset="100%" stop-color="#f7c8e0"/>
+              <stop offset="32%" stop-color="#fdf0f7"/>
+              <stop offset="64%" stop-color="#f8d4e8"/>
+              <stop offset="100%" stop-color="#eda6cd"/>
             </radialGradient>
           </defs>
-          <!-- ⚠ 모든 도형이 viewBox(0 0 120 84) 안에 들어와야 한다.
-               전에는 가운데 뭉치가 cy=13 r=18 이라 위로 5만큼 삐져나가
-               윗부분이 잘려 나갔다(사용자 신고 2026-08-24).
-               SVG는 그림틀 밖을 그리지 않는다. -->
-          <g fill="url(#fg)">
-            <rect x="3" y="20" width="114" height="60" rx="24"/>
-            <circle cx="28" cy="22" r="13"/>
-            <circle cx="59" cy="16" r="16"/>
-            <circle cx="90" cy="21" r="12"/>
-          </g>
+          <g id="bigBody" fill="url(#fg)"></g>
         </svg>
 
         <div class="stack" id="stack" aria-hidden="true"></div>
@@ -935,7 +935,6 @@
         <div class="pouch" id="pouch">
           <!-- 목소리를 담았을 때 -->
           <div id="pVoice">
-            <h3>들어보고, 필요하면 잘라내세요</h3>
             <div class="trim" id="trim">
           <div class="track">
             <div class="bars" id="tbars"></div>
@@ -954,8 +953,8 @@
           <span id="tRight">0:00</span>
         </div>
             <div class="row">
-              <button type="button" class="btn-ghost" id="again">다시 녹음</button>
-              <button type="button" class="btn-line" id="play">들어보기</button>
+              <button type="button" class="btn-ghost" id="again">재녹음</button>
+              <button type="button" class="btn-line" id="play">재생</button>
               <button type="button" class="btn-fill" id="keep">담기</button>
             </div>
           </div>
@@ -1139,6 +1138,48 @@
   function sizeCloud(w, h) {
     cloud.style.setProperty('--cw', w + 'px');
     cloud.style.setProperty('--ch', h + 'px');
+    paintBigCloud(w, h);
+  }
+
+  /* 커진 몽실이를 **그 크기 그대로** 다시 그린다.
+     viewBox 를 실제 픽셀과 같게 잡으므로 뭉치가 늘 동그랗다.
+     반지름을 제각각으로 두는 것이 핵심이다 — 다 같으면 톱니처럼 보인다.
+     (작은 몽실이와 같은 원리다: components/brand/Mongsil.tsx 주석 참고) */
+  const bigG = document.getElementById('bigBody');
+  const bigGrad = document.getElementById('fg');
+
+  function paintBigCloud(w, h) {
+    const big = cloud.querySelector('svg.big');
+    big.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    // 그라데이션도 같은 좌표계를 쓴다. 왼쪽 위가 밝고 오른쪽 아래로 갈수록 짙다.
+    bigGrad.setAttribute('cx', (w * 0.3).toFixed(1));
+    bigGrad.setAttribute('cy', (h * 0.12).toFixed(1));
+    bigGrad.setAttribute('r', (Math.max(w, h) * 1.15).toFixed(1));
+
+    // 몸통. 흰 판(.pouch: 좌우 8%, 위 27%, 아래 8%)을 넉넉히 감싸야 한다.
+    const bx = w * 0.035, by = h * 0.19;
+    const bw = w - bx * 2, bh = h - by - h * 0.05;
+    const parts = [
+      `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${Math.min(34, h * 0.16).toFixed(1)}"/>`,
+    ];
+
+    /** 가장자리를 따라 뭉치를 두른다. 반지름은 짧은 변을 기준으로 잡아야
+        가로로 긴 판에서도 뭉치가 커지지 않는다. */
+    const unit = Math.min(w, h);
+    const bump = (cx, cy, r) =>
+      parts.push(`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}"/>`);
+
+    // 위 — 가운데가 크고 양옆으로 갈수록 작아진다
+    [[0.14, 0.085], [0.30, 0.125], [0.47, 0.15], [0.64, 0.115], [0.81, 0.08], [0.92, 0.055]]
+      .forEach(([fx, fr]) => bump(w * fx, by + unit * fr * 0.18, unit * fr));
+    // 아래 — 위보다 잔잔하게
+    [[0.18, 0.07], [0.38, 0.095], [0.60, 0.085], [0.80, 0.065]]
+      .forEach(([fx, fr]) => bump(w * fx, by + bh - unit * fr * 0.2, unit * fr));
+    // 옆 — 판이 각져 보이지 않게 한 개씩
+    bump(bx + unit * 0.03, by + bh * 0.5, unit * 0.085);
+    bump(bx + bw - unit * 0.03, by + bh * 0.5, unit * 0.08);
+
+    bigG.innerHTML = parts.join('');
   }
   const bigW = () => Math.min(344, phone.clientWidth - 40);
 
@@ -1496,28 +1537,51 @@
     cancelAnimationFrame(playRaf);
     playing = false;
     phead.classList.remove('on');
-    document.getElementById('play').textContent = '들어보기';
+    document.getElementById('play').textContent = '재생';
     [...tbars.children].forEach((el) => el.classList.remove('played'));
   }
 
-  document.getElementById('play').addEventListener('click', () => {
-    if (playing) { stopPlay(); return; }
+  /** `from` 초부터 재생한다. 파형을 눌러 시작할 수도 있어서 시작점을 받는다. */
+  function startPlay(from) {
+    cancelAnimationFrame(playRaf);
     playing = true;
     phead.classList.add('on');
-    document.getElementById('play').textContent = '멈추기';
+    document.getElementById('play').textContent = '멈춤';
+
+    // 잘라낸 바깥은 재생 대상이 아니다. 눌러도 남긴 구간 안으로 끌어들인다.
+    const begin = Math.max(a, Math.min(b, from));
     const t0 = performance.now();
+
     const step = () => {
-      const t = a + (performance.now() - t0) / 1000;
+      const t = begin + (performance.now() - t0) / 1000;
       if (t >= b) { stopPlay(); return; }
       const w = trim.clientWidth;
       phead.style.left = ((t / dur) * w) + 'px';
       [...tbars.children].forEach((el, i) => {
         const bt = ((i + 0.5) / shape.length) * dur;
-        el.classList.toggle('played', bt >= a && bt <= t);
+        el.classList.toggle('played', bt >= begin && bt <= t);
       });
       playRaf = requestAnimationFrame(step);
     };
     playRaf = requestAnimationFrame(step);
+  }
+
+  /* 파형의 아무 데나 누르면 **거기서부터** 들린다.
+     손잡이는 구간을 정하는 것이고, 파형을 누르는 것은 그 안에서 자리를 옮기는 일이다.
+     둘을 한 몸에 두면 손잡이를 잡으려다 재생이 튀므로, 손잡이 위에서 시작한 것은 넘긴다. */
+  trim.addEventListener('pointerdown', (e) => {
+    if (!dur) return;
+    if (e.target.closest('.grip')) return;
+    e.stopPropagation();
+    const box = trim.getBoundingClientRect();
+    const t = ((e.clientX - box.left) / box.width) * dur;
+    tick(430, 22, 0.03);
+    startPlay(t);
+  });
+
+  document.getElementById('play').addEventListener('click', () => {
+    if (playing) { stopPlay(); return; }
+    startPlay(a);
   });
 
   document.getElementById('again').addEventListener('click', () => {
@@ -1708,19 +1772,19 @@
     if (kind === 'voice') {
       for (let i = 0; i < 7; i++) {
         const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        const h = 14 + Math.abs(Math.sin(i * 1.4)) * 36;
-        r.setAttribute('x', 88 + i * 15);
-        r.setAttribute('y', 96 - h / 2);
-        r.setAttribute('width', 7);
+        const h = 10 + Math.abs(Math.sin(i * 1.4)) * 24;
+        r.setAttribute('x', 92 + i * 13);
+        r.setAttribute('y', 132 - h / 2);   // 눈(92)·입(104) 아래, 배 자리
+        r.setAttribute('width', 6);
         r.setAttribute('height', h);
-        r.setAttribute('rx', 3.5);
+        r.setAttribute('rx', 3);
         r.setAttribute('fill', '#d50e68');
         r.setAttribute('opacity', '0.55');
         cargo.appendChild(r);
       }
     } else if (kind === 'photo') {
       const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      t.setAttribute('x', '120'); t.setAttribute('y', '106');
+      t.setAttribute('x', '120'); t.setAttribute('y', '142');
       t.setAttribute('text-anchor', 'middle');
       t.setAttribute('font-size', '46');
       t.setAttribute('font-weight', '700');
