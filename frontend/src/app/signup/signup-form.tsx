@@ -1,17 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 
 import { BirthDateField } from '@/components/ui/BirthDateField'
 import { Button } from '@/components/ui/Button'
 import { Field } from '@/components/ui/Field'
+import { RuleList } from '@/components/ui/RuleList'
 import { signUp, type AuthState } from '@/lib/actions/auth'
 import { needsGuardianConsent } from '@/lib/age'
+import { track } from '@/lib/analytics'
 import {
   normalizeUsername,
   USERNAME_MAX_LENGTH,
-  USERNAME_RULE_HINT,
+  USERNAME_MIN_LENGTH,
   validateUsername,
 } from '@/lib/username'
 
@@ -35,15 +37,78 @@ export function SignupForm({ next }: { next: string }) {
     [아무 이름이나 넣어주세요]가 칸을 채우려면 값을 쥐고 있어야 하고,
     저장에 실패했을 때 서버가 돌려준 값으로 시작해야 다시 적지 않아도 된다.
   */
+  /*
+    가입 퍼널 계측.
+
+    `signup_field_error` 의 field 가 이 서비스에서 사람들이 실제로 막히는 칸을
+    알려준다. 오류 문구만 세면 "가입에서 막혔다"까지밖에 못 보고, 그러면
+    어느 칸을 고쳐야 할지 알 수 없다.
+
+    성공은 여기서 못 본다 — 서버가 곧바로 다른 화면으로 보내기 때문이다.
+    도착한 화면의 SignupBeacon 이 대신 보낸다.
+  */
+  useEffect(() => {
+    track('signup_begin')
+  }, [])
+
+  useEffect(() => {
+    if (state?.error && state.field) {
+      track('signup_field_error', { field: state.field })
+    }
+  }, [state])
+
   const [name, setName] = useState(state?.values?.name ?? '')
 
   const [birthDate, setBirthDate] = useState('')
   const [username, setUsername] = useState('')
+  /*
+    비밀번호도 제어 입력으로 바꿨다 — 아래 규칙 목록에 불이 들어오려면
+    지금 몇 글자인지를 화면이 알아야 한다.
+    실패하고 돌아왔을 때 **일부러 안 채운다**(서버가 돌려준 비밀번호를 화면에 남기지 않는다).
+  */
+  const [password, setPassword] = useState('')
   /** 한 번 칸을 벗어난 뒤에만 잔소리한다. 두 글자 쳤을 때부터 빨간 글씨면 성가시다. */
   const [usernameTouched, setUsernameTouched] = useState(false)
 
   const usernameError =
     usernameTouched && username ? validateUsername(username) : null
+
+  /*
+    화면에 거는 규칙들.
+
+    ⚠️ 서버가 실제로 보는 것보다 **느슨하면 안 된다** — 전부 체크됐는데 퇴짜를 맞으면
+    사용자는 이유를 알 수 없다. 아이디 규칙은 validateUsername 과 같은 조건을 쓰고,
+    비밀번호는 minLength(8)과 같은 값을 쓴다.
+
+    이름은 반대로 **서버보다 엄격하다.** 서버는 비어 있지만 않으면 받는데
+    여기서는 2자 이상·특수문자 없음을 권한다. 전부터 안내 문구가 그렇게 말해 왔고,
+    막지는 않으므로(제출은 그대로 된다) 권장으로 읽힌다.
+  */
+  const trimmedName = name.trim()
+  const nameRules = [
+    { label: '2~10자', met: trimmedName.length >= 2 && trimmedName.length <= 10 },
+    {
+      label: '특수문자 없이',
+      met:
+        trimmedName.length > 0 &&
+        !/[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 ]/.test(trimmedName),
+    },
+  ]
+
+  const usernameRules = [
+    {
+      label: '영문 소문자와 숫자만',
+      met: username.length > 0 && !/[^a-z0-9]/.test(username),
+    },
+    {
+      label: `${USERNAME_MIN_LENGTH}~${USERNAME_MAX_LENGTH}자`,
+      met:
+        username.length >= USERNAME_MIN_LENGTH &&
+        username.length <= USERNAME_MAX_LENGTH,
+    },
+  ]
+
+  const passwordRules = [{ label: '8자 이상', met: password.length >= 8 }]
 
   // 만 14세 미만이면 법정대리인 동의 항목을 보여준다 (개인정보보호법)
   const minor = birthDate.length === 10 && needsGuardianConsent(birthDate)
@@ -71,7 +136,7 @@ export function SignupForm({ next }: { next: string }) {
           id="name"
           name="name"
           label="어떻게 불러드릴까요?"
-          hint="2~10자로 적어주세요. 특수문자는 쓸 수 없어요."
+          hint={<RuleList rules={nameRules} />}
           required
           maxLength={10}
           autoComplete="name"
@@ -133,7 +198,7 @@ export function SignupForm({ next }: { next: string }) {
               type="checkbox"
               name="guardian_consented"
               required
-              className="size-6 shrink-0 accent-[#d50e68]"
+              className="size-6 shrink-0 accent-primary"
             />
             <span>보호자가 이 가입에 동의합니다.</span>
           </label>
@@ -149,7 +214,12 @@ export function SignupForm({ next }: { next: string }) {
         id="username"
         name="username"
         label="아이디"
-        hint={`${USERNAME_RULE_HINT}. 로그인할 때 쓰는 이름이에요.`}
+        hint={
+          <>
+            <p className="mb-2">로그인할 때 쓰는 이름이에요.</p>
+            <RuleList rules={usernameRules} />
+          </>
+        }
         error={usernameError}
         autoComplete="username"
         autoCapitalize="off"
@@ -165,11 +235,13 @@ export function SignupForm({ next }: { next: string }) {
         id="password"
         name="password"
         label="비밀번호"
-        hint="8자 이상으로 만들어주세요."
+        hint={<RuleList rules={passwordRules} />}
         type="password"
         autoComplete="new-password"
         minLength={8}
         required
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
       />
 
       <label className="flex min-h-[44px] items-start gap-3 text-base leading-relaxed text-ink">
@@ -178,7 +250,7 @@ export function SignupForm({ next }: { next: string }) {
           name="agree_terms"
           required
           defaultChecked={state?.values?.agreed}
-          className="mt-1 size-6 shrink-0 accent-[#d50e68]"
+          className="mt-1 size-6 shrink-0 accent-primary"
         />
         {/*
           두 링크는 반드시 새 탭에서 연다.

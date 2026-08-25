@@ -77,10 +77,15 @@ export function FieldShell({
         ) : null}
       </div>
 
+      {/*
+        p 가 아니라 div 인 이유: 도움말 자리에 규칙 체크 목록(RuleList)이 들어오는
+        화면이 있는데, <p> 안에는 <ul>을 넣을 수 없다(브라우저가 태그를 끊어버린다).
+        글자만 들어올 때의 모양은 이전과 같다.
+      */}
       {hint ? (
-        <p id={`${id}-hint`} className="text-base leading-relaxed text-muted">
+        <div id={`${id}-hint`} className="text-base leading-relaxed text-muted">
           {hint}
-        </p>
+        </div>
       ) : null}
 
       {children}

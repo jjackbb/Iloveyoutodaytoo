@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
@@ -11,6 +12,7 @@ import {
   writeLargeTextCookie,
 } from '@/lib/large-text'
 import { safeNextPath } from '@/lib/safe-redirect'
+import { SIGNUP_DONE_COOKIE, type SignupField } from '@/lib/signup-done'
 import {
   USERNAME_RULE_HINT,
   normalizeUsername,
@@ -21,6 +23,13 @@ import {
 
 export type AuthState = {
   error: string
+  /**
+   * 오류가 난 칸. 화면에는 쓰지 않고 **계측에만** 쓴다(GA4 `signup_field_error`).
+   *
+   * 오류 문구 하나만 남기면 "가입에서 막혔다"까지만 알 수 있다.
+   * 어느 칸에서 막혔는지를 알아야 그 칸을 고칠 수 있다.
+   */
+  field?: SignupField
   /**
    * 오류로 되돌아왔을 때 폼이 다시 채워 넣을 값.
    *
@@ -222,31 +231,35 @@ export async function signUp(
    * "그 오류일 때만 이름이 사라지는" 이상한 화면이 된다.
    * 비밀번호는 담지 않는다.
    */
-  const fail = (message: string): AuthState => ({
+  const fail = (message: string, field?: SignupField): AuthState => ({
     error: message,
+    field,
     values: { name, username, guardianName, guardianPhone, agreed },
   })
 
   // 생년월일은 여기서 빼고 아래 validateBirthDate에 맡긴다 —
   // 그 칸만 비었을 때 "모든 항목을 입력해주세요" 대신 무엇이 비었는지 말해준다.
   if (!name || !username || !password) {
-    return fail('모든 항목을 입력해주세요.')
+    return fail(
+      '모든 항목을 입력해주세요.',
+      !name ? 'name' : !username ? 'username' : 'password',
+    )
   }
 
   // 아이디 규칙은 화면에서도 보지만 서버가 다시 본다.
   // 화면 검사는 거들 뿐이고, 여기가 진짜 관문이다.
   const usernameError = validateUsername(username)
-  if (usernameError) return fail(usernameError)
+  if (usernameError) return fail(usernameError, 'username')
 
   // 생년월일도 마찬가지다. 예전 달력 입력칸은 여섯 자리 연도를 그대로 통과시켰다.
   const birthDateError = validateBirthDate(birthDate)
-  if (birthDateError) return fail(birthDateError)
+  if (birthDateError) return fail(birthDateError, 'birth_date')
 
   if (password.length < 8) {
-    return fail('비밀번호는 8자 이상으로 만들어주세요.')
+    return fail('비밀번호는 8자 이상으로 만들어주세요.', 'password')
   }
   if (!agreed) {
-    return fail('이용약관과 개인정보 처리방침에 동의해주세요.')
+    return fail('이용약관과 개인정보 처리방침에 동의해주세요.', 'terms')
   }
 
   // 만 14세 미만은 법정대리인 동의가 있어야 가입할 수 있다 (개인정보보호법)
@@ -256,6 +269,7 @@ export async function signUp(
   if (minor && (!guardianName || !guardianPhone || !guardianConsented)) {
     return fail(
       '만 14세 미만은 법정대리인의 성함·연락처와 동의가 필요해요. 보호자와 함께 입력해주세요.',
+      'guardian',
     )
   }
 
@@ -284,7 +298,7 @@ export async function signUp(
   if (error) {
     // 원문은 로그에만. 화면에는 friendlySignUpError가 고른 문구만 나간다.
     console.error('[가입] signUp 실패:', error.code, error.message)
-    return fail(friendlySignUpError(error))
+    return fail(friendlySignUpError(error), 'username')
   }
 
   /*
@@ -302,9 +316,25 @@ export async function signUp(
     이메일과 달리 아이디는 연락처가 아니라서, 있는지 알려주는 편의 쪽이 크다.
   */
   if (data.user && data.user.identities?.length === 0) {
-    return fail('이미 쓰고 있는 아이디예요. 다른 아이디로 만들어주세요.')
+    return fail('이미 쓰고 있는 아이디예요. 다른 아이디로 만들어주세요.', 'username')
   }
 
+  /*
+    가입 성공을 브라우저에 한 번만 알린다.
+
+    여기서 바로 redirect 하므로 폼은 성공 상태를 볼 수 없다. 그렇다고 이동할 주소에
+    `?signup=1` 을 붙이면, 초대 링크처럼 주소가 이미 복잡한 경로에서 지저분해진다.
+    쿠키에 잠깐 두면 어디로 이동하든 도착한 화면이 집어서 지운다(SignupBeacon).
+
+    httpOnly 가 아니다 — 브라우저가 읽어야 하기 때문이다. 담는 값도
+    "방금 가입했다 / 미성년이었다" 뿐이라 새어도 잃을 것이 없다.
+  */
+  const jar = await cookies()
+  jar.set(SIGNUP_DONE_COOKIE, minor ? 'minor' : 'adult', {
+    maxAge: 60,
+    path: '/',
+    sameSite: 'lax',
+  })
   revalidatePath('/', 'layout')
   redirect(next)
 }

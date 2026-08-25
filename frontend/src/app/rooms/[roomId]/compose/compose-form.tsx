@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/Button'
 import { controlClassName } from '@/components/ui/Field'
 import { createMemory, updateMemory } from '@/lib/actions/memories'
+import { track } from '@/lib/analytics'
 import { resizePhoto } from '@/lib/image'
 import { CAPTION_MAX_LENGTH, PHOTO_MAX_COUNT } from '@/lib/limits'
 import { createClient } from '@/lib/supabase/client'
@@ -491,6 +492,26 @@ export function ComposeForm({
 
   const busy = phase === 'sending' || phase === 'retrying'
 
+  /*
+    작성 퍼널 계측 — 몽실이를 붙이기 "전"의 숫자를 여기서 확보한다.
+
+    GA4는 소급 집계가 안 되므로, 기존 화면에서 같은 모양의 이벤트를 지금 쌓아두지
+    않으면 나중에 "몽실이가 나아졌다"를 증명할 방법이 없다.
+
+    stageRef 는 떠나는 순간 "어디까지 갔다가 나갔는지"를 알려준다.
+    가장 중요한 숫자는 confirmed(올릴 준비가 끝났는데 안 올림)의 비율이다.
+  */
+  const stageRef = useRef<'open' | 'capturing' | 'confirmed'>('open')
+
+  useEffect(() => {
+    track('compose_open', { variant: 'legacy' })
+    return () => {
+      if (!committedRef.current) {
+        track('compose_abandon', { step: stageRef.current })
+      }
+    }
+  }, [])
+
   // 사진이 2장 이상일 때만, 그리고 담는 중이 아닐 때만 순서를 바꿀 수 있다.
   const {
     listRef: photoListRef,
@@ -534,6 +555,11 @@ export function ComposeForm({
     // 다시 녹음했으면 더 이상 원래 목소리가 아니다. 원래 파일은 건드리지 않는다.
     setVoiceIsOriginal(false)
     setRecording(next)
+
+    if (next) {
+      if (stageRef.current === 'open') stageRef.current = 'capturing'
+      track('capture_start', { kind: 'voice' })
+    }
   }, [])
 
   /*
@@ -581,12 +607,26 @@ export function ComposeForm({
     recording !== null &&
     caption.trim().length <= CAPTION_MAX_LENGTH
 
+  /*
+    올릴 준비가 처음 끝난 순간. 몽실이의 "담기"에 해당한다.
+    한 번만 보낸다 — 글자를 지웠다 썼다 하면 여러 번 오갈 수 있어서다.
+  */
+  useEffect(() => {
+    if (canSubmit && stageRef.current !== 'confirmed') {
+      stageRef.current = 'confirmed'
+      track('capture_confirm', { kind: 'photo' })
+    }
+  }, [canSubmit])
+
   /** 고른 사진을 올릴 수 있는 크기로 줄여서 타일 줄에 붙인다. */
   async function handlePick(event: React.ChangeEvent<HTMLInputElement>) {
     const chosen = Array.from(event.target.files ?? [])
     // 같은 사진을 다시 골라도 change가 일어나야 하므로 값을 비운다.
     event.target.value = ''
     if (chosen.length === 0) return
+
+    if (stageRef.current === 'open') stageRef.current = 'capturing'
+    track('capture_start', { kind: 'photo' })
 
     setError(null)
     setPicking(true)
@@ -665,6 +705,14 @@ export function ComposeForm({
     setNotice(null)
     setPhase('sending')
 
+    /*
+      몽실이의 "위로 던지기"에 해당한다.
+      kind 를 'photo' 로 고정한 이유 — 이 화면은 사진과 목소리를 **묶어서 한 번에**
+      올린다(canSubmit 이 둘 다 있어야 참). 몽실이는 따로 올리므로, 두 화면을
+      비교할 때는 kind 별 쪼개기가 아니라 **퍼널의 모양**으로 봐야 한다.
+    */
+    track('upload_throw', { kind: 'photo' })
+
     try {
       // 사진 — 화면에 놓인 순서 그대로 올린다. 첫 장이 대표 사진이 된다.
       // 한 장씩 차례로 올리는 이유: 열 장을 한꺼번에 밀면 느린 연결에서 서로 발목을 잡고,
@@ -733,6 +781,7 @@ export function ComposeForm({
 
       // 저장 성공. 올라간 파일은 이제 게시물의 것이므로 떠날 때 지우면 안 된다.
       committedRef.current = true
+      track('upload_complete', { kind: 'photo' })
 
       /*
         새로 남겼으면 방 피드로(방금 남긴 추억이 맨 위에 보인다),
@@ -756,6 +805,16 @@ export function ComposeForm({
       setNotice(null)
       setError(message)
       setPhase('failed')
+
+      /*
+        FriendlyError 는 "사람에게 보여줄 만한 이유"라는 뜻일 뿐 종류를 알려주지 않는다.
+        ALBUM-02의 30초·50MB 검사를 붙일 때, 그 검사 자리에서 'size'/'duration'을
+        직접 보내도록 바꾼다. 지금 추측으로 분류하면 숫자가 거짓말을 한다.
+      */
+      track('upload_fail', {
+        kind: 'photo',
+        reason: submitError instanceof FriendlyError ? 'unknown' : 'network',
+      })
     }
   }, [
     busy,

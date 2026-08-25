@@ -306,7 +306,9 @@ function BirthWheelSheet({
             placeholder="예: 19850809"
             aria-describedby={
               [
-                `${baseId}-typed-hint`,
+                // 안내 문구를 없앴으므로(사용자 결정 2026-08-25), 아래 <p>는
+                // 읽어준 날짜가 있을 때만 존재한다. 없는 id를 가리키지 않게 맞춘다.
+                preview ? `${baseId}-typed-hint` : null,
                 errorMessage ? `${baseId}-typed-error` : null,
               ]
                 .filter(Boolean)
@@ -320,14 +322,21 @@ function BirthWheelSheet({
               className: 'min-h-[52px] tabular-nums',
             })}
           />
-          <p
-            id={`${baseId}-typed-hint`}
-            className="text-base leading-relaxed text-muted"
-          >
-            {preview
-              ? `이렇게 읽었어요 — ${preview}`
-              : '숫자로 바로 적어도 되고, 아래에서 굴려 골라도 돼요.'}
-          </p>
+          {/*
+            안내 문구("숫자로 바로 적어도 되고…")는 뺐다(사용자 결정 2026-08-25).
+            placeholder("예: 19850809")가 이미 같은 말을 하고 있어 두 번 말하는 셈이었다.
+
+            **읽어준 날짜는 남긴다.** 8자리를 붙여 치는 칸이라 자릿수를 밀려 적기 쉬운데,
+            "이렇게 읽었어요"가 사라지면 틀린 걸 확인할 방법이 없어진다.
+          */}
+          {preview ? (
+            <p
+              id={`${baseId}-typed-hint`}
+              className="text-base leading-relaxed text-muted"
+            >
+              이렇게 읽었어요 — {preview}
+            </p>
+          ) : null}
           {errorMessage ? (
             <p
               id={`${baseId}-typed-error`}
