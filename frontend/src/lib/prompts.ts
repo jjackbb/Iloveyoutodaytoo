@@ -82,3 +82,43 @@ export function getDailyPrompt(options?: DailyPromptOptions): string {
   const index = hashToInt(`${dateKey}|${seed}`) % HEART_PROMPTS.length
   return HEART_PROMPTS[index]
 }
+
+/**
+ * ISO-8601 주차(1~53). 순수 달력 계산이라 시간대 변환이 다시 필요하지 않다 —
+ * dateKey는 이미 kstTodayKey() 등을 거쳐 KST 기준 연-월-일로 정해져 있고,
+ * 그 값을 UTC 자정으로 놓고 계산해도 "무슨 요일·몇 째 주"라는 달력상의 답은 같다.
+ */
+function isoWeekNumber(dateKey: string): number {
+  const [year, month, day] = dateKey.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+
+  // 그 날이 속한 주의 목요일로 옮긴다(ISO 주는 목요일이 있는 연도에 속한다).
+  const dayNum = (date.getUTCDay() + 6) % 7 // 월=0 … 일=6
+  date.setUTCDate(date.getUTCDate() - dayNum + 3)
+
+  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4))
+  const firstDayNum = (firstThursday.getUTCDay() + 6) % 7
+  firstThursday.setUTCDate(firstThursday.getUTCDate() - firstDayNum + 3)
+
+  return (
+    1 + Math.round((date.getTime() - firstThursday.getTime()) / (7 * 86_400_000))
+  )
+}
+
+/**
+ * "이번 주 질문"의 목록 인덱스.
+ *
+ * 왜 날짜 해시(getDailyPrompt)가 아니라 ISO 주차인가:
+ * 매번 무작위로 바뀌면 "우리가 이번 주에 받은 질문"이라는 감각이 안 생긴다.
+ * 같은 주(월요일~일요일, KST)에는 항상 같은 질문에서 시작해야 그 감각이 생긴다.
+ * [다른 질문 보기]로 그 자리에서 넘기는 것은 이 값과 무관하게 화면(클라이언트) 상태로만 다룬다.
+ */
+export function getWeeklyPromptIndex(dateKey?: string): number {
+  const key = dateKey || kstTodayKey()
+  return isoWeekNumber(key) % HEART_PROMPTS.length
+}
+
+/** 이번 주의 시작 질문. */
+export function getWeeklyPrompt(dateKey?: string): string {
+  return HEART_PROMPTS[getWeeklyPromptIndex(dateKey)]
+}

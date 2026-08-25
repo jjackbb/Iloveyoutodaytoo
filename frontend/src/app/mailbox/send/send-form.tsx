@@ -13,6 +13,7 @@ import { Toast } from '@/components/ui/Toast'
 import { resolveHeartTargets, type HeartTarget } from '@/lib/actions/heart-send'
 import { sendHeartMessage } from '@/lib/actions/messages'
 import type { SendCandidate, SendCandidates } from '@/lib/heart-send'
+import { HEART_PROMPTS, getWeeklyPromptIndex } from '@/lib/prompts'
 import { createClient } from '@/lib/supabase/client'
 
 /**
@@ -91,6 +92,16 @@ export function SendForm({ candidates }: { candidates: SendCandidates }) {
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  /**
+   * 오늘의 질문. 이번 주(ISO 주차, KST) 고정 인덱스에서 시작하고,
+   * [다른 질문 보기]는 이 화면 안에서만 그 자리를 넘긴다 — 다음에 다시 들어오면
+   * 또 이번 주 시작 질문으로 돌아온다.
+   */
+  const [promptIndex, setPromptIndex] = useState(() => getWeeklyPromptIndex())
+  /** 질문을 접었는지. 접으면 promptUsed는 null로 보낸다. */
+  const [promptOpen, setPromptOpen] = useState(true)
+  const currentPrompt = HEART_PROMPTS[promptIndex]
+
   /** 토스트를 다시 띄우려면 key가 바뀌어야 한다(Toast는 마운트될 때 한 번만 센다). */
   const [toast, setToast] = useState<{ key: number; message: string } | null>(
     null,
@@ -125,6 +136,11 @@ export function SendForm({ candidates }: { candidates: SendCandidates }) {
     uploadedByRoomRef.current.clear()
     if (stale.length > 0) void discardUploads(stale)
     setRecording(next)
+  }, [])
+
+  /** [다른 질문 보기] — 목록을 한 칸 돌린다. 끝까지 가면 다시 처음으로. */
+  const handleNextPrompt = useCallback(() => {
+    setPromptIndex((current) => (current + 1) % HEART_PROMPTS.length)
   }, [])
 
   function handleConfirm(picked: SendCandidate[]) {
@@ -210,6 +226,8 @@ export function SendForm({ candidates }: { candidates: SendCandidates }) {
           // 녹음하면서 이미 잰 값. 저장해 두면 사서함이 파일을 안 받고도 파형을 그린다.
           voiceLevels: recording.levels,
           sendMode: target.sendMode,
+          // 질문을 접은 채로 보냈으면 null — "질문 없이 썼다"는 사실 그대로 남긴다.
+          promptUsed: promptOpen ? currentPrompt : null,
         })
 
         // 한 분이 안 됐다고 나머지를 멈추지 않는다 — 그 사이 방을 나간 분이 있을 수 있다.
@@ -251,7 +269,7 @@ export function SendForm({ candidates }: { candidates: SendCandidates }) {
       )
       setPhase('failed')
     }
-  }, [busy, canSubmit, recording, router, selected, upload])
+  }, [busy, canSubmit, currentPrompt, promptOpen, recording, router, selected, upload])
 
   return (
     // 캡처 40처럼 [보내기]가 화면 아래에 고정된다 — 스크롤 칸 + 고정 줄 2단이다.
@@ -260,7 +278,7 @@ export function SendForm({ candidates }: { candidates: SendCandidates }) {
         <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-screen-x pt-2 pb-screen-b">
           {/* 받는 사람 (캡처 40·44) */}
           <section className="flex flex-col gap-3">
-            <h2 className="text-base font-extrabold text-ink">받는 사람</h2>
+            <h2 className="text-base font-bold text-ink">받는 사람</h2>
 
             {candidates.error ? (
               <p
@@ -345,12 +363,46 @@ export function SendForm({ candidates }: { candidates: SendCandidates }) {
 
           {/* 메세지 녹음 (캡처 40·45) — 앨범방 작성 화면과 같은 녹음기를 그대로 쓴다. */}
           <section aria-labelledby="send-voice-label" className="flex flex-col gap-2">
-            <h2
-              id="send-voice-label"
-              className="text-base font-extrabold text-ink"
-            >
-              메세지 녹음
-            </h2>
+            <div className="flex items-center justify-between gap-2">
+              <h2
+                id="send-voice-label"
+                className="text-base font-bold text-ink"
+              >
+                메세지 녹음
+              </h2>
+              {/*
+                오늘의 질문을 접었다 폈다 한다 — 질문은 거들 뿐이라 강요하지 않는다.
+                접어도 상태만 바뀔 뿐 index는 그대로라, 다시 펴면 보던 질문이 그대로 나온다.
+              */}
+              <button
+                type="button"
+                onClick={() => setPromptOpen((open) => !open)}
+                disabled={busy}
+                className="min-h-[44px] shrink-0 rounded-[8px] px-2 text-base text-muted underline active:bg-surface-soft disabled:opacity-60"
+              >
+                {promptOpen ? '질문 없이 쓰기' : '질문 보기'}
+              </button>
+            </div>
+
+            {promptOpen ? (
+              <div className="flex items-center gap-3 rounded-inner bg-surface-soft px-4 py-3">
+                <p
+                  aria-live="polite"
+                  className="flex-1 text-base leading-relaxed break-keep text-ink"
+                >
+                  {currentPrompt}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleNextPrompt}
+                  disabled={busy}
+                  className="min-h-[44px] shrink-0 rounded-[8px] px-2 text-base font-bold whitespace-nowrap text-primary active:bg-primary-soft disabled:opacity-60"
+                >
+                  다른 질문 보기
+                </button>
+              </div>
+            ) : null}
+
             <VoiceRecorder
               value={recording}
               onChange={handleRecordingChange}
