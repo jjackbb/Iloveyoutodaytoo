@@ -25,3 +25,6 @@ dist-ssr
 
 # 시안 검증용 스크린샷 — 무겁고 재생성 가능하다. 시안 HTML(_workspace/mock)은 남긴다.
 frontend/_workspace/shots/
+
+# superdesign 캔버스 작업 상태 (계정에 붙어 있어 저장소에 둘 것이 아니다)
+frontend/.superdesign/
