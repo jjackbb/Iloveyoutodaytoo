@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/Button'
 import { controlClassName, Field, FieldShell } from '@/components/ui/Field'
 import { RuleList } from '@/components/ui/RuleList'
 import { signUp, type AuthState } from '@/lib/actions/auth'
+import { checkUsername, type UsernameCheck } from '@/lib/actions/username'
 import { needsGuardianConsent } from '@/lib/age'
 import { track } from '@/lib/analytics'
 import {
   normalizeUsername,
   USERNAME_MAX_LENGTH,
   USERNAME_MIN_LENGTH,
-  validateUsername,
 } from '@/lib/username'
 
 /**
@@ -67,11 +67,16 @@ export function SignupForm({ next }: { next: string }) {
     실패하고 돌아왔을 때 **일부러 안 채운다**(서버가 돌려준 비밀번호를 화면에 남기지 않는다).
   */
   const [password, setPassword] = useState('')
-  /** 한 번 칸을 벗어난 뒤에만 잔소리한다. 두 글자 쳤을 때부터 빨간 글씨면 성가시다. */
-  const [usernameTouched, setUsernameTouched] = useState(false)
+  /*
+    중복확인 결과.
 
-  const usernameError =
-    usernameTouched && username ? validateUsername(username) : null
+    아이디를 한 글자라도 고치면 **반드시 비운다** — 다른 아이디에 대해 받은
+    "쓸 수 있어요"가 그대로 남아 있으면 거짓말이 된다.
+    확인하지 않고 제출해도 막지 않는다. 진짜 방어선은 users.username 의 unique 제약이고
+    이건 미리 알려주는 편의일 뿐이다.
+  */
+  const [check, setCheck] = useState<UsernameCheck | null>(null)
+  const [checking, setChecking] = useState(false)
 
   /*
     화면에 거는 규칙들.
@@ -109,6 +114,18 @@ export function SignupForm({ next }: { next: string }) {
   ]
 
   const passwordRules = [{ label: '8자 이상', met: password.length >= 8 }]
+
+  /** 형식이 틀린 아이디는 물어볼 것도 없다. 규칙이 다 켜져야 [중복확인]이 열린다. */
+  const usernameReady = usernameRules.every((rule) => rule.met)
+
+  const handleCheck = async () => {
+    setChecking(true)
+    try {
+      setCheck(await checkUsername(username))
+    } finally {
+      setChecking(false)
+    }
+  }
 
   // 만 14세 미만이면 법정대리인 동의 항목을 보여준다 (개인정보보호법)
   const minor = birthDate.length === 10 && needsGuardianConsent(birthDate)
@@ -219,33 +236,60 @@ export function SignupForm({ next }: { next: string }) {
         치는 대로 소문자로 맞춰준다. 지우지는 않는다 — 글자가 조용히 사라지면
         무엇을 잘못했는지 알 수 없으니, 규칙에 어긋나는 글자는 아래 문구로 알린다.
       */}
-      <FieldShell
-        id="username"
-        label="아이디"
-        hint="로그인할 때 쓰는 이름이에요."
-        error={usernameError}
-      >
-        <input
-          id="username"
-          name="username"
-          autoComplete="username"
-          autoCapitalize="off"
-          spellCheck={false}
-          maxLength={USERNAME_MAX_LENGTH}
-          required
-          aria-describedby={
-            ['username-hint', 'username-rules', usernameError ? 'username-error' : null]
-              .filter(Boolean)
-              .join(' ')
-          }
-          aria-invalid={usernameError ? true : undefined}
-          value={username}
-          onChange={(event) => setUsername(normalizeUsername(event.target.value))}
-          onBlur={() => setUsernameTouched(true)}
-          className={controlClassName({ hasError: Boolean(usernameError) })}
-        />
+      <FieldShell id="username" label="아이디">
+        <div className="flex items-stretch gap-2">
+          <input
+            id="username"
+            name="username"
+            autoComplete="username"
+            autoCapitalize="off"
+            spellCheck={false}
+            maxLength={USERNAME_MAX_LENGTH}
+            required
+            aria-describedby="username-rules"
+            value={username}
+            onChange={(event) => {
+              setUsername(normalizeUsername(event.target.value))
+              // 아이디가 바뀌면 앞서 받은 결과는 남의 것이다. 즉시 버린다.
+              setCheck(null)
+            }}
+            className={controlClassName({ className: 'min-w-0 flex-1' })}
+          />
+
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={handleCheck}
+            disabled={!usernameReady || checking}
+            pending={checking}
+            pendingText="확인 중"
+            className="min-h-[52px] shrink-0 px-4"
+          >
+            중복확인
+          </Button>
+        </div>
 
         <RuleList id="username-rules" rules={usernameRules} />
+
+        {check ? (
+          <p
+            role="status"
+            className={[
+              'text-base leading-relaxed',
+              check.status === 'available'
+                ? 'font-medium text-primary'
+                : 'text-muted',
+            ].join(' ')}
+          >
+            {check.status === 'available'
+              ? '쓸 수 있는 아이디예요.'
+              : check.status === 'taken'
+                ? '이미 쓰고 있는 아이디예요. 다른 아이디로 만들어주세요.'
+                : check.status === 'invalid'
+                  ? check.message
+                  : '지금은 확인할 수 없어요. 잠시 후 다시 눌러주세요.'}
+          </p>
+        ) : null}
       </FieldShell>
 
       <FieldShell id="password" label="비밀번호">

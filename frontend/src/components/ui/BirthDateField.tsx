@@ -73,7 +73,7 @@ export interface BirthDateFieldProps {
 export function BirthDateField({
   name,
   label = '생년월일',
-  hint = '누르면 숫자로 적거나 년·월·일을 굴려서 고를 수 있어요.',
+  hint,
   error,
   defaultValue = '',
   onValueChange,

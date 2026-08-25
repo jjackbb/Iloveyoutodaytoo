@@ -652,6 +652,41 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'push_subscriptions_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string
@@ -825,6 +860,10 @@ export type Database = {
       users: {
         Row: {
           auth_provider: Database['public']['Enums']['auth_provider']
+          /**
+           * 이메일(아이디) 가입은 항상 채워진다. 카카오 등 OAuth는 생년월일을 주지 않아
+           * 로그인 직후에는 null이고, 프로필 완성 화면에서 채운다.
+           */
           birth_date: string
           created_at: string
           email: string | null
@@ -929,6 +968,23 @@ export type Database = {
           used: boolean
         }[]
       }
+      /** 더 이상 유효하지 않은 구독 정리(404/410 응답을 받았을 때). endpoint만 알면 지울 수 있다. */
+      prune_push_subscription: {
+        Args: { p_endpoint: string }
+        Returns: undefined
+      }
+      /** 이 사람에게 보낼 구독 목록. shares_room_with()로 같은 방 사람만 조회할 수 있다. */
+      push_targets_for_user: {
+        Args: { p_user_id: string }
+        Returns: { auth: string; endpoint: string; p256dh: string }[]
+      }
+      /**
+       * 이 아이디를 이미 누가 쓰고 있는가. **있다/없다 하나만** 돌려준다.
+       * 가입 화면(로그인 전, anon)의 [중복확인]이 부른다 — users 테이블은
+       * authenticated 에게만 보여서 직접 조회할 수 없다.
+       * (마이그레이션 username_taken_lookup)
+       */
+      username_taken: { Args: { p_username: string }; Returns: boolean }
       shares_room_with: { Args: { p_user_id: string }; Returns: boolean }
       /**
        * 지금 나에게 락이 걸린 발신자들 (답장 미션, PRD [MISSION-01]).
