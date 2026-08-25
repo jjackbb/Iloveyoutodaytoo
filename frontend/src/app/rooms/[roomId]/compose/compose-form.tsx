@@ -976,14 +976,20 @@ export function ComposeForm({
             />
           </section>
 
-          {/* 문구 선택 (캡처 12) — 선택 사항이라 라벨에 그렇게 적어 둔다. */}
+          {/*
+            문구 (캡처 12). **안 써도 되는 칸**이다.
+
+            전에는 "문구 선택"이라고 적었는데, 흐린 글씨로 구분했어도
+            "문구를 고르세요"라는 명령으로 읽혔다(고를 목록도 없다).
+            괄호로 묶으면 덧붙인 설명으로 읽힌다.
+          */}
           <section className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between gap-3">
               <label
                 htmlFor="memory-caption"
                 className="text-base font-bold text-ink"
               >
-                문구 <span className="font-medium text-muted">선택</span>
+                문구 <span className="font-medium text-muted">(선택)</span>
               </label>
               <span className="shrink-0 tabular-nums text-base text-muted">
                 {caption.length}/{CAPTION_MAX_LENGTH}

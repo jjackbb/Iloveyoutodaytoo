@@ -5,6 +5,7 @@ import { MemoryCard } from '@/components/memory/MemoryCard'
 import { BottomNav } from '@/components/nav/BottomNav'
 import { RoomAppBar, RoomAppBarLink } from '@/components/room/RoomAppBar'
 import { ButtonLink } from '@/components/ui/Button'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { Toast } from '@/components/ui/Toast'
 import { requireUser } from '@/lib/auth'
 import {
@@ -436,17 +437,49 @@ async function loadFeedAuthors(
 /**
  * 아직 아무것도 없을 때 (캡처 10).
  *
+ * 2026-08-25까지는 맨 글씨를 화면 위쪽에 띄웠는데, 홈은 같은 상황을 **카드**에 담고 있어서
+ * 같은 앱에서 같은 상황이 다르게 보였다. 담긴 데가 없으니 화면이 덜 만들어진 것처럼도 읽혔다.
+ * 공용 EmptyState(홈과 같은 모양)로 옮겼다.
+ *
  * 버튼을 여기 달지 않는다 — 아래 고정 줄에 이미 [마음 표현하기]가 있다.
  * 대신 그 버튼의 이름을 문장 안에서 굵게 짚어준다. 캡처도 같은 방식이다.
  */
 function EmptyFeed() {
   return (
-    <p className="mt-24 text-center text-lg leading-relaxed break-keep text-muted">
-      아직 추억이 없어요.
-      <br />
-      아래 <strong className="font-bold text-ink">마음 표현하기</strong>로
-      <br />첫 번째 추억을 남겨보세요 🌷
-    </p>
+    <div className="mt-9">
+      <EmptyState
+        icon={<PhotoIcon />}
+        title="아직 추억이 없어요"
+        description={
+          <>
+            아래 <strong className="font-bold text-ink">마음 표현하기</strong>로
+            <br />첫 번째 추억을 남겨보세요.
+          </>
+        }
+      />
+    </div>
+  )
+}
+
+/** 빈 방의 사진 그림 (홈의 빈 화면과 같은 것). 아직 아무것도 담기지 않은 앨범을 뜻한다. */
+function PhotoIcon() {
+  return (
+    <svg
+      width="52"
+      height="52"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <rect x="3" y="4.5" width="18" height="15" rx="3" />
+      <circle cx="8.6" cy="9.8" r="1.7" />
+      <path d="m4 17 4.6-4.4a2 2 0 0 1 2.7 0L16 17" />
+      <path d="m14 14.4 1.6-1.5a2 2 0 0 1 2.7 0L21 15.4" />
+    </svg>
   )
 }
 

@@ -1,0 +1,340 @@
+<meta charset="utf-8">
+<title>방·작성 화면 다듬기</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+<style>
+  /* ============================================================
+     방 빈 화면 / 작성 화면 다듬기 — 전·후 비교
+
+     지금 토큰(남보라 + Pretendard) 그대로 쓴다. 새 색을 만들지 않았다.
+     여기서 고칠 것은 색이 아니라 **규칙이 흩어져 있는 것**이다.
+     ============================================================ */
+  :root {
+    --canvas: #f7f8fa;
+    --card: #ffffff;
+    --surface-soft: #f2f4f6;
+    --primary: #5b4be0;
+    --primary-active: #4a3bc4;
+    --primary-soft: #efecff;
+    --ink: #222222;
+    --muted: #6a6a6a;
+    --hairline: #e5e8eb;
+    --hairline-strong: #dce0e5;
+    --r-card: 22px;
+    --r-button: 17px;
+    --r-inner: 14px;
+    --r-chip: 100px;
+    --sh-card: 0 10px 30px -16px rgb(25 31 40 / 0.26);
+    --sh-button: 0 12px 22px -10px rgb(91 75 224 / 0.42);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #e7e7ea; color: var(--ink);
+    font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+    font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  h1.doc { margin: 0 0 10px; font-size: 25px; font-weight: 700; letter-spacing: -0.035em; }
+  p.doc { margin: 0 0 12px; font-size: 15px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  p.doc b { color: var(--ink); }
+
+  section { margin-top: 48px; }
+  .sec-h {
+    display: flex; align-items: baseline; gap: 12px;
+    margin: 0 0 8px; padding-top: 24px; border-top: 2px solid #cfcfd4;
+    font-size: 19px; font-weight: 700; letter-spacing: -0.03em;
+  }
+  .sec-h span { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #8b95a1; }
+  .sec-p { margin: 0 0 20px; font-size: 14.5px; line-height: 1.76; color: #4e5968; max-width: 78ch; }
+  .sec-p b { color: var(--ink); }
+
+  .pair { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; max-width: 800px; }
+  .col h3 { margin: 0 0 3px; font-size: 15px; font-weight: 700; letter-spacing: -0.03em; }
+  .col h3 em {
+    font-style: normal; font-size: 11.5px; font-weight: 700; color: #fff;
+    border-radius: 100px; padding: 2px 8px; margin-left: 5px; vertical-align: 2px;
+  }
+  .col.before h3 em { background: #9aa0a6; }
+  .col.after h3 em { background: var(--primary); }
+  .col .note { margin: 0 0 12px; min-height: 4.6em; font-size: 13px; line-height: 1.68; color: #4e5968; }
+  .col .note b { color: var(--ink); }
+
+  .phone {
+    position: relative; width: 100%; aspect-ratio: 390 / 780; border-radius: 28px;
+    background: var(--canvas); overflow: hidden; display: flex; flex-direction: column;
+    box-shadow: 0 18px 44px -22px rgb(25 31 40 / 0.4), 0 0 0 1px rgb(25 31 40 / 0.07);
+    container-type: inline-size;
+  }
+  .bar {
+    display: flex; align-items: center; gap: 3cqw; padding: 5cqw 5cqw 3cqw;
+    font-size: 4.4cqw; font-weight: 700; letter-spacing: -0.03em;
+  }
+  .bar .ico { color: var(--muted); font-size: 4.6cqw; }
+  .bar .sp { flex: 1; }
+  .body { flex: 1; min-height: 0; padding: 0 5cqw; }
+  .foot { padding: 3cqw 5cqw 4.5cqw; }
+  .cta {
+    width: 100%; padding: 4.2cqw 0; border: 0; border-radius: 4.4cqw;
+    background: var(--primary); color: #fff; font: inherit;
+    font-size: 4.3cqw; font-weight: 600; letter-spacing: -0.03em;
+  }
+  .cta.off { background: #c4bdf3; }
+
+  /* ── 빈 화면 ─────────────────────────────────────────────── */
+  .empty-plain {
+    padding-top: 14cqw; text-align: center;
+    font-size: 3.9cqw; line-height: 1.9; color: var(--muted);
+  }
+  .empty-plain b { color: var(--ink); font-weight: 700; }
+
+  .empty-card {
+    margin-top: 9cqw; background: var(--card); border-radius: 6.5cqw;
+    padding: 9cqw 6cqw 8cqw; text-align: center; box-shadow: var(--sh-card);
+    background-image: linear-gradient(180deg, #ffffff 0%, var(--primary-soft) 100%);
+  }
+  .empty-card .badge {
+    width: 26cqw; height: 26cqw; margin: 0 auto 4.5cqw; border-radius: 50%;
+    background: var(--primary-soft); display: flex; align-items: center; justify-content: center;
+  }
+  .empty-card h2 {
+    margin: 0; font-size: 5.6cqw; font-weight: 700; letter-spacing: -0.035em;
+    line-height: 1.45; word-break: keep-all;
+  }
+  .empty-card p {
+    margin: 3cqw 0 0; font-size: 3.9cqw; line-height: 1.7; color: var(--muted); word-break: keep-all;
+  }
+
+  /* ── 작성 화면 ───────────────────────────────────────────── */
+  .tile {
+    width: 21cqw; height: 21cqw; border: 1.5px solid var(--primary); border-radius: 4.5cqw;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.2cqw; color: var(--primary); font-size: 3.3cqw; font-weight: 600;
+    margin-top: 3cqw;
+  }
+  .lbl { margin: 5cqw 0 2.4cqw; font-size: 3.9cqw; font-weight: 700; }
+  .lbl .opt { font-weight: 500; color: var(--muted); }
+  .lbl .paren { font-weight: 500; color: var(--muted); }
+
+  .rec {
+    background: var(--card); border-radius: 5cqw; padding: 6cqw 4cqw;
+    text-align: center; box-shadow: 0 2cqw 5cqw -3.5cqw rgb(25 31 40 / 0.28);
+  }
+  .rec .mic {
+    width: 12.5cqw; height: 12.5cqw; margin: 0 auto 3cqw; border-radius: 50%;
+    background: var(--primary); display: flex; align-items: center; justify-content: center;
+  }
+  .rec p { margin: 0; font-size: 3.7cqw; color: var(--muted); }
+
+  .warnchip {
+    display: inline-flex; align-items: center; gap: 1.6cqw; margin-top: 3cqw;
+    background: var(--primary-soft); color: var(--primary);
+    border-radius: 100px; padding: 2cqw 4cqw; font-size: 3.4cqw; font-weight: 600;
+  }
+  .ta {
+    background: var(--card); border: 1px solid var(--hairline-strong); border-radius: 4cqw;
+    padding: 3.6cqw; min-height: 17cqw; font-size: 3.9cqw; color: #9aa0a6;
+  }
+  .undertext { margin: 3.4cqw 0 0; text-align: center; font-size: 3.5cqw; color: var(--muted); }
+
+  /* 규칙 체크 목록 — 가입 폼과 같은 부품 */
+  .rules { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2cqw 4cqw; margin-top: 3cqw; padding: 0; list-style: none; }
+  .rules li { display: flex; align-items: center; gap: 1.8cqw; font-size: 3.7cqw; }
+  .rules li.on { color: var(--primary); font-weight: 600; }
+  .rules li.off { color: var(--muted); }
+  .rules svg { flex-shrink: 0; }
+
+  .cap { display: flex; justify-content: space-between; align-items: baseline; }
+  .cap .cnt { font-size: 3.4cqw; color: var(--muted); }
+
+  /* ── 문구 라벨 3안 ───────────────────────────────────────── */
+  .lbls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 800px; }
+  .lbls > div {
+    background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; padding: 18px 20px;
+  }
+  .lbls .demo { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+  .lbls .demo .opt { font-weight: 500; color: var(--muted); }
+  .lbls p { margin: 0; font-size: 13px; line-height: 1.66; color: #4e5968; }
+  .lbls b { color: var(--ink); }
+  .lbls .tag {
+    display: inline-block; margin-bottom: 9px; font-size: 11.5px; font-weight: 700;
+    border-radius: 100px; padding: 2px 8px; background: var(--surface-soft); color: var(--muted);
+  }
+  .lbls .tag.now { background: #ececef; }
+  .lbls .tag.rec { background: var(--primary); color: #fff; }
+</style>
+
+<div class="wrap">
+  <h1 class="doc">방 빈 화면 · 작성 화면 다듬기</h1>
+  <p class="doc">
+    색·글씨는 지금 것 그대로입니다. 고칠 것은 <b>규칙과 안내가 흩어져 있는 것</b>입니다.
+  </p>
+
+  <!-- ═══ 1 ═══ -->
+  <section>
+    <h2 class="sec-h">1. 방 빈 화면 <span>01</span></h2>
+    <p class="sec-p">
+      홈은 빈 상태를 <b>카드 안</b>에 담는데 방 안은 <b>맨 글씨</b>로 띄웁니다.
+      같은 앱에서 같은 상황을 다르게 그리고 있습니다.
+    </p>
+    <div class="pair">
+      <div class="col before">
+        <h3>지금 <em>전</em></h3>
+        <p class="note">글씨가 화면 위쪽에 붕 떠 있습니다. 담긴 데가 없어서
+          <b>화면이 덜 만들어진 것</b>처럼 보입니다.</p>
+        <div class="phone">
+          <div class="bar">
+            <span class="ico">‹</span> 우리집 <span class="sp"></span>
+            <span class="ico">⌕</span><span class="ico">☺</span><span class="ico">≡</span>
+          </div>
+          <div class="body">
+            <p class="empty-plain">
+              아직 추억이 없어요.<br>
+              아래 <b>마음 표현하기</b>로<br>
+              첫 번째 추억을 남겨보세요 🌷
+            </p>
+          </div>
+          <div class="foot"><button class="cta">마음 표현하기</button></div>
+        </div>
+      </div>
+
+      <div class="col after">
+        <h3>제안 <em>후</em></h3>
+        <p class="note">홈과 같은 <b>카드</b>에 담습니다. 그림 하나를 얹어
+          "비어 있다"가 <b>상태</b>로 읽히게 합니다. 문구는 그대로입니다.</p>
+        <div class="phone">
+          <div class="bar">
+            <span class="ico">‹</span> 우리집 <span class="sp"></span>
+            <span class="ico">⌕</span><span class="ico">☺</span><span class="ico">≡</span>
+          </div>
+          <div class="body">
+            <div class="empty-card">
+              <div class="badge">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5b4be0"
+                     stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4.5" width="18" height="15" rx="3"/>
+                  <circle cx="8.6" cy="9.8" r="1.7"/>
+                  <path d="m4 17 4.6-4.4a2 2 0 0 1 2.7 0L16 17"/>
+                  <path d="m14 14.4 1.6-1.5a2 2 0 0 1 2.7 0L21 15.4"/>
+                </svg>
+              </div>
+              <h2>아직 추억이 없어요</h2>
+              <p>아래 [마음 표현하기]로<br>첫 번째 추억을 남겨보세요.</p>
+            </div>
+          </div>
+          <div class="foot"><button class="cta">마음 표현하기</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 2 ═══ -->
+  <section>
+    <h2 class="sec-h">2. 작성 화면 — 규칙이 세 곳에 흩어져 있습니다 <span>02</span></h2>
+    <p class="sec-p">
+      <b>가입 폼과 똑같은 문제</b>입니다. 그리고 <b>“3초 이상 녹음해 주세요”에 ✕가 붙어 있어서</b>
+      아직 녹음을 시작도 안 했는데 <b>실패한 것처럼</b> 보입니다.
+    </p>
+    <div class="pair">
+      <div class="col before">
+        <h3>지금 <em>전</em></h3>
+        <p class="note">
+          규칙이 <b>사진 칸(0/10)</b>·<b>✕ 칩</b>·<b>맨 아래 안내문</b> 세 곳에 나뉘어 있습니다.
+          무엇을 더 해야 버튼이 켜지는지 한눈에 안 보입니다.
+        </p>
+        <div class="phone">
+          <div class="bar"><span class="ico">‹</span> 마음 표현하기</div>
+          <div class="body">
+            <div class="tile">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.4"/></svg>
+              0/10
+            </div>
+            <p class="lbl">함께 담을 목소리</p>
+            <div class="rec">
+              <div class="mic"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0" stroke="#fff" stroke-width="1.8" fill="none"/></svg></div>
+              <p>마이크를 눌러 녹음을 시작하세요</p>
+            </div>
+            <span class="warnchip">✕ 3초 이상 녹음해 주세요</span>
+            <p class="lbl cap"><span>문구 <span class="opt">선택</span></span><span class="cnt">0/300</span></p>
+            <div class="ta">오늘의 마음을 짧게 남겨보세요</div>
+            <p class="undertext">사진과 음성 녹음을 모두 담아야 표현할 수 있어요</p>
+          </div>
+          <div class="foot"><button class="cta off">♥ 표현하기</button></div>
+        </div>
+      </div>
+
+      <div class="col after">
+        <h3>제안 <em>후</em></h3>
+        <p class="note">
+          가입 폼과 <b>같은 체크 목록</b>으로 묶습니다. 조건을 채우면 불이 들어옵니다.
+          ✕ 칩과 맨 아래 안내문은 <b>없앱니다</b> — 같은 말을 세 번 하고 있었습니다.
+        </p>
+        <div class="phone">
+          <div class="bar"><span class="ico">‹</span> 마음 표현하기</div>
+          <div class="body">
+            <div class="tile">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.4"/></svg>
+              0/10
+            </div>
+            <p class="lbl">함께 담을 목소리</p>
+            <div class="rec">
+              <div class="mic"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0" stroke="#fff" stroke-width="1.8" fill="none"/></svg></div>
+              <p>마이크를 눌러 녹음을 시작하세요</p>
+            </div>
+
+            <ul class="rules">
+              <li class="off"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="#dce0e5" stroke-width="1.5"/></svg>사진 1장 이상</li>
+              <li class="off"><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="#dce0e5" stroke-width="1.5"/></svg>3초 이상 녹음</li>
+            </ul>
+
+            <p class="lbl cap"><span>문구 <span class="paren">(선택)</span></span><span class="cnt">0/300</span></p>
+            <div class="ta">오늘의 마음을 짧게 남겨보세요</div>
+          </div>
+          <div class="foot"><button class="cta off">♥ 표현하기</button></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="sec-p" style="margin-top:22px">
+      <b>채워지면 이렇게 됩니다</b> — 가입 폼과 똑같이 색이 살아나고 체크가 켜집니다.
+    </p>
+    <ul class="rules" style="font-size:16px;gap:6px 22px;max-width:800px">
+      <li class="on" style="font-size:16px;gap:8px">
+        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#5b4be0"/><path d="m6 10.3 2.7 2.7L14 7.7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        사진 1장 이상
+      </li>
+      <li class="on" style="font-size:16px;gap:8px">
+        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#5b4be0"/><path d="m6 10.3 2.7 2.7L14 7.7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        3초 이상 녹음
+      </li>
+    </ul>
+  </section>
+
+  <!-- ═══ 3 ═══ -->
+  <section>
+    <h2 class="sec-h">3. 여기가 “문구 선택”입니다 <span>03</span></h2>
+    <p class="sec-p">
+      작성 화면 글칸 <b>바로 위 라벨</b>입니다(위 시안에서 <b>0/300</b> 왼쪽).
+      코드 주석에는 <b>“선택 사항이라 라벨에 그렇게 적어 둔다”</b>고 되어 있습니다 —
+      즉 <b>“안 써도 된다”</b>는 뜻인데, 읽히기로는 <b>“문구를 고르세요”</b>로 읽힙니다.
+      (실제로 고를 목록도 없습니다)
+    </p>
+    <div class="lbls">
+      <div>
+        <span class="tag now">지금</span>
+        <div class="demo">문구 <span class="opt">선택</span></div>
+        <p>흐린 글씨로 구분했지만 <b>“고르라”는 명령</b>으로 읽힐 수 있습니다.</p>
+      </div>
+      <div>
+        <span class="tag rec">추천</span>
+        <div class="demo">문구 <span class="opt">(선택)</span></div>
+        <p>괄호가 있으면 <b>덧붙인 설명</b>으로 읽힙니다. 가장 짧고 관례적입니다.</p>
+      </div>
+      <div>
+        <span class="tag">대안</span>
+        <div class="demo">문구 <span class="opt">· 안 써도 돼요</span></div>
+        <p>제일 분명하지만 <b>깁니다.</b> 이 앱의 말투와는 잘 맞습니다.</p>
+      </div>
+    </div>
+  </section>
+</div>
