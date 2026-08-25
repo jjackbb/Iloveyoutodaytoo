@@ -142,9 +142,16 @@ export function TargetPicker({
         </header>
 
         <div className="flex-1 overflow-y-auto">
-          {/* 고른 사람 줄 (캡처 43 위쪽). 아직 아무도 없으면 캡처 42처럼 안내 한 줄만 둔다. */}
+          {/*
+            고른 사람 줄 (캡처 43 위쪽). 아직 아무도 없으면 캡처 42처럼 안내 한 줄만 둔다.
+
+            ⚠ overflow-x-auto 는 **세로도 함께 자른다** — CSS 규칙상 한쪽이 auto면
+            반대쪽 visible 이 auto 로 바뀐다. 위로 삐져나온 ✕ 단추는 스크롤로 닿지도
+            못해서 윗부분이 잘렸다(사용자 신고 2026-08-26).
+            그래서 ✕를 칸 안쪽으로 당기고(SelectedAvatar) 위 여백도 넉넉히 준다.
+          */}
           {selected.length > 0 ? (
-            <ul className="flex gap-4 overflow-x-auto border-b border-hairline bg-card px-screen-x py-3">
+            <ul className="flex gap-4 overflow-x-auto border-b border-hairline bg-card px-screen-x pt-5 pb-3">
               {selected.map((item) => (
                 <li key={item.id} className="shrink-0">
                   <SelectedAvatar item={item} onRemove={() => toggle(item.id)} />
@@ -216,14 +223,18 @@ function SelectedAvatar({
       <div className="relative">
         <CandidateAvatar item={item} size="sm" />
         {/*
-          X는 동그라미 위에 겹치지만 누르는 칸은 44px을 지킨다 —
+          ✕는 동그라미 위에 겹치지만 누르는 칸은 44px을 지킨다 —
           보이는 동그라미(24px)보다 훨씬 넓게 잡아 손이 떨려도 눌린다.
+
+          **밖으로 빼지 않는다.** 부모가 가로 스크롤 칸이라 삐져나온 만큼 잘린다.
+          보이는 동그라미는 칸 안쪽에 두고, 넓은 누름판만 밖으로 넘긴다 —
+          누름판은 배경이 없어서 잘려도 보이는 것이 없다.
         */}
         <button
           type="button"
           onClick={onRemove}
           aria-label={`${item.name} 빼기`}
-          className="absolute -top-3 -right-3 flex h-11 w-11 items-center justify-center rounded-full text-ink"
+          className="absolute -top-2.5 -right-2.5 flex h-11 w-11 items-start justify-end rounded-full p-1.5 text-ink"
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white">
             <svg
