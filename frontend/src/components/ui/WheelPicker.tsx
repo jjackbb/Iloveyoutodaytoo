@@ -104,6 +104,11 @@ export function WheelColumn({
         paddingTop: WHEEL_PADDING,
         paddingBottom: WHEEL_PADDING,
         scrollSnapType: 'y mandatory',
+        /*
+          원근. 이게 없으면 줄이 눕어도 그냥 납작하게 눌린 것으로만 보인다.
+          값이 작을수록 드럼이 급하게 휜다 — 640px 정도가 손목만 한 드럼으로 읽힌다.
+        */
+        perspective: '640px',
       }}
       className="min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
@@ -114,11 +119,13 @@ export function WheelColumn({
             key={option}
             style={{ height: WHEEL_ITEM_HEIGHT, scrollSnapAlign: 'center' }}
             className={[
-              'flex items-center justify-center tabular-nums',
-              // 고른 줄은 크기·굵기·색이 함께 바뀐다. 색 하나로만 알리지 않는다.
-              selected
-                ? 'text-xl font-extrabold text-ink'
-                : 'text-lg text-muted',
+              'wheel-row flex items-center justify-center text-lg tabular-nums',
+              /*
+                고른 줄은 **굵기와 색**으로 알린다. 크기는 건드리지 않는다 —
+                글자 크기를 바꾸면 줄 높이가 흔들려 scroll-snap 이 가운데를 놓친다.
+                커 보이는 효과는 .wheel-row 의 scale 이 대신 낸다(높이는 그대로 두고).
+              */
+              selected ? 'font-extrabold text-ink' : 'text-muted',
             ].join(' ')}
           >
             {format(option)}

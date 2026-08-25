@@ -174,3 +174,57 @@ input[type='submit'] {
     var(--color-brand-purple) 100%
   );
 }
+
+/* 휠(드럼) 한 줄의 굴림감.
+   ────────────────────────────────────────────────────────────
+   전에는 가운데 줄만 진하고 나머지는 전부 똑같이 흐렸다 — 평평한 목록이지
+   굴러가는 드럼으로는 안 읽혔다. 가운데에서 멀어질수록 **눕고, 작아지고, 흐려지게** 한다.
+
+   스크롤 위치를 JS로 매 프레임 재지 않는다. `animation-timeline: view()` 는
+   그 줄이 스크롤 영역을 지나가는 진행도를 브라우저가 직접 재서
+   합성 단계에서 그린다 — 굴리는 손끝을 따라오는 게 이 방식뿐이다.
+
+   ⚠️ 바꾸는 건 transform·opacity 뿐이다. 글자 크기나 높이를 건드리면
+   줄 높이가 흔들려 scroll-snap 이 어긋난다(가운데에 안 선다).
+
+   못 받는 브라우저에서는 애니메이션 없이 평평하게 보인다 — 고르는 데는 지장이 없다. */
+@keyframes wheel-row {
+  from {
+    opacity: 0.3;
+    transform: rotateX(54deg) scale(0.84);
+  }
+  50% {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+  to {
+    opacity: 0.3;
+    transform: rotateX(-54deg) scale(0.84);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .wheel-row {
+    animation: wheel-row linear both;
+    animation-timeline: view(y);
+  }
+}
+
+/* 움직임을 줄여달라고 한 분에게는 눕히지 않는다. 멀수록 흐려지는 것만 남긴다 —
+   그것까지 없애면 어디가 가운데인지 알기 어려워진다. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes wheel-row {
+    from {
+      opacity: 0.45;
+      transform: none;
+    }
+    50% {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0.45;
+      transform: none;
+    }
+  }
+}
