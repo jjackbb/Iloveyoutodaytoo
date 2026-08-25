@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { AvatarCircle } from '@/components/ui/AvatarCircle'
 import { LargeTextRow } from '@/app/my/large-text-row'
+import { PushNotificationRow } from '@/app/my/push-notification-row'
 import { TabScreen } from '@/components/layout/TabScreen'
 import { signOut } from '@/lib/actions/auth'
 import { requireUser } from '@/lib/auth'
@@ -88,10 +89,11 @@ export default async function MyPage() {
         설정 카드 (캡처 48의 두 번째 묶음).
 
         캡처에는 큰 글자 / 테마 설정 / 구독 관리 / 알림 설정 네 줄이 있다.
-        지금은 **큰 글자만** 둔다 — 나머지 셋은 뒤를 받쳐줄 것이 아직 없다.
-        테마는 팔레트가 라이트 하나뿐이고, 구독은 결제가 없고, 알림은 알림 자체가 없다.
-        눌러도 아무 일이 없는 줄을 세워두면 시니어 사용자에게는 고장으로 보인다
-        (이 화면이 처음부터 지켜온 규칙이다). 각각이 생기는 단계에서 이 카드에 붙인다.
+        테마는 팔레트가 라이트 하나뿐이고 구독은 결제가 없어 아직 안 둔다.
+        알림(웹푸시)은 2026-08-24에 붙였다 — 답장 미션·연속 기록이 "다시 들어오라"고
+        말할 통로가 이제 생겼다. 눌러도 아무 일이 없는 줄을 세워두면 고장으로 보이므로
+        (이 화면이 처음부터 지켜온 규칙이다), 지원 안 하는 환경에서는 스위치 대신
+        안내문이 뜬다 — PushNotificationRow 안에서 판별한다.
 
         차단한 분을 여기 넣은 이유: 캡처에는 없지만 이미 있는 기능이라 없앨 수 없고,
         '내가 켜고 끄는 것'이라는 점에서 아래 읽는 문서들보다 이 묶음에 가깝다.
@@ -101,6 +103,7 @@ export default async function MyPage() {
 
         <ul className="flex flex-col divide-y divide-hairline overflow-hidden rounded-card bg-card shadow-card">
           <LargeTextRow enabled={user.large_text} />
+          <PushNotificationRow />
           <MenuLink href="/my/blocks">차단한 분</MenuLink>
         </ul>
       </section>

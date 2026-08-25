@@ -25,6 +25,7 @@ import {
   VOICE_MAX_SEC,
   VOICE_MIN_SEC,
 } from '@/lib/limits'
+import { sendPush } from '@/lib/push'
 import { createClient } from '@/lib/supabase/server'
 import { sanitizeLevels } from '@/lib/waveform'
 
@@ -202,6 +203,33 @@ export async function createMemory(
   // 방 피드와 홈의 "게시물 N개"를 서버가 다시 세도록 캐시를 비운다.
   revalidatePath(`/rooms/${roomId}`)
   revalidatePath('/')
+
+  // 앱 밖 알림(웹푸시) — 이 방의 다른 구성원들에게 "OO님이 마음을 남겼어요".
+  // 실패해도 게시물 작성 자체는 이미 끝났다. try/catch로 완전히 삼킨다 —
+  // 알림이 안 갔다고 방금 남긴 추억이 사라지면 안 된다.
+  try {
+    const { data: otherMembers } = await supabase
+      .from('room_members')
+      .select('user_id')
+      .eq('room_id', roomId)
+      .eq('status', 'active')
+      .neq('user_id', user.id)
+
+    if (otherMembers && otherMembers.length > 0) {
+      const notifyBody = caption || '새 추억을 확인해보세요'
+      await Promise.all(
+        otherMembers.map((member) =>
+          sendPush(member.user_id, {
+            title: `${user.name}님이 마음을 남겼어요`,
+            body: notifyBody,
+            url: `/rooms/${roomId}`,
+          }),
+        ),
+      )
+    }
+  } catch (err) {
+    console.error('[웹푸시] 새 게시물 알림 실패:', err)
+  }
 
   return { ok: true }
 }
