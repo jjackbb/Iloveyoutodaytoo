@@ -1,3 +1,40 @@
+## 2026-09-06 — 인프라·버그·앱 전환 (구현 세션)
+
+**한 것**
+- **Supabase 프로젝트가 멈춰 있던 것을 되살렸다.** 무료 플랜 미사용으로 INACTIVE 였고
+  도메인이 NXDOMAIN 이라 **배포된 앱의 로그인·가입이 전부 죽어 있었다.** 90초 만에 복구.
+- 스키마를 저장소로 내렸다(`frontend/supabase/schema/`, 7개 파일). 개수를 DB 실제와 대조해 일치.
+- 보호자 인증 행 24시간 자동 정리(pg_cron). HANDOFF 6번은 **이걸로 끝났다.**
+- 서버 버그 2건: 탈퇴 시 파일이 RPC 앞에서 지워지던 것, 조용히 실패하던 액션 4곳.
+- 죽은 파일 정리(1.7G → 625M).
+- **APP-01: Capacitor 안드로이드 껍데기.** 에뮬레이터에서 서버 액션 왕복까지 확인.
+
+**결정과 이유**
+- 패키지명 **`app.oneuldo.android`**, 앱 이름 **"오늘도 사랑해"**(사용자 확정).
+  패키지명은 스토어 등록 후 못 바꾼다.
+- 마이그레이션 파일이 저장소에 **하나도 없었다** — 스키마 원본이 라이브 DB 한 곳뿐이었다.
+  앞으로 DB 변경은 `supabase/schema/` 에 파일로 먼저 남기고 적용한다(`07_cron.sql` 이 첫 사례).
+- 사서함의 "치운 id 를 전부 URL 에 싣는" 문제는 **안 고쳤다.** 안티조인으로 바꾸면 되고
+  문법도 200 으로 통과하지만 `heart_messages` 가 0행이라 실제로 걸러지는지 검증할 수 없다.
+  사서함에 무엇이 보일지 정하는 쿼리라 검증 없이 바꾸지 않았다.
+
+**함정**
+- **Android Studio 내장 JDK 25 로는 빌드가 안 된다** — Gradle 8.14.3 이 "Unsupported class
+  file major version 69" 로 죽는다. `JAVA_HOME=/opt/homebrew/opt/openjdk@21` 로 빌드할 것.
+  `ANDROID_HOME=~/Library/Android/sdk`, `android/local.properties` 에 `sdk.dir` 필요(gitignore 됨).
+- `.next` 를 지우면 Next.js 전역 타입(`PageProps`·`LayoutProps`)이 사라져 타입 검사가 18곳에서
+  깨진다. `verify.sh` 는 타입 검사를 빌드보다 **먼저** 돌리므로, 캐시를 비운 뒤에는
+  `npm run build` 를 한 번 돌리고 verify 할 것.
+- 커밋할 때 `git add -A` 를 쓰지 말 것. 사용자가 PRD 를 편집 중이면 딸려 들어간다(실제로 한 번 그랬다).
+
+**다음**
+- **WIDGET-01 이 이제 안 막힌다** — 네이티브 프로젝트가 생겼다. 다만 시작 전에
+  **위젯이 어떻게 인증하느냐**를 정해야 한다(권한 범위 결정이라 임의로 못 정한다).
+- 딥링크 수단 선택(Firebase Dynamic Links 종료됨) → 그다음 FCM.
+- WRITE-01 손글씨 → WRITE-02 타임랩스 → DAILY-01.
+
+---
+
 ## 2026-09-06 — 로고 재작업 준비 (Recraft로 넘김)
 
 **한 것**
