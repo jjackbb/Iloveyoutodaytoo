@@ -3,8 +3,28 @@ import { createServerClient } from '@supabase/ssr'
 
 import { isNativeAppUserAgent } from '@/lib/native'
 
-/** 로그인하지 않아도 들어갈 수 있는 경로 */
-const PUBLIC_PATHS = ['/start', '/login', '/signup', '/invite', '/legal', '/auth']
+/**
+ * 로그인하지 않아도 들어갈 수 있는 경로.
+ *
+ * 뒤쪽 다섯은 사람이 아니라 기계가 읽는 것들이다 — /welcome(브라우저 랜딩),
+ * /.well-known(App Links 검증), /api(위젯이 Bearer 토큰으로 부른다. 쿠키 세션이 없다),
+ * /manifest.json·/sw.js(PWA·웹푸시). 여기 없으면 로그인 전 요청이 /start 로 튕겨
+ * **조용히 깨진다** — 2026-09-06 에 manifest.json 이 실제로 그렇게 막혀 있었다.
+ * (matcher 가 .txt·.xml·이미지는 애초에 거르지만 .json·.js 는 거르지 않는다)
+ */
+const PUBLIC_PATHS = [
+  '/start',
+  '/login',
+  '/signup',
+  '/invite',
+  '/legal',
+  '/auth',
+  '/welcome',
+  '/.well-known',
+  '/api',
+  '/manifest.json',
+  '/sw.js',
+]
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some(
