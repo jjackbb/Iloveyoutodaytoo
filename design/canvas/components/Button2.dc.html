@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #3a3a3c; } a:hover { color: #2a2a2c; }
+    .sheet { font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+    .tag { font-size: 11px; font-weight: 600; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+    button, input { font-family: inherit; }
+  </style>
+</helmet>
+<div class="sheet" style="width: 390px; padding: 20px 20px 28px; background: #ffffff; color: #191f28; box-sizing: border-box;"><div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px;">
+    <div style="display: flex; align-items: baseline; gap: 8px;">
+      <span style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #191f28;">버튼 ②</span>
+      <span style="font-size: 13px; font-weight: 600; color: #8b95a1;">토스식 — 플랫 단색</span>
+    </div>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: #8b95a1;">56px · 반지름 16 · 그라데이션·그림자 없음. 보조 버튼은 <b>연한 면(weak)</b> — 테두리 대신 채움으로 위계를 나눈다.</p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <button style="min-height: 56px; padding: 0 24px; border: 0; border-radius: 16px; font-size: 17px; font-weight: 600; color: #ffffff; background: #191f28; box-shadow: none; cursor: pointer; width: 100%;">시작하기</button>
+    <button style="min-height: 56px; padding: 0 24px; border: 0; border-radius: 16px; font-size: 17px; font-weight: 600; color: #191f28; background: #f2f4f6; box-shadow: none; cursor: pointer; width: 100%;">다른 방법으로 시작하기</button>
+    <button style="min-height: 48px; padding: 0 24px; border: 0; border-radius: 16px; font-size: 16px; font-weight: 600; color: #4e5968; background: transparent; box-shadow: none; cursor: pointer; width: 100%;">나중에</button>
+  </div></div>
+</x-dc>
+</body>
+</html>

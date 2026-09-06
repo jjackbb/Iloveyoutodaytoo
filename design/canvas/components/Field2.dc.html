@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #3a3a3c; } a:hover { color: #2a2a2c; }
+    .sheet { font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+    .tag { font-size: 11px; font-weight: 600; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+    button, input { font-family: inherit; }
+  </style>
+</helmet>
+<div class="sheet" style="width: 390px; padding: 20px 20px 28px; background: #ffffff; color: #191f28; box-sizing: border-box;"><div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px;">
+    <div style="display: flex; align-items: baseline; gap: 8px;">
+      <span style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #191f28;">입력칸 ②</span>
+      <span style="font-size: 13px; font-weight: 600; color: #8b95a1;">토스 line — 밑줄만</span>
+    </div>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: #8b95a1;">박스를 없애고 <b>밑줄 하나</b>. 글자가 크고(20px) 화면이 가벼워진다. 규칙은 칩 대신 글줄로.</p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <label style="font-size: 14px; font-weight: 600; color: #8b95a1;">어떻게 불러드릴까요?</label>
+    <input type="text" placeholder="가족들이 부르는 이름" style="min-height: 48px; padding: 8px 0; border: 0; border-bottom: 2px solid #191f28; border-radius: 0; background: transparent; font-size: 20px; font-weight: 600; color: #191f28; box-sizing: border-box; width: 100%;">
+    <div style="display: flex; gap: 14px; margin-top: 4px;">
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #8b95a1;"><span style="width: 14px; height: 14px; border-radius: 100px; border: 1.5px solid #8b95a1; display: inline-block;"></span>2~10자</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #191f28;"><span style="width: 14px; height: 14px; border-radius: 100px; background: #191f28; display: grid; place-items: center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>한글·영문</span>
+    </div>
+  </div></div>
+</x-dc>
+</body>
+</html>

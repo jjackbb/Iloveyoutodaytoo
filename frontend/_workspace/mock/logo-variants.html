@@ -1,102 +1,78 @@
-<!doctype html><meta charset="utf-8"><title>로고 변형</title>
+<!doctype html><meta charset="utf-8"><title>로고 색 변형</title>
 <style>
  body{margin:0;background:#f7f8fa;font:14px/1.5 -apple-system,'Pretendard Variable',Pretendard,system-ui,sans-serif;color:#222}
  .wrap{padding:34px 40px 60px}
  h1{font-size:19px;font-weight:700;margin:0 0 4px;letter-spacing:-.02em}
  .sub{color:#6a6a6a;margin:0 0 8px;font-size:13px}
- h2{font-size:13px;font-weight:700;color:#6a6a6a;margin:32px 0 12px}
- .row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
- .card{background:#fff;border:1px solid #e5e8eb;border-radius:16px;padding:16px}
+ h2{font-size:13px;font-weight:700;color:#6a6a6a;margin:30px 0 12px}
+ .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+ .card{background:#fff;border:1px solid #e5e8eb;border-radius:16px;padding:14px}
  .name{font-weight:700;font-size:14px;letter-spacing:-.02em}
- .note{color:#6a6a6a;font-size:12px;margin:2px 0 14px;min-height:34px}
- .specs{display:flex;align-items:flex-end;gap:14px}
- .s{display:flex;flex-direction:column;align-items:center;gap:5px}
+ .note{color:#6a6a6a;font-size:12px;margin:2px 0 12px;min-height:34px}
+ .specs{display:flex;align-items:flex-end;gap:10px}
+ .s{display:flex;flex-direction:column;align-items:center;gap:4px}
  .cap{font-size:10px;color:#6a6a6a}
- img{display:block;image-rendering:auto}
- .dark{background:#1c1c1e;border-radius:12px;padding:6px}
- .lite{background:#fff;border:1px solid #eee;border-radius:12px;padding:6px}
+ img{display:block}
+ .dark{background:#1c1c1e;border-radius:10px;padding:5px}
+ .lite{background:#fff;border:1px solid #eee;border-radius:10px;padding:5px}
  .rc{border-radius:50%;overflow:hidden}
- .chip{margin-top:12px;font-size:11px;color:#6a6a6a;display:flex;align-items:center;gap:8px}
- .sw{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.08)}
+ .chip{margin-top:10px;font-size:11px;color:#6a6a6a;display:flex;align-items:center;gap:7px}
+ .sw{width:13px;height:13px;border-radius:4px;border:1px solid rgba(0,0,0,.08)}
  .warn{color:#a2563a;font-weight:700}
+ .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 </style>
 <div class="wrap">
-<h1>오늘도 사랑해 — 로고 색 변형 · 디벨롭</h1>
-<p class="sub">위 3개는 <b>원본 파일의 픽셀을 그대로 두고 색값만 치환</b>했습니다. 형태는 100% 원본입니다.</p>
+<h1>오늘도 사랑해 — 로고 색 변형</h1>
+<p class="sub">전부 <b>원본 파일의 픽셀을 그대로 두고 색값만 치환</b>했습니다. 형태는 100% 원본. 대비는 흰 글자 기준.</p>
 
-<h2>① 색만 바꾼 것 — 형태 원본 그대로</h2>
-<div class="row">
- <div class="card"><div class="name">원본 · 테라코타</div>
-  <div class="note"><span class="warn">#C17753 — 흰 글자 3.48:1, AA 미달.</span> 강조색으로 못 씁니다.</div>
-  <div class="specs">
-   <div class="s lite"><img src="logo/original.png" width="120"></div>
-   <div class="s"><div class="dark"><img src="logo/original.png" width="56"></div><span class="cap">어두운 배경</span></div>
-   <div class="s"><img src="logo/original.png" width="48"><span class="cap">48dp</span></div>
-  </div>
-  <div class="chip"><span class="sw" style="background:#C17753"></span>#C17753 · 3.48:1</div></div>
+<h2>① 색만 바꾼 것 — 원본 + 10색</h2>
+<div class="grid" id="g"></div>
 
- <div class="card"><div class="name">진한 테라코타</div>
-  <div class="note">원본 색감을 유지하면서 대비만 확보. 가장 안전한 교체.</div>
-  <div class="specs">
-   <div class="s lite"><img src="logo/recolor-terracotta-dark.png" width="120"></div>
-   <div class="s"><div class="dark"><img src="logo/recolor-terracotta-dark.png" width="56"></div><span class="cap">어두운 배경</span></div>
-   <div class="s"><img src="logo/recolor-terracotta-dark.png" width="48"><span class="cap">48dp</span></div>
-  </div>
-  <div class="chip"><span class="sw" style="background:#A2563A"></span>#A2563A · 5.35:1 AA</div></div>
-
- <div class="card"><div class="name">딥 틸</div>
-  <div class="note">차분함으로. 카톡 노랑 옆에서 안 부딪힘. 온기는 줄어듭니다.</div>
-  <div class="specs">
-   <div class="s lite"><img src="logo/recolor-deep-teal.png" width="120"></div>
-   <div class="s"><div class="dark"><img src="logo/recolor-deep-teal.png" width="56"></div><span class="cap">어두운 배경</span></div>
-   <div class="s"><img src="logo/recolor-deep-teal.png" width="48"><span class="cap">48dp</span></div>
-  </div>
-  <div class="chip"><span class="sw" style="background:#0F5F57"></span>#0F5F57 · 7.51:1 AA</div></div>
-</div>
-
-<div class="row" style="margin-top:16px;grid-template-columns:1fr 2fr">
- <div class="card"><div class="name">짙은 감청</div>
-  <div class="note">대비가 제일 높지만 금융·업무 앱처럼 읽힙니다.</div>
-  <div class="specs">
-   <div class="s lite"><img src="logo/recolor-ink-navy.png" width="120"></div>
-   <div class="s"><div class="dark"><img src="logo/recolor-ink-navy.png" width="56"></div><span class="cap">어두운 배경</span></div>
-   <div class="s"><img src="logo/recolor-ink-navy.png" width="48"><span class="cap">48dp</span></div>
-  </div>
-  <div class="chip"><span class="sw" style="background:#1B3A5C"></span>#1B3A5C · 11.63:1 AA</div></div>
- <div class="card" style="display:flex;align-items:center"><div>
-   <div class="name">⚠️ 원본 파일의 구조 문제</div>
-   <div class="note" style="min-height:0">하트와 봉투 플랩이 <b>흰색이 아니라 뚫려 있습니다(투명).</b> 흰 배경에서만 흰색으로 보인 거예요.<br>
-   왼쪽 “어두운 배경” 칸을 보시면 하트가 배경색으로 비칩니다. 안드로이드 아이콘은 배경이 뭐가 될지 모르므로 <b>흰 면으로 채워야</b> 합니다 — 아래 디벨롭 1번.</div>
- </div></div>
-</div>
-
-<h2>② 디벨롭 — 원본 형태에서 기계적으로 파생 (제가 새로 그린 것 없음)</h2>
-<div class="row">
+<h2>② 디벨롭 — 원본 형태에서 기계적으로 파생</h2>
+<div class="row3">
  <div class="card"><div class="name">1. 컷아웃을 흰 면으로</div>
-  <div class="note">뚫린 자리를 흰색으로 채웠습니다. 어떤 배경에서도 하트가 하트로 보입니다.</div>
+  <div class="note">뚫린 자리를 흰색으로 채움. 어두운 배경에서도 하트가 하트로 보임.</div>
   <div class="specs">
-   <div class="s lite"><img src="logo/filled-terracotta-dark.png" width="120"></div>
-   <div class="s"><div class="dark"><img src="logo/filled-terracotta-dark.png" width="56"></div><span class="cap">어두운 배경</span></div>
+   <div class="s lite"><img src="logo/filled-terracotta-dark.png" width="110"></div>
+   <div class="s"><div class="dark"><img src="logo/filled-terracotta-dark.png" width="52"></div><span class="cap">어두운 배경</span></div>
    <div class="s"><img src="logo/filled-terracotta-dark.png" width="48"><span class="cap">48dp</span></div>
-  </div>
-  <div class="chip">형태 원본 동일 · 투명부만 흰색</div></div>
-
+  </div></div>
  <div class="card"><div class="name">2. 안전영역 대응</div>
-  <div class="note">배경을 화면 끝까지 채우고 마크를 61% 안으로 축소. 원형 마스크에서 플랩이 안 잘립니다.</div>
+  <div class="note">배경을 끝까지 채우고 마크를 61% 안으로. 원형 마스크에서 플랩이 안 잘림.</div>
   <div class="specs">
-   <div class="s lite"><img src="logo/safe-terracotta-dark.png" width="120"></div>
-   <div class="s"><div class="rc" style="width:56px;height:56px"><img src="logo/safe-terracotta-dark.png" width="56"></div><span class="cap">원형 마스크</span></div>
+   <div class="s lite"><img src="logo/safe-terracotta-dark.png" width="110"></div>
+   <div class="s"><div class="rc" style="width:52px;height:52px"><img src="logo/safe-terracotta-dark.png" width="52"></div><span class="cap">원형 마스크</span></div>
    <div class="s"><img src="logo/safe-terracotta-dark.png" width="48"><span class="cap">48dp</span></div>
-  </div>
-  <div class="chip">적응형 아이콘 규격 통과</div></div>
-
+  </div></div>
  <div class="card"><div class="name">3. 마크만 (모노크롬)</div>
-  <div class="note">배경 없이 마크만 단색. 앱바·테마 아이콘·워터마크용.</div>
+  <div class="note">배경 없이 마크만 단색. 앱바·테마 아이콘용.</div>
   <div class="specs">
-   <div class="s lite"><img src="logo/markonly.png" width="120"></div>
-   <div class="s lite"><img src="logo/markonly.png" width="56"><span class="cap">56px</span></div>
+   <div class="s lite"><img src="logo/markonly.png" width="110"></div>
+   <div class="s lite"><img src="logo/markonly.png" width="52"><span class="cap">52px</span></div>
    <div class="s lite"><img src="logo/markonly.png" width="24"><span class="cap">24px 앱바</span></div>
-  </div>
-  <div class="chip">단색 실루엣 성립 여부 확인용</div></div>
+  </div></div>
 </div>
 </div>
+<script>
+const C=[
+ ['original','원본 · 테라코타','#C17753','3.48:1','<span class="warn">AA 미달</span> — 강조색으로 못 씀'],
+ ['terracotta-dark','진한 테라코타','#A2563A','5.35:1','원본 색감 유지 + 대비 확보'],
+ ['brick','벽돌','#8A3B2E','7.65:1','더 깊고 묵직한 붉은 흙'],
+ ['burnt-orange','번트 오렌지','#B0461C','5.62:1','가장 따뜻하고 생기 있음'],
+ ['amber-brown','앰버 브라운','#7A4A1F','7.43:1','가죽·나무 — 오래 보관하는 느낌'],
+ ['cocoa','코코아','#5C4033','9.39:1','가장 차분한 갈색'],
+ ['burgundy','버건디','#7A2E3B','9.2:1','분홍 아님 — 와인색. 애정을 어른스럽게'],
+ ['moss','짙은 모스','#3E5C3A','7.51:1','자라나는 것 — 쌓임'],
+ ['slate-blue','슬레이트 블루','#3F5A78','7.13:1','파랑 중 가장 덜 차가움'],
+ ['deep-teal','딥 틸','#0F5F57','7.51:1','차분. 온기는 줄어듦'],
+ ['ink-navy','짙은 감청','#1B3A5C','11.63:1','단단하지만 금융앱처럼 읽힘'],
+];
+document.getElementById('g').innerHTML=C.map(([k,n,h,r,d])=>`<div class="card">
+ <div class="name">${n}</div><div class="note">${d}</div>
+ <div class="specs">
+  <div class="s lite"><img src="logo/recolor-${k}.png" width="110"></div>
+  <div class="s"><div class="dark"><img src="logo/recolor-${k}.png" width="52"></div><span class="cap">어두운 배경</span></div>
+  <div class="s"><img src="logo/recolor-${k}.png" width="48"><span class="cap">48dp</span></div>
+ </div>
+ <div class="chip"><span class="sw" style="background:${h}"></span>${h} · ${r}</div></div>`).join('');
+</script>

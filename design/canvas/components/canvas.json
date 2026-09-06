@@ -1,0 +1,192 @@
+{
+  "pages": [
+    {
+      "id": "page-card",
+      "name": "앨범방 카드"
+    },
+    {
+      "id": "page-button",
+      "name": "버튼"
+    },
+    {
+      "id": "page-field",
+      "name": "입력칸"
+    },
+    {
+      "id": "page-chip",
+      "name": "칩 · 뱃지"
+    },
+    {
+      "id": "page-inner",
+      "name": "안쪽 면"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 420,
+      "page": "page-card"
+    },
+    {
+      "file": "Card2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 420,
+      "page": "page-card"
+    },
+    {
+      "file": "Card3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 420,
+      "page": "page-card"
+    },
+    {
+      "file": "Button1.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 330,
+      "page": "page-button"
+    },
+    {
+      "file": "Button2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 330,
+      "page": "page-button"
+    },
+    {
+      "file": "Button3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 330,
+      "page": "page-button"
+    },
+    {
+      "file": "Field1.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 300,
+      "page": "page-field"
+    },
+    {
+      "file": "Field2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 300,
+      "page": "page-field"
+    },
+    {
+      "file": "Field3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 300,
+      "page": "page-field"
+    },
+    {
+      "file": "Chip1.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 250,
+      "page": "page-chip"
+    },
+    {
+      "file": "Chip2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 250,
+      "page": "page-chip"
+    },
+    {
+      "file": "Chip3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 250,
+      "page": "page-chip"
+    },
+    {
+      "file": "Inner1.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 240,
+      "page": "page-inner"
+    },
+    {
+      "file": "Inner2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 240,
+      "page": "page-inner"
+    },
+    {
+      "file": "Inner3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 240,
+      "page": "page-inner"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "guide-card",
+      "page": "page-card",
+      "x": 0,
+      "y": -170,
+      "w": 620,
+      "text": "앨범방 카드 3안\n\n① 정리형 — 지금 구조에서 이미지 위를 비우고, 통계 대신 '마지막 마음' 한 줄\n② 토스식 — 플랫·테두리·청회색 중립. 가장 가볍다\n③ 목소리 — 커버는 썸네일로, 카드 본체가 최근 목소리. 이 앱의 정체성에 가장 가깝다\n\n색은 전부 임시 무채색. ②만 토스 중립색(#191f28·#8b95a1)을 써서 차이를 보인다. 페이지 메뉴에서 다른 부품으로 넘어가세요."
+    },
+    {
+      "id": "guide-button",
+      "page": "page-button",
+      "x": 0,
+      "y": -130,
+      "w": 620,
+      "text": "버튼 3안 — ① 지금(그라데이션+그림자, 17) ② 토스식(플랫, 56/16, 보조는 연한 면) ③ 알약(56/28, 보조는 얇은 선)"
+    },
+    {
+      "id": "guide-field",
+      "page": "page-field",
+      "x": 0,
+      "y": -130,
+      "w": 620,
+      "text": "입력칸 3안 — ① 지금(박스, 14) ② 토스 line(밑줄만, 20px) ③ 토스 big(값이 크게 24px). ③은 한 화면에 질문 하나만 묻는 가입 흐름에 어울린다"
+    },
+    {
+      "id": "guide-chip",
+      "page": "page-chip",
+      "x": 0,
+      "y": -130,
+      "w": 620,
+      "text": "칩 3안 — ① 지금(알약 선택) ② 세그먼트(트랙 안에서 흰 알약이 떠오름 — inner-sm 11px이 원래 이 자리) ③ 글자 탭(면 없이 밑줄)"
+    },
+    {
+      "id": "guide-inner",
+      "page": "page-inner",
+      "x": 0,
+      "y": -130,
+      "w": 620,
+      "text": "안쪽 면 3안 — ① 지금(회색 면) ② 토스식(선으로만) ③ 면 없이 인용부호+들여쓰기"
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-card"
+  }
+}

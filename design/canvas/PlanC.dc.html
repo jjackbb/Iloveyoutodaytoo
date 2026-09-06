@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #3a3a3c; } a:hover { color: #2a2a2c; }
+    .sheet {
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif;
+      background: #f7f8fa; color: #222222;
+      -webkit-font-smoothing: antialiased; word-break: keep-all;
+    }
+    .tag {
+      font-size: 11px; font-weight: 600; color: #6a6a6a;
+      letter-spacing: .04em; font-variant-numeric: tabular-nums;
+    }
+  </style>
+</helmet>
+
+<div class="sheet" style="width: 390px; padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- 머리 -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="display: flex; align-items: baseline; gap: 8px;">
+      <span style="font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">C안</span>
+      <span style="font-size: 14px; font-weight: 600; color: #6a6a6a;">큰 것 / 작은 것, 두 단계만</span>
+    </div>
+    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #6a6a6a;">
+      반지름 <strong style="color:#222222; font-weight:600;">2단계</strong> · 큰 것 22 / 나머지 전부 10 · 칩은 알약<br>
+      여백은 <strong style="color:#222222; font-weight:600;">4px 눈금만</strong>
+    </p>
+  </div>
+
+  <div style="height: 1px; background: #e5e8eb;"></div>
+
+  <!-- 1. 앨범방 카드 -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span class="tag">앨범방 카드 · 22px</span>
+    <div style="background: #ffffff; border-radius: 22px; box-shadow: 0 10px 30px -16px rgb(25 31 40 / 0.26); overflow: hidden;">
+      <div style="height: 104px; background: linear-gradient(135deg, #eeeef0 0%, #e5e8eb 100%);"></div>
+      <div style="padding: 16px 16px 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">우리 가족 행복방</span>
+          <div style="width: 34px; height: 34px; border-radius: 100px; background: #f2f4f6; display: grid; place-items: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6a6a6a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex;">
+            <div style="width: 26px; height: 26px; border-radius: 100px; background: #dce0e5; border: 2px solid #ffffff;"></div>
+            <div style="width: 26px; height: 26px; border-radius: 100px; background: #e5e8eb; border: 2px solid #ffffff; margin-left: -8px;"></div>
+            <div style="width: 26px; height: 26px; border-radius: 100px; background: #eeeef0; border: 2px solid #ffffff; margin-left: -8px;"></div>
+          </div>
+          <span style="font-size: 13px; color: #6a6a6a;">3명이 함께해요</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 버튼 3종 -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span class="tag">버튼 · 10px</span>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <button style="min-height: 52px; padding: 12px 24px; border: 0; border-radius: 10px; font-family: inherit; font-size: 18px; font-weight: 600; color: #ffffff; background-image: linear-gradient(135deg, #3a3a3c 0%, #525255 100%); box-shadow: 0 12px 22px -10px rgb(25 31 40 / 0.30); cursor: pointer;">시작하기</button>
+      <button style="min-height: 52px; padding: 12px 24px; border: 2px solid #3a3a3c; border-radius: 10px; font-family: inherit; font-size: 18px; font-weight: 600; color: #3a3a3c; background: #ffffff; cursor: pointer;">다른 방법으로 시작하기</button>
+      <button style="min-height: 44px; padding: 10px 20px; border: 0; border-radius: 10px; font-family: inherit; font-size: 16px; font-weight: 600; color: #3a3a3c; background: transparent; cursor: pointer;">나중에</button>
+    </div>
+  </div>
+
+  <!-- 3. 입력칸 -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span class="tag">입력칸 10px · 규칙 체크 10px</span>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label style="font-size: 15px; font-weight: 600;">어떻게 불러드릴까요?</label>
+      <input type="text" placeholder="가족들이 부르는 이름" style="min-height: 52px; padding: 16px 16px; border: 1px solid #dce0e5; border-radius: 10px; background: #ffffff; font-family: inherit; font-size: 17px; color: #222222; box-sizing: border-box;">
+      <span style="font-size: 13px; color: #6a6a6a;">나중에 마이에서 바꿀 수 있어요.</span>
+      <div style="display: flex; gap: 8px; margin-top: 0;">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: #f2f4f6;">
+          <div style="width: 16px; height: 16px; border-radius: 100px; background: #dce0e5;"></div>
+          <span style="font-size: 13px; color: #6a6a6a;">2~10자</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: #eeeef0;">
+          <div style="width: 16px; height: 16px; border-radius: 100px; background: #3a3a3c; display: grid; place-items: center;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <span style="font-size: 13px; font-weight: 600; color: #3a3a3c;">한글·영문</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 칩 · 뱃지 -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span class="tag">필터 칩 알약 · 뱃지 10px</span>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <span style="padding: 8px 16px; border-radius: 100px; background: #3a3a3c; color: #ffffff; font-size: 14px; font-weight: 600;">전체</span>
+      <span style="padding: 8px 16px; border-radius: 100px; background: #ffffff; border: 1px solid #e5e8eb; color: #6a6a6a; font-size: 14px; font-weight: 600;">좋아요</span>
+      <span style="padding: 8px 16px; border-radius: 100px; background: #ffffff; border: 1px solid #e5e8eb; color: #6a6a6a; font-size: 14px; font-weight: 600;">1:1</span>
+      <span style="padding: 8px 16px; border-radius: 100px; background: #ffffff; border: 1px solid #e5e8eb; color: #6a6a6a; font-size: 14px; font-weight: 600;">랜덤</span>
+    </div>
+    <div style="display: flex; gap: 8px; margin-top: 0;">
+      <span style="padding: 8px 12px; border-radius: 10px; background: #eeeef0; color: #3a3a3c; font-size: 12px; font-weight: 600;">3초 이상</span>
+      <span style="padding: 8px 12px; border-radius: 10px; background: #f2f4f6; color: #6a6a6a; font-size: 12px; font-weight: 600;">선택</span>
+    </div>
+  </div>
+
+  <!-- 5. 안쪽 면 -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <span class="tag">카드 22px 안의 한 겹 더 · 10px</span>
+    <div style="background: #ffffff; border-radius: 22px; padding: 16px; box-shadow: 0 10px 30px -16px rgb(25 31 40 / 0.26);">
+      <div style="background: #f2f4f6; border-radius: 10px; padding: 16px 20px;">
+        <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #222222;">오늘 목소리 남겨줘서 고마워요.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
