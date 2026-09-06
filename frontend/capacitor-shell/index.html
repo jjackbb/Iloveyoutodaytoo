@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>오늘도 사랑해</title>
+    <style>
+      /*
+        이 화면은 평소에 뜨지 않는다. capacitor.config.ts 의 server.url 이
+        배포된 서버를 부르고, 그 서버에 닿지 못했을 때만 여기가 보인다.
+        색을 박아 쓰지 않고 중립 회색만 쓴 이유: 강조색이 아직 미정이고(PRD §0),
+        로고 세션이 색을 정하면 앱 전체가 한 번에 바뀌어야 하기 때문이다.
+      */
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: grid; place-items: center;
+        background: #f7f8fa; color: #3a3a3c;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        padding: 24px; text-align: center; line-height: 1.6;
+      }
+      p { margin: 0; font-size: 17px; }
+      .sub { margin-top: 8px; font-size: 15px; color: #8a8a8e; }
+    </style>
+  </head>
+  <body>
+    <div>
+      <p>연결이 잠시 불안정했어요.</p>
+      <p class="sub">인터넷을 확인한 뒤 앱을 다시 열어주세요.</p>
+    </div>
+  </body>
+</html>
