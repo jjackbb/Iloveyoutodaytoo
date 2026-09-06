@@ -1,6 +1,10 @@
 {
   "pages": [
     {
+      "id": "page-card-w",
+      "name": "앨범방 카드 · 흰 바탕 3안"
+    },
+    {
       "id": "page-final",
       "name": "앨범방 카드 · 확정"
     },
@@ -34,6 +38,38 @@
     }
   ],
   "artboards": [
+    {
+      "file": "CardW0.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 740,
+      "page": "page-card-w"
+    },
+    {
+      "file": "CardW1.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 740,
+      "page": "page-card-w"
+    },
+    {
+      "file": "CardW2.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 740,
+      "page": "page-card-w"
+    },
+    {
+      "file": "CardW3.dc.html",
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 740,
+      "page": "page-card-w"
+    },
     {
       "file": "Main.dc.html",
       "x": 0,
@@ -221,6 +257,14 @@
   ],
   "annotations": [
     {
+      "id": "guide-card-w",
+      "page": "page-card-w",
+      "x": 0,
+      "y": -190,
+      "w": 760,
+      "text": "이름의 흰 바탕 — 3안 (2026-09-06)\n\n배경을 일부러 일상 사진처럼 밝고 어두운 덩어리가 섞이게 깔았습니다. W⓪은 지금 확정안이 그 위에서 어떻게 무너지는지 대조용.\n\nW① 흰 알약   W② 흰 사각(10px)   W③ 반투명 흰(frosted)\n\n하트는 이제 즐겨찾기하면 분홍(#ff5a7a). 둘째 카드가 그 상태. 분홍도 주황 점처럼 임시 의미색 — 로고 색 옆에서 다시 봅니다.\n\n고르시면 '확정' 페이지의 Main 을 그걸로 갱신합니다."
+    },
+    {
       "id": "guide-final",
       "page": "page-final",
       "x": 470,
@@ -287,6 +331,6 @@
   ],
   "launch": {
     "view": "canvas",
-    "page": "page-final"
+    "page": "page-card-w"
   }
 }
