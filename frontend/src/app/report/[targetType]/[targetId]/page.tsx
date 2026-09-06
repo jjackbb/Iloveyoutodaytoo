@@ -150,7 +150,7 @@ export default async function ReportPage({
           </div>
 
           {/* 문구는 실제 동작과 맞춰 적는다. 차단을 거는 곳은 방 설정 화면이다. */}
-          <aside className="flex flex-col gap-2 rounded-[14px] bg-primary-soft px-5 py-4">
+          <aside className="flex flex-col gap-2 rounded-inner bg-primary-soft px-5 py-4">
             <h3 className="text-lg font-medium text-ink">
               지금 바로 안 보이게 하고 싶다면
             </h3>

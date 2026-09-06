@@ -32,7 +32,7 @@ export function InviteLetter({
       </header>
 
       {/* 초대자가 남긴 첫 마디. 이 화면에서 가장 먼저 읽히도록 크게 둔다. */}
-      <blockquote className="rounded-[14px] bg-primary-soft px-5 py-6 text-center text-lg leading-relaxed text-ink">
+      <blockquote className="rounded-inner bg-primary-soft px-5 py-6 text-center text-lg leading-relaxed text-ink">
         “{message}”
       </blockquote>
     </>

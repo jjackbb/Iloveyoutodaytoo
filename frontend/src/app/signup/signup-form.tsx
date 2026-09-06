@@ -191,7 +191,7 @@ export function SignupForm({ next }: { next: string }) {
       <BirthDateField name="birth_date" onValueChange={setBirthDate} />
 
       {minor ? (
-        <fieldset className="flex flex-col gap-4 rounded-[14px] bg-primary-soft p-4">
+        <fieldset className="flex flex-col gap-4 rounded-inner bg-primary-soft p-4">
           <legend className="px-1 text-base font-medium text-primary">
             보호자 동의가 필요해요
           </legend>

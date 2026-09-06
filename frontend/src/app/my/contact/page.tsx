@@ -146,7 +146,7 @@ export default async function ContactPage() {
         */}
       <section
         aria-labelledby="contact-address"
-        className="flex flex-col gap-2 rounded-[14px] bg-primary-soft px-5 py-5"
+        className="flex flex-col gap-2 rounded-inner bg-primary-soft px-5 py-5"
       >
         {/*
             글자색을 분홍(text-primary)이 아니라 먹색(text-ink)으로 둔 이유:
@@ -186,7 +186,7 @@ export default async function ContactPage() {
           {TOPICS.map((topic) => (
             <li
               key={topic.id}
-              className="flex flex-col gap-3 rounded-[14px] border border-hairline px-5 py-5"
+              className="flex flex-col gap-3 rounded-inner border border-hairline px-5 py-5"
             >
               <h3 className="text-lg font-bold text-ink">{topic.label}</h3>
 
@@ -237,7 +237,7 @@ export default async function ContactPage() {
           바로 하실 수 있는 일
         </h2>
 
-        <ul className="flex flex-col divide-y divide-hairline rounded-[14px] border border-hairline">
+        <ul className="flex flex-col divide-y divide-hairline rounded-inner border border-hairline">
           <li>
             <Link
               href="/my/blocks"

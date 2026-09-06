@@ -149,7 +149,7 @@ function BlockConfirm({
   onCancel: () => void
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-[14px] bg-surface-soft p-5">
+    <div className="flex flex-col gap-4 rounded-inner bg-surface-soft p-5">
       <h4 className="text-lg font-bold text-ink">
         {member.name}님을 차단할까요?
       </h4>

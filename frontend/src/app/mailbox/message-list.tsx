@@ -117,7 +117,7 @@ export function MessageList({
 
   if (error && items.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-[14px] bg-surface-soft px-6 py-10 text-center">
+      <div className="flex flex-col items-center gap-4 rounded-inner bg-surface-soft px-6 py-10 text-center">
         <p role="alert" className="text-base text-ink">
           {error}
         </p>
@@ -170,7 +170,7 @@ export function MessageList({
       {error ? (
         <p
           role="alert"
-          className="rounded-[14px] bg-primary-soft px-4 py-3 text-base text-primary"
+          className="rounded-inner bg-primary-soft px-4 py-3 text-base text-primary"
         >
           {error}
         </p>
@@ -332,7 +332,7 @@ function MessageBody({ item, title }: { item: MailboxItem; title: string }) {
         controls
         preload="metadata"
         playsInline
-        className="mt-1 w-full rounded-[14px] bg-surface-soft"
+        className="mt-1 w-full rounded-inner bg-surface-soft"
       />
     )
   }

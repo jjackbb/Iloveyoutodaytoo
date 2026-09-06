@@ -422,7 +422,7 @@ function renderTable(block: Extract<Block, { kind: 'table' }>, key: string) {
       tabIndex: 0,
       // 넘치지 않는 표에도 같은 안내가 붙으므로 "화면이 좁으면"이라고 조건을 밝힌다.
       'aria-label': '표 — 화면이 좁으면 좌우로 밀어서 볼 수 있어요',
-      className: 'mt-5 overflow-x-auto rounded-[14px] border border-hairline',
+      className: 'mt-5 overflow-x-auto rounded-inner border border-hairline',
     },
     createElement('table', { className: 'w-full border-collapse' }, head, body),
   )
@@ -469,7 +469,7 @@ function renderBlock(block: Block, key: string): ReactNode {
         {
           key,
           className:
-            'mt-5 rounded-[14px] border-l-4 border-primary bg-surface-soft px-5 py-4',
+            'mt-5 rounded-inner border-l-4 border-primary bg-surface-soft px-5 py-4',
         },
         renderBlocks(block.blocks, key),
       )
@@ -622,7 +622,7 @@ export function renderLegalToc(toc: LegalTocEntry[]): ReactNode {
     {
       'aria-labelledby': 'legal-toc-heading',
       className:
-        'mt-8 rounded-[14px] border border-hairline bg-surface-soft p-5',
+        'mt-8 rounded-inner border border-hairline bg-surface-soft p-5',
     },
     createElement(
       'h2',

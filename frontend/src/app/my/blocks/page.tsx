@@ -53,7 +53,7 @@ export default async function BlocksPage({
       {result ? (
         <p
           role="status"
-          className="rounded-[14px] bg-primary-soft px-4 py-4 text-base leading-relaxed text-primary"
+          className="rounded-inner bg-primary-soft px-4 py-4 text-base leading-relaxed text-primary"
         >
           {result === 'unblocked'
             ? '차단을 풀었어요. 이제 이분의 마음이 사서함에 다시 보여요.'
@@ -64,7 +64,7 @@ export default async function BlocksPage({
       {error ? (
         <p
           role="alert"
-          className="rounded-[14px] bg-surface-soft px-4 py-4 text-base leading-relaxed text-ink"
+          className="rounded-inner bg-surface-soft px-4 py-4 text-base leading-relaxed text-ink"
         >
           {error}
         </p>
@@ -99,7 +99,7 @@ export default async function BlocksPage({
                 </div>
 
                 {confirming ? (
-                  <div className="flex flex-col gap-4 rounded-[14px] bg-surface-soft p-5">
+                  <div className="flex flex-col gap-4 rounded-inner bg-surface-soft p-5">
                     <h2 className="text-lg font-bold text-ink">
                       차단을 풀까요?
                     </h2>

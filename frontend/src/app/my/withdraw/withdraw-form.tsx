@@ -155,7 +155,7 @@ export function WithdrawPanel({ summary }: { summary: WithdrawRoomSummary }) {
 
       <section
         aria-labelledby="withdraw-effect-heading"
-        className="flex flex-col gap-4 rounded-[14px] bg-surface-soft px-5 py-5"
+        className="flex flex-col gap-4 rounded-inner bg-surface-soft px-5 py-5"
       >
         <h2
           id="withdraw-effect-heading"
@@ -193,7 +193,7 @@ export function WithdrawPanel({ summary }: { summary: WithdrawRoomSummary }) {
 
       <section
         aria-labelledby="withdraw-keep-heading"
-        className="flex flex-col gap-4 rounded-[14px] border border-hairline px-5 py-5"
+        className="flex flex-col gap-4 rounded-inner border border-hairline px-5 py-5"
       >
         <h2 id="withdraw-keep-heading" className="text-lg font-bold text-ink">
           그대로 남는 것
@@ -341,7 +341,7 @@ export function WithdrawPanel({ summary }: { summary: WithdrawRoomSummary }) {
           labelSuffix={`${detail.length}/${DETAIL_MAX_LENGTH}`}
         />
 
-        <div className="flex flex-col gap-4 rounded-[14px] border-2 border-primary px-5 py-5">
+        <div className="flex flex-col gap-4 rounded-inner border-2 border-primary px-5 py-5">
           <p className="text-base leading-relaxed text-ink">
             실수로 눌리지 않도록, 마지막으로 아래 문구를 그대로 적어주세요.
           </p>

@@ -21,7 +21,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
 
       {/* 아이디 로그인은 개발용 임시 수단이다 (01_PRD.md §8).
           Phase 2에서 카카오·구글·휴대폰 로그인으로 교체하고 이 화면은 사라진다. */}
-      <p className="rounded-[14px] bg-surface-soft px-4 py-3 text-base text-muted">
+      <p className="rounded-inner bg-surface-soft px-4 py-3 text-base text-muted">
         지금은 개발 중이라 아이디로 로그인해요. 정식 오픈 때는 카카오·구글·휴대폰
         번호로 바뀔 예정이에요.
       </p>

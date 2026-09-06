@@ -1,0 +1,87 @@
+<!doctype html><meta charset="utf-8"><title>로고 변형 6안</title>
+<style>
+  :root{--ink:#222;--muted:#6a6a6a;--line:#e5e8eb}
+  body{margin:0;background:#f7f8fa;font:14px/1.5 -apple-system,'Pretendard Variable',Pretendard,system-ui,sans-serif;color:var(--ink)}
+  .wrap{padding:36px 40px}
+  h1{font-size:19px;font-weight:700;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin:0 0 26px;font-size:13px}
+  h2{font-size:13px;font-weight:700;color:var(--muted);margin:30px 0 12px;letter-spacing:.02em}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+  .name{font-weight:700;font-size:14px;letter-spacing:-.02em;margin-bottom:2px}
+  .note{color:var(--muted);font-size:12px;margin-bottom:14px;min-height:32px}
+  .specs{display:flex;align-items:flex-end;gap:16px}
+  .big{flex:none}
+  .small{display:flex;flex-direction:column;align-items:center;gap:5px}
+  .cap{font-size:10px;color:var(--muted)}
+  .chip{margin-top:14px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .sw{width:15px;height:15px;border-radius:4px;border:1px solid rgba(0,0,0,.08)}
+  code{font-size:11px;color:var(--ink)}
+</style>
+<div class="wrap">
+<h1>오늘도 사랑해 — 로고 변형 6안</h1>
+<p class="sub">봉투의 V 꼭짓점 = 하트의 아래 꼭짓점. 원본 구조는 그대로 두고 색 3 / 형태 3.</p>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- 원본 마크: 하트 + 봉투 플랩 얇은 선 -->
+    <g id="m-base">
+      <path d="M25,44 A14.5,14.5 0 0 1 54,44 A14.5,14.5 0 0 1 83,44 L54,78 Z" fill="#fff"/>
+      <path d="M0,28 L54,78 L108,28" fill="none" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"/>
+    </g>
+    <!-- D1: 하트가 봉투 위로 솟음 -->
+    <g id="m-d1">
+      <path d="M25,38 A14.5,14.5 0 0 1 54,38 A14.5,14.5 0 0 1 83,38 L54,72 Z" fill="#fff"/>
+      <path d="M6,44 L54,86 L102,44" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <!-- D2: 얇은 선을 굵은 면으로 -->
+    <g id="m-d2">
+      <path d="M28,45 A13,13 0 0 1 54,45 A13,13 0 0 1 80,45 L54,75 Z" fill="#fff"/>
+      <path d="M10,32 L54,79 L98,32" fill="none" stroke="#fff" stroke-width="8.5" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <!-- D3: 하트 아래가 봉투 안으로 -->
+    <g id="m-d3">
+      <path d="M25,42 A14.5,14.5 0 0 1 54,42 A14.5,14.5 0 0 1 83,42 L54,76 Z" fill="#fff"/>
+      <path d="M8,52 L54,84 L100,52 L100,90 L8,90 Z" fill="var(--bg)"/>
+      <path d="M8,52 L54,84 L100,52" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+  </defs>
+</svg>
+
+<script>
+const V=[
+ {k:'c1',t:'색 1 — 진한 테라코타',n:'원본 색감을 유지하면서 대비만 확보. 가장 안전한 교체.',c:'#A2563A',r:'5.35:1',m:'m-base'},
+ {k:'c2',t:'색 2 — 딥 틸',n:'따뜻함을 버리고 차분함으로. 카톡 노랑 옆에서 가장 안 부딪힘.',c:'#0F5F57',r:'7.51:1',m:'m-base'},
+ {k:'c3',t:'색 3 — 짙은 감청',n:'가장 단단하고 조용함. 대비가 제일 높아 본문에도 쓰기 편함.',c:'#1B3A5C',r:'11.63:1',m:'m-base'},
+ {k:'d1',t:'형태 1 — 하트가 솟는다',n:'봉투 입구를 낮추고 하트를 위로. 담겨 있는 게 아니라 나오는 동작이 보임.',c:'#A2563A',r:'5.35:1',m:'m-d1'},
+ {k:'d2',t:'형태 2 — 선을 면으로',n:'3.2px 선은 48dp에서 사라진다. 굵은 면으로 바꿔 작은 크기를 통과시킴.',c:'#A2563A',r:'5.35:1',m:'m-d2'},
+ {k:'d3',t:'형태 3 — 봉투 안으로',n:'하트 아래가 봉투 뒤로 들어가 깊이가 생김. 보관의 뜻이 형태에 들어옴.',c:'#A2563A',r:'5.35:1',m:'m-d3'},
+];
+function icon(v,size,mode){
+  const r=size*0.225, id=v.k+'-'+size+'-'+mode;
+  const fg = mode==='mono' ? '' : `<g style="--bg:${v.c}"><use href="#${v.m}"/></g>`;
+  if(mode==='mono'){
+    return `<svg width="${size}" height="${size}" viewBox="0 0 108 108">
+      <rect width="108" height="108" fill="#222"/>
+      <g style="--bg:#222"><use href="#${v.m}"/></g></svg>`;
+  }
+  const clip = mode==='circle' ? `<clipPath id="cp${id}"><circle cx="54" cy="54" r="54"/></clipPath>`
+                               : `<clipPath id="cp${id}"><rect width="108" height="108" rx="24.3"/></clipPath>`;
+  const guide = mode==='safe' ? `<circle cx="54" cy="54" r="33" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="4 3"/>` : '';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 108 108">${clip}
+    <g clip-path="url(#cp${id})"><rect width="108" height="108" fill="${v.c}"/>${fg}</g>${guide}</svg>`;
+}
+document.write(V.map((v,i)=>(i%3===0?`${i===0?'<h2>색만 바꾼 것 — 형태 동일</h2>':'<h2>여기서 디벨롭한 것 — 색은 테라코타로 고정해 형태만 비교</h2>'}<div class="row">`:'')
+ +`<div class="card">
+    <div class="name">${v.t}</div><div class="note">${v.n}</div>
+    <div class="specs">
+      <div class="big">${icon(v,132,'sq')}</div>
+      <div class="small">${icon(v,48,'sq')}<span class="cap">48dp</span></div>
+      <div class="small">${icon(v,48,'circle')}<span class="cap">원형</span></div>
+      <div class="small">${icon(v,48,'mono')}<span class="cap">모노</span></div>
+      <div class="small">${icon(v,60,'safe')}<span class="cap">안전영역</span></div>
+    </div>
+    <div class="chip"><span class="sw" style="background:${v.c}"></span><code>${v.c}</code> · 흰 글자 ${v.r} AA</div>
+  </div>`+((i%3===2)?'</div>':'')).join(''));
+</script>
+</div>

@@ -715,7 +715,7 @@ export function CoverCropDialog({
                 width: crop.w,
                 height: cropHeight,
               }}
-              className="pointer-events-none absolute border border-white/70 shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"
+              className="pointer-events-none absolute border border-white/70 shadow-crop-mask"
             >
               {/* 삼분할 구도선. 어디를 가운데 둘지 가늠하는 눈금이다. */}
               <div aria-hidden className="absolute inset-0">

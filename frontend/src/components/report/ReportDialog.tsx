@@ -141,7 +141,7 @@ export function ReportDialog({
       <input type="hidden" name="targetId" value={targetId} />
 
       {/* 무엇을 신고하는 중인지 늘 눈에 보이게 둔다. */}
-      <section className="flex flex-col gap-2 rounded-[14px] bg-surface-soft px-5 py-4">
+      <section className="flex flex-col gap-2 rounded-inner bg-surface-soft px-5 py-4">
         <h2 className="text-base text-muted">신고할 내용</h2>
         <p className="text-lg font-medium leading-relaxed text-ink">
           {targetSummary}
@@ -280,7 +280,7 @@ export function ReportDialog({
               이대로 접수할까요?
             </h2>
 
-            <dl className="flex flex-col gap-4 rounded-[14px] border border-hairline px-5 py-4">
+            <dl className="flex flex-col gap-4 rounded-inner border border-hairline px-5 py-4">
               <div className="flex flex-col gap-1">
                 <dt className="text-base text-muted">고르신 이유</dt>
                 <dd className="text-lg font-medium text-ink">
@@ -390,7 +390,7 @@ function ResultPanel({
  */
 function BlockHint({ blockHref }: { blockHref: string | null }) {
   return (
-    <aside className="flex flex-col gap-2 rounded-[14px] bg-primary-soft px-5 py-4">
+    <aside className="flex flex-col gap-2 rounded-inner bg-primary-soft px-5 py-4">
       <h3 className="text-lg font-medium text-ink">
         지금 바로 안 보이게 하고 싶다면
       </h3>

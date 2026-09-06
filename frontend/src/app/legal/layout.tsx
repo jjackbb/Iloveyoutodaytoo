@@ -30,7 +30,7 @@ export default function LegalLayout({ children }: LayoutProps<'/legal'>) {
         */}
         <aside
           aria-label="문서 안내"
-          className="rounded-[14px] bg-primary-soft px-5 py-5 text-primary"
+          className="rounded-inner bg-primary-soft px-5 py-5 text-primary"
         >
           {/*
             일부러 제목 태그(h2)를 쓰지 않았다.

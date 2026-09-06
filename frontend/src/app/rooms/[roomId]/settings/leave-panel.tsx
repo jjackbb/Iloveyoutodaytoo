@@ -81,7 +81,7 @@ export function LeavePanel({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-[14px] bg-surface-soft p-5">
+    <div className="flex flex-col gap-4 rounded-inner bg-surface-soft p-5">
       {/* 바깥 절(section)의 제목이 h3이라 그 아래인 h4로 둔다. */}
       <h4 className="text-lg font-bold text-ink">
         ‘{roomName}’ 방에서 나갈까요?

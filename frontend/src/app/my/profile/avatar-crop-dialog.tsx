@@ -686,7 +686,7 @@ export function AvatarCropDialog({
               style={{ left: crop.x, top: crop.y, width: crop.size, height: crop.size }}
               className="pointer-events-none absolute border border-dashed border-white/35"
             >
-              <div className="absolute inset-0 overflow-hidden rounded-full border border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]">
+              <div className="absolute inset-0 overflow-hidden rounded-full border border-white/80 shadow-crop-mask">
                 {/* 삼분할 구도선. 얼굴을 어디에 둘지 가늠하는 눈금이다. 원 안쪽만 보인다. */}
                 <div aria-hidden className="absolute inset-0">
                   <div className="absolute inset-y-0 left-1/3 w-px bg-white/35" />
