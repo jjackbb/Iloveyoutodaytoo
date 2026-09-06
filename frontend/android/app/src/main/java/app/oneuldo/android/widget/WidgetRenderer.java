@@ -28,8 +28,6 @@ public final class WidgetRenderer {
 
     private WidgetRenderer() {}
 
-    private WidgetRenderer(Void unused) {}
-
     public static int[] widgetIds(Context context) {
         return AppWidgetManager
             .getInstance(context)

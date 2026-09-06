@@ -1,6 +1,10 @@
 {
   "pages": [
     {
+      "id": "page-final",
+      "name": "앨범방 카드 · 확정"
+    },
+    {
       "id": "page-card-3",
       "name": "앨범방 카드 · 3차 (뱃지·위치·아바타)"
     },
@@ -30,6 +34,14 @@
     }
   ],
   "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1120,
+      "page": "page-final"
+    },
     {
       "file": "CardU1.dc.html",
       "x": 0,
@@ -87,7 +99,7 @@
       "page": "page-card-toss"
     },
     {
-      "file": "Main.dc.html",
+      "file": "Card1.dc.html",
       "x": 0,
       "y": 0,
       "w": 390,
@@ -209,6 +221,14 @@
   ],
   "annotations": [
     {
+      "id": "guide-final",
+      "page": "page-final",
+      "x": 470,
+      "y": 0,
+      "w": 420,
+      "text": "확정 (2026-09-06)\n\n토스식 플랫 · 1px 테두리 · 반지름 16\n사진 4:3, 카드 전체\n하트 — 사진 우상단, 흰 획만. 즐겨찾기하면 채워짐\n이름 — 사진 위 좌하단, 흰 글자 + 아래 옅은 어두움\n새 마음 — 이름 옆 주황 점 (숫자 없음). 없으면 점도 없음\n아바타 — 없음. 누가 있는지는 방에 들어가면\n\n남은 것: 주황은 임시. 로고 색이 나오면 옆에 놓고 다시 본다.\n\n다른 부품(버튼·입력칸·칩·안쪽 면)은 뒤 페이지에서 골라주세요."
+    },
+    {
       "id": "guide-card-3",
       "page": "page-card-3",
       "x": 0,
@@ -267,6 +287,6 @@
   ],
   "launch": {
     "view": "canvas",
-    "page": "page-card-3"
+    "page": "page-final"
   }
 }

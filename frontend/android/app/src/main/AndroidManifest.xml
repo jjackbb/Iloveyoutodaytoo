@@ -22,7 +22,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!--
+              App Links (딥링크). 설치돼 있으면 초대 링크가 브라우저 대신 앱으로 열린다.
+              autoVerify 는 서버의 /.well-known/assetlinks.json 에 이 앱의 서명 지문이
+              있어야 통과한다 — 지문은 Vercel 환경변수 ANDROID_CERT_SHA256 로 넣는다.
+              (지문이 없으면 시스템이 "이 링크를 어떤 앱으로 열까"를 묻는 것으로 물러난다)
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="iloveyoutodaytoo.vercel.app"
+                    android:pathPrefix="/invite/" />
+            </intent-filter>
+
         </activity>
+
+        <!-- 홈 화면 위젯 (WIDGET-01). exported=true 여야 런처가 APPWIDGET_UPDATE 를 보낼 수 있다. -->
+        <receiver
+            android:name=".widget.LatestWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_latest_info" />
+        </receiver>
+
+        <!-- 위젯의 [톡톡] 단추. 우리 앱 안의 PendingIntent 만 부르므로 밖에 열지 않는다. -->
+        <receiver
+            android:name=".widget.WidgetKnockReceiver"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
