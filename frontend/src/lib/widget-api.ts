@@ -44,6 +44,8 @@ export function anonClient() {
  *
  * 키가 없으면(Vercel 환경변수 미설정) null — 사진만 빠지고 위젯은 글로 그린다.
  * 다른 곳에서 이 함수를 부르지 마라. 부르고 싶다면 그건 규칙을 바꾸는 결정이다.
+ *
+ * residue-scan-allow: service-role-key — 위젯 사진 서명 한 곳에만 허용. 사용자 승인 2026-09-06.
  */
 export function serviceClientForWidgetPhoto() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
