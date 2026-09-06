@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8"><title>로고 확정 후보</title>
+<style>
+ body{margin:0;background:#f7f8fa;font:14px/1.5 -apple-system,'Pretendard Variable',Pretendard,system-ui,sans-serif;color:#222}
+ .wrap{padding:34px 40px 60px}h1{font-size:19px;font-weight:700;margin:0 0 4px}.sub{color:#6a6a6a;margin:0 0 22px;font-size:13px}
+ .g{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+ .card{background:#fff;border:1px solid #e5e8eb;border-radius:16px;padding:16px}
+ .name{font-weight:700;font-size:14px}.note{color:#6a6a6a;font-size:12px;margin:2px 0 14px;min-height:34px}
+ .specs{display:flex;align-items:flex-end;gap:12px}.s{display:flex;flex-direction:column;align-items:center;gap:5px}.cap{font-size:10px;color:#6a6a6a}
+ img{display:block}.dark{background:#1c1c1e;border-radius:12px;padding:7px}.lite{background:#fff;border:1px solid #eee;border-radius:12px;padding:7px}
+ .home{background:#2a2a2e;border-radius:14px;padding:12px 14px;display:flex;gap:14px;align-items:center;margin-top:14px}
+ .home img{width:48px;height:48px}.k{width:48px;height:48px;border-radius:11px;background:#FEE500;display:flex;align-items:center;justify-content:center;font-size:20px}
+</style>
+<div class="wrap"><h1>오늘도 사랑해 — 두 톤 세기 비교 · #BF3F0D</h1>
+<p class="sub">봉투 앞면(플랩 아래)의 밝기만 −1 / −1.5 / −2 / −3. 하트는 전부 크림 면.</p>
+<div class="g" id="g"></div></div>
+<script>
+const V=[['1','−1 · #BA3D0D','거의 안 보임'],['15','−1.5 · #B83D0D','자세히 봐야 보임'],['2','−2 · #B53C0C','살짝'],['','−3 · #B13A0C','이전 안 (한눈에 티남)']];
+document.getElementById('g').innerHTML=V.map(([t,n,d])=>{const f=`logo/final-twotone${t?'-'+t:''}.png`;return `<div class="card"><div class="name">${n}</div><div class="note">${d}</div>
+<div class="specs"><div class="s lite"><img src="${f}" width="150"></div><div class="s"><div class="dark"><img src="${f}" width="56"></div><span class="cap">어두운 배경</span></div><div class="s"><img src="${f}" width="48"><span class="cap">48dp</span></div></div>
+<div class="home"><div class="k">💬</div><img src="${f}"></div></div>`}).join('');
+</script>

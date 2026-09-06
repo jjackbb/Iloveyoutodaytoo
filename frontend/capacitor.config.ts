@@ -56,6 +56,13 @@ const config: CapacitorConfig = {
      * (약관·개인정보 화면은 우리 도메인이라 그대로 앱 안에서 열린다)
      */
     allowMixedContent: false,
+
+    /**
+     * 서버가 "이 요청은 앱에서 왔다"를 알아보는 표식 (PRD §6⑮ 웹 폐기).
+     * 브라우저로 들어온 사람은 소개·스토어 화면으로 보내고, 앱은 그대로 통과시킨다.
+     * 판별은 src/lib/native.ts 한 곳에서만 한다 — 여기 문자열을 바꾸면 그쪽도 함께.
+     */
+    appendUserAgent: 'OneuldoApp/1.0',
   },
 }
 

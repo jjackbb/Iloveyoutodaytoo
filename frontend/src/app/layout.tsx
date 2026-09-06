@@ -2,6 +2,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata, Viewport } from 'next'
 
 import { SignupBeacon } from '@/app/signup-beacon'
+import { NativeBridge } from '@/components/native/NativeBridge'
 import { GA_ID } from '@/lib/analytics'
 import { readLargeTextCookie } from '@/lib/large-text'
 
@@ -65,6 +66,8 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
       <body className="min-h-full flex flex-col font-sans">
         {children}
         <SignupBeacon />
+        {/* 앱(Capacitor) 안에서만 일하는 다리들. 브라우저에서는 아무 것도 안 한다. */}
+        <NativeBridge />
       </body>
       {/*
         GA4. 측정 ID가 없으면 아예 붙이지 않는다 — 로컬에서 개발할 때

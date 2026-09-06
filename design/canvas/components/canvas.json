@@ -1,6 +1,10 @@
 {
   "pages": [
     {
+      "id": "page-card-toss",
+      "name": "앨범방 카드 · 토스식 3안"
+    },
+    {
       "id": "page-card",
       "name": "앨범방 카드"
     },
@@ -22,6 +26,30 @@
     }
   ],
   "artboards": [
+    {
+      "file": "CardT1.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 420,
+      "page": "page-card-toss"
+    },
+    {
+      "file": "CardT2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 460,
+      "page": "page-card-toss"
+    },
+    {
+      "file": "CardT3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 820,
+      "page": "page-card-toss"
+    },
     {
       "file": "Main.dc.html",
       "x": 0,
@@ -145,6 +173,14 @@
   ],
   "annotations": [
     {
+      "id": "guide-card-toss",
+      "page": "page-card-toss",
+      "x": 0,
+      "y": -170,
+      "w": 640,
+      "text": "앨범방 카드 · 토스식 3안 (2차)\n\n공통 — 플랫·1px 테두리·16px·토스 청회색. 커버 크게, 정보 작게, 하트는 사진 좌상단에 흰 획만(원 없음).\n달라지는 것 — 사진 비율과 정보 줄 수.\n\nT① 16:9 · 두 줄     T② 4:3 · 한 줄     T③ 1:1 · 이름만 (2열 그리드 가능)\n\n이전 3안은 아래 '앨범방 카드' 페이지에 그대로 있습니다."
+    },
+    {
       "id": "guide-card",
       "page": "page-card",
       "x": 0,
@@ -187,6 +223,6 @@
   ],
   "launch": {
     "view": "canvas",
-    "page": "page-card"
+    "page": "page-card-toss"
   }
 }
