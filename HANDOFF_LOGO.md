@@ -88,7 +88,8 @@ PRD에 "성격은 목소리·파형"이라고 적어뒀지만 **그건 절반만
 돌아가 루틴을 다시 밟았다 — **건너뛴 것이 시간을 두 배로 썼다.**
 
 1. `frontend-design-direction` — 톤앤매너·구조 방향
-2. `superdesign` — 캔버스에 시안 **2~3개**를 올려 **눈으로 비교하고 고른다**
+2. **`design`** — Claude Design 캔버스에 시안 **2~3개**를 아트보드로 올려 **눈으로 비교하고 고른다**
+   (⛔ `superdesign` 은 쓰지 않는다 — 크레딧이 들어 작업 도중 막힌다)
 3. `frontend-design` — 고른 시안을 코드로
 4. `make-interfaces-feel-better` — 여백·타이포·상태 마감
 5. chrome-devtools로 **스크린샷 검증** — "됐다" 선언 대신 스크린샷으로 증명

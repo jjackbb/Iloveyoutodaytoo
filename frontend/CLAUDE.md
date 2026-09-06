@@ -31,11 +31,14 @@
 | 단계 | 스킬 | 건너뛰면 |
 |---|---|---|
 | 2. 방향 잡기 | `frontend-design-direction` | 톤이 화면마다 달라진다 |
-| 3. 시안 비교 | `superdesign` | **결과물이 "AI스럽고 별로"가 된다** |
+| 3. 시안 비교 | **`design`**(Claude Design 캔버스) | **결과물이 "AI스럽고 별로"가 된다** |
 | 4. 구현 | `frontend-design` | 뻔한 레이아웃이 나온다 |
 
-**시안 HTML을 손으로 짜지 마라.** `superdesign` 캔버스에 올려 눈으로 비교하게 하는 것이
-이 루틴의 목적이다. 손으로 짜면 (a) 내 짐작이 시안이 되고 (b) 사용자는 고를 것이 없고
+**시안 HTML을 손으로 짜지 마라.** 캔버스에 올려 눈으로 비교하게 하는 것이
+이 루틴의 목적이다. ⛔ **`superdesign`은 쓰지 않는다**(2026-09-06) — 생성마다 유료
+크레딧이 들어 작업 도중 막힌다. 대신 **`design`** 스킬을 쓴다.
+
+손으로 짜면 (a) 내 짐작이 시안이 되고 (b) 사용자는 고를 것이 없고
 (c) 고쳐도 또 내 짐작이라 같은 자리를 맴돈다.
 
 **실제로 있었던 일(2026-08-26):** 시작 화면 리디자인에서 2·3·4번을 전부 건너뛰고
@@ -64,7 +67,7 @@ HTML 시안을 손으로 짰다. 큰 몽실이를 세 번 고쳐 세 번 다 반
 
 **현재 라우팅:** 화면 작업(신규 화면·기존 화면 개선 모두)은 전역 `~/.claude/CLAUDE.md`의
 "디자인 관문 — 화면 작업 루틴"을 따른다 — 기준 확인 → `frontend-design-direction`으로
-방향 → `superdesign`으로 시안 비교 → `frontend-design`으로 구현 → `make-interfaces-feel-better`로
+방향 → **`design`**으로 시안 비교 → `frontend-design`으로 구현 → `make-interfaces-feel-better`로
 마감 → 스크린샷 검증 → (화면 3개 이상 누적 시) `design-system` 감사.
 
 `oneuldo-port`, `prototype-extract`, `nextjs-port`, `residue-scan` 스킬은 더 이상
