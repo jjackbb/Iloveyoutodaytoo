@@ -310,7 +310,21 @@ export function MailboxTabs({ initialPage, initialBox }: MailboxTabsProps) {
                 disabled={picked.length === 0 || hiding}
                 onClick={() =>
                   startHiding(async () => {
-                    await hideHeartMessages(picked)
+                    const result = await hideHeartMessages(picked)
+
+                    /*
+                      실패하면 고른 것도 편집 모드도 그대로 둔다.
+                      전에는 결과를 보지 않고 무조건 비우고 닫았다 — 마음은 남아 있는데
+                      화면만 치워진 것처럼 굴어서, 사용자는 다시 시도할 생각조차 못 했다.
+                    */
+                    if (!result.ok) {
+                      setState((prev) => ({
+                        ...prev,
+                        [box]: { ...prev[box], error: result.error },
+                      }))
+                      return
+                    }
+
                     setPicked([])
                     setEditing(false)
                     refresh()

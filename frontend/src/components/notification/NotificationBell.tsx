@@ -7,11 +7,9 @@ import {
   deleteNotifications,
   markNotificationsRead,
 } from '@/lib/actions/notifications'
-import {
-  notificationText,
-  type AppNotification,
-} from '@/lib/notification-view'
+import { notificationText, type AppNotification } from '@/lib/notification-view'
 import { formatRelativeTime } from '@/lib/format'
+import { Toast } from '@/components/ui/Toast'
 
 /**
  * 앱바 오른쪽 알림 종 + 알림 모달 (캡처 04·05).
@@ -56,10 +54,30 @@ export function NotificationBell({ items }: { items: AppNotification[] }) {
     })
   }
 
+  const [failure, setFailure] = useState<{ text: string; key: number } | null>(
+    null,
+  )
+
   async function removePicked() {
     const ids = [...picked]
     setPicked(new Set())
-    await deleteNotifications(ids)
+
+    const result = await deleteNotifications(ids)
+
+    /*
+      실패하면 고른 것을 되돌려 놓는다. 전에는 결과를 보지 않고 비워버려서,
+      알림은 그대로 남아 있는데 고른 표시만 사라졌다 — 사용자는 지워진 줄 알았고
+      다시 지우려면 처음부터 다시 골라야 했다.
+    */
+    if (!result.ok) {
+      setPicked(new Set(ids))
+      setFailure((prev) => ({
+        text: result.error,
+        key: (prev?.key ?? 0) + 1,
+      }))
+      return
+    }
+
     router.refresh()
   }
 
@@ -152,6 +170,8 @@ export function NotificationBell({ items }: { items: AppNotification[] }) {
           </div>
         </div>
       ) : null}
+
+      {failure ? <Toast key={failure.key} message={failure.text} /> : null}
     </>
   )
 }

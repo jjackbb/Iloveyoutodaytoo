@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+import { RETRY_MESSAGE, type ActionResult } from '@/lib/action-result'
 import { requireUser } from '@/lib/auth'
 import { COVER_PRESET_LIST, isCoverPreset } from '@/lib/covers'
 import { ROOM_NAME_MAX_LENGTH } from '@/lib/limits'
@@ -158,7 +159,9 @@ export async function createRoom(
  * 다음 상태를 클라이언트가 계산해 보내지 않고 여기서 읽어서 뒤집는다.
  * 화면이 들고 있던 값이 실제와 어긋나 있으면 눌러도 안 바뀌는 것처럼 보이기 때문이다.
  */
-export async function toggleRoomFavorite(roomId: string): Promise<void> {
+export async function toggleRoomFavorite(
+  roomId: string,
+): Promise<ActionResult> {
   const user = await requireUser()
   const supabase = await createClient()
 
@@ -175,7 +178,7 @@ export async function toggleRoomFavorite(roomId: string): Promise<void> {
       '[즐겨찾기] 내 멤버십을 못 읽었다:',
       readError?.message ?? '해당 방의 멤버가 아님',
     )
-    return
+    return { ok: false, error: RETRY_MESSAGE }
   }
 
   const { error: writeError } = await supabase
@@ -185,12 +188,13 @@ export async function toggleRoomFavorite(roomId: string): Promise<void> {
 
   if (writeError) {
     console.error('[즐겨찾기] 저장 실패:', writeError.message)
-    return
+    return { ok: false, error: RETRY_MESSAGE }
   }
 
   // 목록 순서가 바뀌므로 홈을 서버에서 다시 그린다.
   // 클라이언트가 목록을 직접 고쳐 정렬하지 않는다 — 그 방식이 이 프로젝트를 한 번 엎었다.
   revalidatePath('/')
+  return { ok: true }
 }
 
 export type RoomLookState =

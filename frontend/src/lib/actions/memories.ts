@@ -23,6 +23,7 @@
 
 import { revalidatePath } from 'next/cache'
 
+import { RETRY_MESSAGE } from '@/lib/action-result'
 import { getCurrentUser, requireUser } from '@/lib/auth'
 import {
   CAPTION_MAX_LENGTH,
@@ -292,14 +293,16 @@ function revalidateRoom(roomId: string) {
  * residue-scan-allow: physical-delete — 지우는 것은 남의 기록이 아니라
  * **내가 방금 한 내 표시**다. 게시물도 남의 좋아요도 그대로 남는다.
  */
-export async function toggleMemoryLike(memoryId: string): Promise<void> {
+export async function toggleMemoryLike(
+  memoryId: string,
+): Promise<MemoryActionResult> {
   const user = await requireUser()
   const supabase = await createClient()
 
   const memory = await loadMemoryForAction(supabase, memoryId)
   if (!memory) {
     console.error('[좋아요] 게시물을 못 읽었다:', memoryId)
-    return
+    return { ok: false, error: RETRY_MESSAGE }
   }
 
   const { data: existing, error: readError } = await supabase
@@ -311,7 +314,7 @@ export async function toggleMemoryLike(memoryId: string): Promise<void> {
 
   if (readError) {
     console.error('[좋아요] 내 좋아요를 못 읽었다:', readError.message)
-    return
+    return { ok: false, error: RETRY_MESSAGE }
   }
 
   if (existing) {
@@ -321,7 +324,7 @@ export async function toggleMemoryLike(memoryId: string): Promise<void> {
       .eq('id', existing.id)
     if (error) {
       console.error('[좋아요] 취소 실패:', error.message)
-      return
+      return { ok: false, error: RETRY_MESSAGE }
     }
   } else {
     const { error } = await supabase
@@ -330,11 +333,12 @@ export async function toggleMemoryLike(memoryId: string): Promise<void> {
     // 23505 = 두 번 빨리 눌러 같은 줄이 두 번 들어간 경우. 이미 켜져 있으니 성공과 같다.
     if (error && error.code !== '23505') {
       console.error('[좋아요] 저장 실패:', error.message)
-      return
+      return { ok: false, error: RETRY_MESSAGE }
     }
   }
 
   revalidateRoom(memory.roomId)
+  return { ok: true }
 }
 
 /**

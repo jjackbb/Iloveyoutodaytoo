@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 
+import type { ActionResult } from '@/lib/action-result'
 import { getCurrentUser, requireUser } from '@/lib/auth'
 import { COVER_PRESETS, isCoverPreset } from '@/lib/covers'
 import { roomMemberName } from '@/lib/member-name'
@@ -569,14 +570,18 @@ export async function toggleHeartMessageFavorite(
 /**
  * 사서함에서 고른 마음들을 내 화면에서 치운다 (노션 IA 2.2의 편집 모드).
  *
+ * 성공/실패를 **돌려준다**. 전에는 실패해도 조용히 return 했는데, 화면은 그것도
+ * 성공으로 보고 편집 모드를 닫고 고른 것을 비웠다 — 마음은 그대로 남아 있는데
+ * 사용자는 치워진 줄 알았다. 실패를 알려야 다시 시도할 수 있다.
+ *
  * **지우는 게 아니라 치우는 것이다.** 받은 마음을 진짜로 지우면 보낸 사람의
  * '보낸 마음'에서도 사라진다. 내가 정리한 것 때문에 상대의 기록이 없어지면 안 된다.
  * 그래서 나만 안 보이게 하는 표시를 남긴다(heart_message_hides).
  *
  * 내가 주고받은 마음만 치울 수 있다 — 그 확인은 RLS가 한다. 여기서 또 하지 않는다.
  */
-export async function hideHeartMessages(ids: string[]): Promise<void> {
-  if (ids.length === 0) return
+export async function hideHeartMessages(ids: string[]): Promise<ActionResult> {
+  if (ids.length === 0) return { ok: true }
 
   const user = await requireUser()
   const supabase = await createClient()
@@ -589,8 +594,9 @@ export async function hideHeartMessages(ids: string[]): Promise<void> {
 
   if (error) {
     console.error('[사서함] 치우기 실패:', error.message)
-    return
+    return { ok: false, error: '치우지 못했어요. 잠시 후 다시 시도해주세요.' }
   }
 
   revalidatePath('/mailbox')
+  return { ok: true }
 }

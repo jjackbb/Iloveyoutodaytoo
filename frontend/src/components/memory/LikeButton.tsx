@@ -1,8 +1,9 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 
 import { toggleMemoryLike } from '@/lib/actions/memories'
+import { Toast } from '@/components/ui/Toast'
 
 /**
  * 게시물 좋아요 ♡ (캡처 22 카드 왼쪽 아래).
@@ -29,41 +30,60 @@ export function LikeButton({
 }) {
   const [pending, startTransition] = useTransition()
 
+  /*
+    실패했을 때만 쓰는 안내. 전에는 액션이 Promise<void> 라 실패해도 아무 일이
+    없었고, 화면에는 "눌렀는데 하트가 안 켜짐"으로만 보였다 — 왜인지 알 길이 없었다.
+    key 를 함께 올려서 같은 문구도 다시 뜨게 한다(Toast 는 마운트 때 한 번 탄다).
+  */
+  const [failure, setFailure] = useState<{ text: string; key: number } | null>(
+    null,
+  )
+
   return (
-    <button
-      type="button"
-      // 터치 목표 44px. 보이는 것은 하트와 숫자뿐이지만 누를 수 있는 자리는 넉넉하게 둔다.
-      // 색은 조건으로 정한다 — 변형(aria-pressed:)에 맡기면 어느 규칙이 이기는지가
-      // 클래스 정렬 순서에 달려 조용히 어긋날 수 있다.
-      className={`-mx-2 inline-flex min-h-[44px] items-center gap-1.5 rounded-inner px-2 text-sm font-medium transition-colors active:bg-surface-soft disabled:opacity-60 ${
-        liked ? 'text-primary' : 'text-muted'
-      }`}
-      // 토글이라 aria-pressed로 지금 상태를 알린다. 이름은 늘 같고 눌림 여부만 바뀐다.
-      aria-pressed={liked}
-      // 수까지 이름에 넣는다. aria-label은 안의 글자를 **덮으므로**, 넣지 않으면
-      // 낭독기 사용자에게는 몇 명이 눌렀는지가 통째로 사라진다.
-      aria-label={`${authorName}님의 추억에 좋아요 ${likeCount}개`}
-      disabled={pending}
-      onClick={() => {
-        startTransition(async () => {
-          await toggleMemoryLike(memoryId)
-        })
-      }}
-    >
-      <svg
-        width="19"
-        height="19"
-        viewBox="0 0 24 24"
-        fill={liked ? 'currentColor' : 'none'}
-        stroke="currentColor"
-        strokeWidth={1.9}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden
+    <>
+      <button
+        type="button"
+        // 터치 목표 44px. 보이는 것은 하트와 숫자뿐이지만 누를 수 있는 자리는 넉넉하게 둔다.
+        // 색은 조건으로 정한다 — 변형(aria-pressed:)에 맡기면 어느 규칙이 이기는지가
+        // 클래스 정렬 순서에 달려 조용히 어긋날 수 있다.
+        className={`-mx-2 inline-flex min-h-[44px] items-center gap-1.5 rounded-inner px-2 text-sm font-medium transition-colors active:bg-surface-soft disabled:opacity-60 ${
+          liked ? 'text-primary' : 'text-muted'
+        }`}
+        // 토글이라 aria-pressed로 지금 상태를 알린다. 이름은 늘 같고 눌림 여부만 바뀐다.
+        aria-pressed={liked}
+        // 수까지 이름에 넣는다. aria-label은 안의 글자를 **덮으므로**, 넣지 않으면
+        // 낭독기 사용자에게는 몇 명이 눌렀는지가 통째로 사라진다.
+        aria-label={`${authorName}님의 추억에 좋아요 ${likeCount}개`}
+        disabled={pending}
+        onClick={() => {
+          startTransition(async () => {
+            const result = await toggleMemoryLike(memoryId)
+            if (!result.ok) {
+              setFailure((prev) => ({
+                text: result.error,
+                key: (prev?.key ?? 0) + 1,
+              }))
+            }
+          })
+        }}
       >
-        <path d="M12 20.5S3.5 15.2 3.5 9.4A4.9 4.9 0 0 1 12 6a4.9 4.9 0 0 1 8.5 3.4c0 5.8-8.5 11.1-8.5 11.1Z" />
-      </svg>
-      <span className="tabular-nums">{likeCount}</span>
-    </button>
+        <svg
+          width="19"
+          height="19"
+          viewBox="0 0 24 24"
+          fill={liked ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          strokeWidth={1.9}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="M12 20.5S3.5 15.2 3.5 9.4A4.9 4.9 0 0 1 12 6a4.9 4.9 0 0 1 8.5 3.4c0 5.8-8.5 11.1-8.5 11.1Z" />
+        </svg>
+        <span className="tabular-nums">{likeCount}</span>
+      </button>
+
+      {failure ? <Toast key={failure.key} message={failure.text} /> : null}
+    </>
   )
 }

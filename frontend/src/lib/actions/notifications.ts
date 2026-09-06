@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 
+import { RETRY_MESSAGE, type ActionResult } from '@/lib/action-result'
 import { requireUser } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 
@@ -18,8 +19,10 @@ import { createClient } from '@/lib/supabase/server'
  */
 
 /** 지우기는 소프트 삭제다. 이 저장소는 탈퇴 말고 물리 삭제를 하지 않는다. */
-export async function deleteNotifications(ids: string[]): Promise<void> {
-  if (ids.length === 0) return
+export async function deleteNotifications(
+  ids: string[],
+): Promise<ActionResult> {
+  if (ids.length === 0) return { ok: true }
 
   await requireUser()
   const supabase = await createClient()
@@ -32,10 +35,11 @@ export async function deleteNotifications(ids: string[]): Promise<void> {
 
   if (error) {
     console.error('[알림] 지우기 실패:', error.message)
-    return
+    return { ok: false, error: RETRY_MESSAGE }
   }
 
   revalidatePath('/', 'layout')
+  return { ok: true }
 }
 
 /**
