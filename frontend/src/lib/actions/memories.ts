@@ -31,6 +31,7 @@ import {
   VOICE_MAX_SEC,
   VOICE_MIN_SEC,
 } from '@/lib/limits'
+import { HANDWRITING_MAX_DURATION_MS } from '@/lib/handwriting'
 import { sendPush } from '@/lib/push'
 import { createClient } from '@/lib/supabase/server'
 import { sanitizeLevels } from '@/lib/waveform'
@@ -39,10 +40,17 @@ export type CreateMemoryInput = {
   roomId: string
   /** media 버킷에 올라간 사진 경로들. 순서가 곧 화면 순서이고 첫 장이 대표 사진이다. */
   photoPaths: string[]
-  /** voice 버킷에 올라간 음성 경로. */
-  voicePath: string
-  /** 음성 길이(초). */
-  voiceDurationSec: number
+  /**
+   * voice 버킷에 올라간 음성 경로. **선택**이다 (2026-09-06 음성 필수 해제 — PRD §6⑯).
+   * 목소리 · 손글씨 · 사진 중 하나 이상이면 된다.
+   */
+  voicePath: string | null
+  /** 음성 길이(초). voicePath 가 없으면 null. */
+  voiceDurationSec: number | null
+  /** handwriting 버킷에 올라간 획 좌표 JSON 경로. 선택. */
+  handwritingPath?: string | null
+  /** 첫 획부터 마지막 점까지(ms). handwritingPath 가 없으면 null. */
+  handwritingDurationMs?: number | null
   /**
    * 녹음하면서 잰 파형 막대 높이(0~1). 없으면 재생바가 재생할 때 파일을 해석한다.
    * 저장해 두면 화면에 뜨자마자 파형을 그릴 수 있어 파일을 미리 받지 않아도 된다.
@@ -88,6 +96,67 @@ function isOwnRoomPath(path: string, roomId: string): boolean {
  * "사진과 음성 녹음을 모두 담아야 표현할 수 있어요"가 이 규칙이다.
  * 화면에서도 버튼을 잠가 두지만, 서버가 마지막으로 한 번 더 본다.
  */
+type VoiceCheck =
+  | { ok: true; path: string | null; durationSec: number | null }
+  | { ok: false; error: string }
+
+/**
+ * 음성 검사. 없으면(null) 그대로 통과 — 음성은 2026-09-06 부터 선택이다.
+ * 있으면 규칙은 예전과 글자 그대로 같다(경로는 이 방 것, 3~60초).
+ */
+function validateVoice(
+  rawPath: string | null | undefined,
+  rawDuration: number | null | undefined,
+  roomId: string,
+): VoiceCheck {
+  const path = rawPath?.trim() ?? ''
+  if (!path) return { ok: true, path: null, durationSec: null }
+
+  if (!isOwnRoomPath(path, roomId)) {
+    return { ok: false, error: '녹음 파일을 저장하지 못했어요. 다시 한 번 녹음해주세요.' }
+  }
+  if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration)) {
+    return { ok: false, error: '녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.' }
+  }
+  const durationSec = Math.round(rawDuration)
+  if (durationSec < VOICE_MIN_SEC) {
+    return { ok: false, error: `${VOICE_MIN_SEC}초 이상 녹음해주세요.` }
+  }
+  if (durationSec > VOICE_MAX_SEC) {
+    return { ok: false, error: `녹음은 ${VOICE_MAX_SEC}초까지 담을 수 있어요.` }
+  }
+  return { ok: true, path, durationSec }
+}
+
+type HandwritingCheck =
+  | { ok: true; path: string | null; durationMs: number | null }
+  | { ok: false; error: string }
+
+/**
+ * 손글씨 검사 (WRITE-01). 파일 안(획 좌표)은 브라우저가 만든 것을 그대로 두고,
+ * 서버는 경로가 이 방 것인지와 길이 범위(DB CHECK 와 같은 값)만 본다.
+ */
+function validateHandwriting(
+  rawPath: string | null | undefined,
+  rawDuration: number | null | undefined,
+  roomId: string,
+): HandwritingCheck {
+  const path = rawPath?.trim() ?? ''
+  if (!path) return { ok: true, path: null, durationMs: null }
+
+  if (!isOwnRoomPath(path, roomId) || !path.endsWith('.json')) {
+    return { ok: false, error: '손글씨를 저장하지 못했어요. 다시 한 번 적어주세요.' }
+  }
+  if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration)) {
+    return { ok: false, error: '손글씨를 저장하지 못했어요. 다시 한 번 적어주세요.' }
+  }
+  const durationMs = Math.round(rawDuration)
+  if (durationMs < 0 || durationMs > HANDWRITING_MAX_DURATION_MS) {
+    return { ok: false, error: '손글씨는 10분 안에 적어주세요.' }
+  }
+  return { ok: true, path, durationMs }
+}
+
 export async function createMemory(
   input: CreateMemoryInput,
 ): Promise<CreateMemoryResult> {
@@ -114,22 +183,24 @@ export async function createMemory(
     return fail('사진을 저장하지 못했어요. 다시 한 번 담아주세요.')
   }
 
-  // --- 음성 ---
-  const voicePath = input.voicePath?.trim() ?? ''
-  if (!isOwnRoomPath(voicePath, roomId)) {
-    return fail('녹음 파일을 저장하지 못했어요. 다시 한 번 녹음해주세요.')
-  }
+  // --- 음성 (선택 — 2026-09-06 음성 필수 해제) ---
+  const voice = validateVoice(input.voicePath, input.voiceDurationSec, roomId)
+  if (!voice.ok) return fail(voice.error)
 
-  const rawDuration = input.voiceDurationSec
-  if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration)) {
-    return fail('녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.')
-  }
-  const voiceDurationSec = Math.round(rawDuration)
-  if (voiceDurationSec < VOICE_MIN_SEC) {
-    return fail(`${VOICE_MIN_SEC}초 이상 녹음해주세요.`)
-  }
-  if (voiceDurationSec > VOICE_MAX_SEC) {
-    return fail(`녹음은 ${VOICE_MAX_SEC}초까지 담을 수 있어요.`)
+  // --- 손글씨 (선택, WRITE-01) ---
+  const handwriting = validateHandwriting(
+    input.handwritingPath,
+    input.handwritingDurationMs,
+    roomId,
+  )
+  if (!handwriting.ok) return fail(handwriting.error)
+
+  /*
+    하나 이상. 문제 정의가 "쑥스러워서 표현을 못 하는 사람"인데 가장 쑥스러운 일
+    (목소리 녹음)을 강제하고 있었다(PRD §6⑯). 셋 중 무엇이든 하나면 마음이다.
+  */
+  if (!voice.path && !handwriting.path && photoPaths.length === 0) {
+    return fail('목소리 · 손글씨 · 사진 중 하나는 담아주세요.')
   }
 
   // --- 문구 (선택) ---
@@ -165,9 +236,11 @@ export async function createMemory(
       room_id: roomId,
       author_id: user.id, // RLS가 auth.uid()와 같은지 확인한다. 반드시 명시.
       description: caption || null,
-      voice_path: voicePath,
-      voice_duration_sec: voiceDurationSec,
-      voice_levels: sanitizeLevels(input.voiceLevels),
+      voice_path: voice.path,
+      voice_duration_sec: voice.durationSec,
+      voice_levels: voice.path ? sanitizeLevels(input.voiceLevels) : null,
+      handwriting_path: handwriting.path,
+      handwriting_duration_ms: handwriting.durationMs,
       // media_url은 넣지 않는다 — 사진은 아래 memory_photos가 맡는다(컬럼 주석 참고).
     })
     .select('id')
@@ -425,9 +498,12 @@ export type UpdateMemoryInput = {
   memoryId: string
   /** 화면에 놓인 순서 그대로의 사진 경로. 그대로 두는 사진과 새로 올린 사진이 섞여 있다. */
   photoPaths: string[]
-  voicePath: string
-  voiceDurationSec: number
+  /** 선택. 규칙은 CreateMemoryInput 과 같다 — 목소리 · 손글씨 · 사진 중 하나 이상. */
+  voicePath: string | null
+  voiceDurationSec: number | null
   voiceLevels?: number[] | null
+  handwritingPath?: string | null
+  handwritingDurationMs?: number | null
   caption?: string | null
 }
 
@@ -473,21 +549,24 @@ export async function updateMemory(
     return fail('사진을 저장하지 못했어요. 다시 한 번 담아주세요.')
   }
 
-  // --- 음성 ---
-  const voicePath = input.voicePath?.trim() ?? ''
-  if (!isOwnRoomPath(voicePath, roomId)) {
-    return fail('녹음 파일을 저장하지 못했어요. 다시 한 번 녹음해주세요.')
-  }
-  const rawDuration = input.voiceDurationSec
-  if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration)) {
-    return fail('녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.')
-  }
-  const voiceDurationSec = Math.round(rawDuration)
-  if (voiceDurationSec < VOICE_MIN_SEC) {
-    return fail(`${VOICE_MIN_SEC}초 이상 녹음해주세요.`)
-  }
-  if (voiceDurationSec > VOICE_MAX_SEC) {
-    return fail(`녹음은 ${VOICE_MAX_SEC}초까지 담을 수 있어요.`)
+  // --- 음성 (선택 — 2026-09-06 음성 필수 해제) ---
+  const voice = validateVoice(input.voicePath, input.voiceDurationSec, roomId)
+  if (!voice.ok) return fail(voice.error)
+
+  // --- 손글씨 (선택, WRITE-01) ---
+  const handwriting = validateHandwriting(
+    input.handwritingPath,
+    input.handwritingDurationMs,
+    roomId,
+  )
+  if (!handwriting.ok) return fail(handwriting.error)
+
+  /*
+    하나 이상. 문제 정의가 "쑥스러워서 표현을 못 하는 사람"인데 가장 쑥스러운 일
+    (목소리 녹음)을 강제하고 있었다(PRD §6⑯). 셋 중 무엇이든 하나면 마음이다.
+  */
+  if (!voice.path && !handwriting.path && photoPaths.length === 0) {
+    return fail('목소리 · 손글씨 · 사진 중 하나는 담아주세요.')
   }
 
   // --- 문구 (선택) ---
@@ -503,7 +582,7 @@ export async function updateMemory(
     .eq('memory_id', memory.id)
   const { data: beforeMemory } = await supabase
     .from('memories')
-    .select('voice_path')
+    .select('voice_path, handwriting_path')
     .eq('id', memory.id)
     .maybeSingle()
 
@@ -511,9 +590,11 @@ export async function updateMemory(
     .from('memories')
     .update({
       description: caption || null,
-      voice_path: voicePath,
-      voice_duration_sec: voiceDurationSec,
-      voice_levels: sanitizeLevels(input.voiceLevels),
+      voice_path: voice.path,
+      voice_duration_sec: voice.durationSec,
+      voice_levels: voice.path ? sanitizeLevels(input.voiceLevels) : null,
+      handwriting_path: handwriting.path,
+      handwriting_duration_ms: handwriting.durationMs,
     })
     .eq('id', memory.id)
 
@@ -570,9 +651,17 @@ export async function updateMemory(
   }
 
   const staleVoice = beforeMemory?.voice_path
-  if (staleVoice && staleVoice !== voicePath) {
+  if (staleVoice && staleVoice !== voice.path) {
     const { error } = await supabase.storage.from('voice').remove([staleVoice])
     if (error) console.error('[추억 고치기] 옛 녹음 삭제 실패:', error.message)
+  }
+
+  const staleHandwriting = beforeMemory?.handwriting_path
+  if (staleHandwriting && staleHandwriting !== handwriting.path) {
+    const { error } = await supabase.storage
+      .from('handwriting')
+      .remove([staleHandwriting])
+    if (error) console.error('[추억 고치기] 옛 손글씨 삭제 실패:', error.message)
   }
 
   revalidateRoom(roomId)

@@ -5,6 +5,7 @@ import { CommentBar } from './comment-bar'
 import { CommentList } from './comment-list'
 import { PhotoPager } from './photo-pager'
 import { VoicePlayer } from '@/components/media/VoicePlayer'
+import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
 import { LikeButton } from '@/components/memory/LikeButton'
 import { MemoryMenu } from '@/components/memory/MemoryMenu'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
@@ -138,6 +139,21 @@ export default async function MemoryDetailPage({
           {detail.caption ? (
             <p className="pt-4 text-base leading-relaxed break-keep whitespace-pre-wrap text-ink">
               {detail.caption}
+            </p>
+          ) : null}
+
+          {/* 손글씨 — 열자마자 쓰는 과정이 지나간 뒤 결과가 남는다 (WRITE-02). */}
+          {detail.handwritingUrl ? (
+            <div className="pt-4">
+              <HandwritingPlayer
+                src={detail.handwritingUrl}
+                label={`${detail.authorName}님의 손글씨`}
+                autoPlay
+              />
+            </div>
+          ) : detail.handwritingDurationMs !== null ? (
+            <p className="pt-4 text-sm text-muted">
+              손글씨를 불러오지 못했어요. 잠시 후 다시 열어주세요.
             </p>
           ) : null}
 

@@ -48,7 +48,7 @@ const REASON_MAX_LENGTH = 200
  * ⚠️ avatars는 여기 넣으면 안 된다. 경로 규약이 `{user_id}/파일명`이라
  * 방 id로 뒤지면 아무것도 못 찾는다. collectFilesToRemove 가 이 통만 따로 훑는다.
  */
-const FILE_BUCKETS = ['voice', 'media', 'covers'] as const
+const FILE_BUCKETS = ['voice', 'media', 'covers', 'handwriting'] as const
 
 /** 프로필 사진 통. 경로 규약이 `{user_id}/파일명`이라 위 셋과 지우는 방법이 다르다. */
 const AVATAR_BUCKET = 'avatars'

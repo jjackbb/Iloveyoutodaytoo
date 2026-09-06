@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { VoicePlayer } from '@/components/media/VoicePlayer'
+import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
 import { LikeButton } from '@/components/memory/LikeButton'
 import { MemoryMenu } from '@/components/memory/MemoryMenu'
 import { formatRelativeTime } from '@/lib/format'
@@ -54,6 +55,10 @@ export interface MemoryCardProps {
   voiceDurationSec: number | null
   /** 녹음할 때 재어 둔 파형 막대 높이. 없으면 재생바가 재생할 때 파일을 해석한다. */
   voiceLevels?: number[] | null
+  /** 서명된 handwriting 버킷 주소(획 좌표 JSON). 못 만들었으면 null. */
+  handwritingUrl?: string | null
+  /** 손글씨가 있는지(DB 기준). url 이 없는데 이 값이 있으면 "불러오지 못했어요"로 흐른다. */
+  handwritingDurationMs?: number | null
   likeCount: number
   /** 이 화면을 보는 사람이 좋아요를 눌렀는지. 사람마다 다르다. */
   likedByMe: boolean
@@ -79,6 +84,8 @@ export function MemoryCard({
   voiceUrl,
   voiceDurationSec,
   voiceLevels = null,
+  handwritingUrl = null,
+  handwritingDurationMs = null,
   likeCount,
   likedByMe,
   commentCount,
@@ -164,6 +171,20 @@ export function MemoryCard({
       {caption ? (
         <p className="px-4 pt-3.5 text-base leading-relaxed break-keep whitespace-pre-wrap text-ink">
           {caption}
+        </p>
+      ) : null}
+
+      {/*
+        손글씨 (WRITE-01). 피드에서는 다 쓴 그림을 보여주고, 누르면 쓰는 과정이 다시 지나간다.
+        상세는 열자마자 재생한다 — 그 차이는 autoPlay 하나뿐이다.
+      */}
+      {handwritingUrl ? (
+        <div className="px-4 pt-3.5">
+          <HandwritingPlayer src={handwritingUrl} label={`${authorName}님의 손글씨`} />
+        </div>
+      ) : handwritingDurationMs !== null ? (
+        <p className="px-4 pt-3.5 text-sm text-muted">
+          손글씨를 불러오지 못했어요. 잠시 후 다시 열어주세요.
         </p>
       ) : null}
 

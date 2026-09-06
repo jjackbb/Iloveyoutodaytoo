@@ -16,6 +16,13 @@ import {
 import { Button } from '@/components/ui/Button'
 import { controlClassName } from '@/components/ui/Field'
 import { createMemory, updateMemory } from '@/lib/actions/memories'
+import { HandwritingPad } from '@/components/handwriting/HandwritingPad'
+import {
+  HANDWRITING_BUCKET,
+  isHandwritingDoc,
+  serializeHandwriting,
+  type HandwritingDoc,
+} from '@/lib/handwriting'
 import { track } from '@/lib/analytics'
 import { resizePhoto } from '@/lib/image'
 import { CAPTION_MAX_LENGTH, PHOTO_MAX_COUNT } from '@/lib/limits'
@@ -435,12 +442,29 @@ function usePhotoReorder(
  * 고치기로 들어올 때 서버가 넘겨주는 지금 상태 (노션 IA 3.8).
  * 없으면 새로 남기는 화면이다 — 이 파일의 기본 동작은 그대로다.
  */
+/**
+ * 물린 손글씨 파일을 버킷에서 지운다. 실패해도 조용히 — 고아 파일이 남을 뿐 화면은 멀쩡하다.
+ * (목소리의 discardUploads 와 같은 역할. 버킷이 달라 따로 둔다)
+ */
+async function discardHandwriting(path: string) {
+  try {
+    const { error } = await createClient()
+      .storage.from(HANDWRITING_BUCKET)
+      .remove([path])
+    if (error) console.error('[마음 표현하기] 손글씨 정리 실패:', error.message)
+  } catch (cause) {
+    console.error('[마음 표현하기] 손글씨 정리 중 예외:', cause)
+  }
+}
+
 export type ComposeInitial = {
   memoryId: string
   /** 지금 붙어 있는 사진들. 순서 그대로다. */
   photos: { path: string; url: string }[]
-  /** 지금 붙어 있는 목소리. 서명된 주소로 브라우저가 파일을 받아 온다. */
-  voice: { path: string; url: string; durationSec: number; levels: number[] | null }
+  /** 지금 붙어 있는 목소리. 없으면 null (2026-09-06 부터 목소리는 선택). */
+  voice: { path: string; url: string; durationSec: number; levels: number[] | null } | null
+  /** 지금 붙어 있는 손글씨(획 좌표 JSON). 없으면 null. */
+  handwriting: { path: string; url: string; durationMs: number } | null
   caption: string
 }
 
@@ -463,6 +487,7 @@ export function ComposeForm({
     })),
   )
   const [recording, setRecording] = useState<VoiceRecording | null>(null)
+  const [handwriting, setHandwriting] = useState<HandwritingDoc | null>(null)
   const [caption, setCaption] = useState(initial?.caption ?? '')
   const [phase, setPhase] = useState<Phase>('editing')
   const [notice, setNotice] = useState<string | null>(null)
@@ -475,6 +500,7 @@ export function ComposeForm({
    */
   const uploadedPhotoPathsRef = useRef(new Map<string, string>())
   const uploadedVoicePathRef = useRef<string | null>(null)
+  const uploadedHandwritingPathRef = useRef<string | null>(null)
 
   /**
    * 고치기로 들어왔을 때, 지금 화면의 목소리가 **원래 그 게시물의 것**인가.
@@ -484,10 +510,19 @@ export function ComposeForm({
    * 저장하지 않고 나가면 그 게시물의 목소리가 통째로 사라지기 때문이다.
    * 쓰이지 않게 된 옛 파일은 저장이 끝난 뒤 서버(updateMemory)가 지운다.
    */
-  const [voiceIsOriginal, setVoiceIsOriginal] = useState(editing)
+  const [voiceIsOriginal, setVoiceIsOriginal] = useState(
+    editing && Boolean(initial?.voice),
+  )
+  /** 손글씨도 같은 규칙 — 원래 것이면 다시 올리지 않고, 새로 쓰면 새 파일. */
+  const [handwritingIsOriginal, setHandwritingIsOriginal] = useState(
+    editing && Boolean(initial?.handwriting),
+  )
 
   /** 원래 목소리를 아직 받아오는 중인가(고치기 화면에서 잠깐). */
-  const [loadingVoice, setLoadingVoice] = useState(editing)
+  const [loadingVoice, setLoadingVoice] = useState(editing && Boolean(initial?.voice))
+  const [loadingHandwriting, setLoadingHandwriting] = useState(
+    editing && Boolean(initial?.handwriting),
+  )
 
   /** 저장이 끝났는지. 끝났으면 올라간 파일은 게시물의 것이라 건드리면 안 된다. */
   const committedRef = useRef(false)
@@ -533,13 +568,16 @@ export function ComposeForm({
     // 정리할 때 읽으면 **떠나는 순간의 최신 값**이 나온다.
     const photoPaths = uploadedPhotoPathsRef.current
     const voicePath = uploadedVoicePathRef
+    const handwritingPath = uploadedHandwritingPathRef
     const committed = committedRef
 
     return () => {
       if (committed.current) return
       void discardUploads([...photoPaths.values()], voicePath.current)
+      if (handwritingPath.current) void discardHandwriting(handwritingPath.current)
       photoPaths.clear()
       voicePath.current = null
+      handwritingPath.current = null
     }
   }, [])
 
@@ -564,6 +602,19 @@ export function ComposeForm({
     }
   }, [])
 
+  /**
+   * 손글씨가 바뀌면(획을 더하거나 되돌리거나) 앞서 올려 둔 파일은 물린다 —
+   * 녹음(handleRecordingChange)과 같은 이유. 원래 것과 다르니 originals 표시도 내린다.
+   */
+  const handleHandwritingChange = useCallback((next: HandwritingDoc | null) => {
+    const stale = uploadedHandwritingPathRef.current
+    uploadedHandwritingPathRef.current = null
+    if (stale) void discardHandwriting(stale)
+    setHandwritingIsOriginal(false)
+    setHandwriting(next)
+    if (next && stageRef.current === 'open') stageRef.current = 'capturing'
+  }, [])
+
   /*
     고치기로 들어왔으면 원래 목소리를 받아와 화면에 올려둔다.
 
@@ -572,12 +623,13 @@ export function ComposeForm({
     60초짜리라 크지 않다.
   */
   useEffect(() => {
-    if (!initial) return
+    const initialVoice = initial?.voice
+    if (!initialVoice) return
     let cancelled = false
 
     void (async () => {
       try {
-        const response = await fetch(initial.voice.url)
+        const response = await fetch(initialVoice.url)
         if (!response.ok) throw new Error(`voice-fetch-${response.status}`)
         const blob = await response.blob()
         if (cancelled) return
@@ -585,10 +637,10 @@ export function ComposeForm({
         const mimeType = blob.type || 'audio/webm'
         setRecording({
           blob,
-          durationSec: initial.voice.durationSec,
+          durationSec: initialVoice.durationSec,
           mimeType,
           extension: mimeType.split('/')[1]?.split(';')[0] || 'webm',
-          levels: initial.voice.levels,
+          levels: initialVoice.levels,
         })
       } catch (loadError) {
         // 못 받아왔으면 새로 녹음하는 수밖에 없다. 화면을 막지는 않는다.
@@ -604,8 +656,40 @@ export function ComposeForm({
     }
   }, [initial])
 
+  /* 고치기로 들어왔으면 원래 손글씨(획 좌표)도 받아와 판에 올려둔다. 목소리와 같은 길. */
+  useEffect(() => {
+    const initialHandwriting = initial?.handwriting
+    if (!initialHandwriting) return
+    let cancelled = false
+
+    void (async () => {
+      try {
+        const response = await fetch(initialHandwriting.url)
+        if (!response.ok) throw new Error(`handwriting-fetch-${response.status}`)
+        const json: unknown = await response.json()
+        if (cancelled) return
+        if (!isHandwritingDoc(json)) throw new Error('handwriting-shape')
+        setHandwriting(json)
+      } catch (loadError) {
+        console.error('[추억 고치기] 원래 손글씨 불러오기 실패:', loadError)
+        if (!cancelled) setHandwritingIsOriginal(false)
+      } finally {
+        if (!cancelled) setLoadingHandwriting(false)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [initial])
+
+  /*
+    하나 이상이면 된다 — 목소리 · 손글씨 · 사진 (2026-09-06 음성 필수 해제, PRD §6⑯).
+    전에는 "음성 3초"가 유일한 조건이었다. 가장 쑥스러운 일을 가장 먼저 시키고 있었다.
+  */
   const canSubmit =
-    recording !== null && caption.trim().length <= CAPTION_MAX_LENGTH
+    (recording !== null || handwriting !== null || photos.length > 0) &&
+    caption.trim().length <= CAPTION_MAX_LENGTH
 
   /*
     올릴 준비가 처음 끝난 순간. 몽실이의 "담기"에 해당한다.
@@ -699,7 +783,7 @@ export function ComposeForm({
   )
 
   const submit = useCallback(async () => {
-    if (!canSubmit || busy || !recording) return
+    if (!canSubmit || busy) return
 
     setError(null)
     setNotice(null)
@@ -737,18 +821,31 @@ export function ComposeForm({
         photoPaths.push(path)
       }
 
-      // 음성
-      // 원래 목소리를 그대로 두는 경우에는 올릴 것이 없다.
-      let voicePath = voiceIsOriginal && initial ? initial.voice.path : uploadedVoicePathRef.current
-      if (!voicePath) {
+      // 음성 (선택). 원래 목소리를 그대로 두는 경우에는 올릴 것이 없다.
+      let voicePath: string | null =
+        voiceIsOriginal && initial?.voice
+          ? initial.voice.path
+          : uploadedVoicePathRef.current
+      if (!voicePath && recording) {
         voicePath = `${roomId}/${randomFileId()}.${recording.extension}`
-        await upload(
-          VOICE_BUCKET,
-          voicePath,
-          recording.blob,
-          recording.mimeType,
-        )
+        await upload(VOICE_BUCKET, voicePath, recording.blob, recording.mimeType)
         uploadedVoicePathRef.current = voicePath
+      }
+
+      // 손글씨 (선택). 획 좌표 JSON 을 올린다 — 목소리와 같은 길, 다른 버킷.
+      let handwritingPath: string | null =
+        handwritingIsOriginal && initial?.handwriting
+          ? initial.handwriting.path
+          : uploadedHandwritingPathRef.current
+      if (!handwritingPath && handwriting) {
+        handwritingPath = `${roomId}/${randomFileId()}.json`
+        await upload(
+          HANDWRITING_BUCKET,
+          handwritingPath,
+          serializeHandwriting(handwriting),
+          'application/json',
+        )
+        uploadedHandwritingPathRef.current = handwritingPath
       }
 
       // 저장. 서버가 마지막으로 값들을 확인한다.
@@ -756,9 +853,11 @@ export function ComposeForm({
         const payload = {
           photoPaths,
           voicePath,
-          voiceDurationSec: recording.durationSec,
+          voiceDurationSec: recording?.durationSec ?? null,
           // 녹음하면서 이미 잰 값. 저장해 두면 피드가 파일을 안 받고도 파형을 그린다.
-          voiceLevels: recording.levels,
+          voiceLevels: recording?.levels ?? null,
+          handwritingPath,
+          handwritingDurationMs: handwriting?.durationMs ?? null,
           caption: caption.trim() || null,
         }
 
@@ -823,6 +922,8 @@ export function ComposeForm({
     initial,
     photos,
     recording,
+    handwriting,
+    handwritingIsOriginal,
     roomId,
     router,
     upload,
@@ -967,11 +1068,26 @@ export function ComposeForm({
           {/* 함께 담을 목소리 (캡처 12·16·18) */}
           <section aria-labelledby="voice-label" className="flex flex-col gap-2">
             <h2 id="voice-label" className="text-base font-bold text-ink">
-              함께 담을 목소리
+              목소리 <span className="font-medium text-muted">(선택)</span>
             </h2>
             <VoiceRecorder
               value={recording}
               onChange={handleRecordingChange}
+              disabled={busy}
+            />
+          </section>
+
+          {/*
+            손글씨 (WRITE-01, 2026-09-06 결정). 목소리 녹음이 쑥스러운 사람의 길.
+            겉모습은 임시 — 브랜드가 정해지면 디자인 관문을 밟는다.
+          */}
+          <section aria-labelledby="handwriting-label" className="flex flex-col gap-2">
+            <h2 id="handwriting-label" className="text-base font-bold text-ink">
+              손글씨 <span className="font-medium text-muted">(선택)</span>
+            </h2>
+            <HandwritingPad
+              value={handwriting}
+              onChange={handleHandwritingChange}
               disabled={busy}
             />
           </section>
@@ -1011,12 +1127,12 @@ export function ComposeForm({
             고치기로 들어와 원래 목소리를 아직 받아오는 중. 이 동안 [저장하기]가 꺼져 있는데
             이유를 말해주지 않으면 고장으로 읽힌다.
           */}
-          {loadingVoice ? (
+          {loadingVoice || loadingHandwriting ? (
             <p
               role="status"
               className="rounded-inner bg-surface-soft px-4 py-3 text-base leading-relaxed text-muted"
             >
-              담아둔 목소리를 불러오는 중이에요…
+              담아둔 것을 불러오는 중이에요…
             </p>
           ) : null}
 

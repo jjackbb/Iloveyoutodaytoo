@@ -32,7 +32,7 @@ export default async function EditMemoryPage({
   const { data: memory } = await supabase
     .from('memories')
     .select(
-      'id, author_id, description, voice_path, voice_duration_sec, voice_levels, photos:memory_photos(storage_path, sort_order)',
+      'id, author_id, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, photos:memory_photos(storage_path, sort_order)',
     )
     .eq('id', memoryId)
     .eq('room_id', roomId)
@@ -52,13 +52,21 @@ export default async function EditMemoryPage({
     .map((row) => row.storage_path)
     .filter((path): path is string => Boolean(path))
 
-  const [photoUrlByPath, voiceUrlByPath] = await Promise.all([
+  const [photoUrlByPath, voiceUrlByPath, handwritingUrlByPath] = await Promise.all([
     signPaths(supabase, 'media', photoPaths),
     signPaths(supabase, 'voice', memory.voice_path ? [memory.voice_path] : []),
+    signPaths(
+      supabase,
+      'handwriting',
+      memory.handwriting_path ? [memory.handwriting_path] : [],
+    ),
   ])
 
   const voiceUrl = memory.voice_path
     ? (voiceUrlByPath.get(memory.voice_path) ?? null)
+    : null
+  const handwritingUrl = memory.handwriting_path
+    ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
     : null
 
   /*
@@ -70,7 +78,15 @@ export default async function EditMemoryPage({
     .map((path) => ({ path, url: photoUrlByPath.get(path) }))
     .filter((photo): photo is { path: string; url: string } => Boolean(photo.url))
 
-  if (photos.length === 0 || !memory.voice_path || !voiceUrl) redirect(backHref)
+  /*
+    2026-09-06 음성 필수 해제 — 목소리 · 손글씨 · 사진 중 하나 이상이면 게시물이다.
+    있는 것의 주소를 못 만들었을 때만 돌려보낸다("그대로 두기"로 저장하면 그것이 사라진다).
+  */
+  const voiceBroken = Boolean(memory.voice_path) && !voiceUrl
+  const handwritingBroken = Boolean(memory.handwriting_path) && !handwritingUrl
+  const photosBroken = photoPaths.length > 0 && photos.length === 0
+  const nothing = photos.length === 0 && !memory.voice_path && !memory.handwriting_path
+  if (voiceBroken || handwritingBroken || photosBroken || nothing) redirect(backHref)
 
   return (
     <div className="flex h-[100dvh] flex-col">
@@ -85,12 +101,23 @@ export default async function EditMemoryPage({
         initial={{
           memoryId,
           photos,
-          voice: {
-            path: memory.voice_path,
-            url: voiceUrl,
-            durationSec: memory.voice_duration_sec ?? 0,
-            levels: memory.voice_levels,
-          },
+          voice:
+            memory.voice_path && voiceUrl
+              ? {
+                  path: memory.voice_path,
+                  url: voiceUrl,
+                  durationSec: memory.voice_duration_sec ?? 0,
+                  levels: memory.voice_levels,
+                }
+              : null,
+          handwriting:
+            memory.handwriting_path && handwritingUrl
+              ? {
+                  path: memory.handwriting_path,
+                  url: handwritingUrl,
+                  durationMs: memory.handwriting_duration_ms ?? 0,
+                }
+              : null,
           caption: memory.description ?? '',
         }}
       />

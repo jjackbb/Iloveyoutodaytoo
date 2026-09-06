@@ -27,7 +27,7 @@ export const GRID_SLOTS = 3
  * 결과가 unknown이 된다. `as const`라 리터럴 타입이 그대로 전달된다.
  */
 export const MEMORY_CARD_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 위 select가 돌려주는 한 줄. 조회는 화면마다 다르지만 이 모양은 같다. */
 export type MemoryRow = {
@@ -38,6 +38,9 @@ export type MemoryRow = {
   voice_duration_sec: number | null
   /** 녹음할 때 재어 둔 파형 막대 높이. 없으면 재생바가 재생할 때 파일을 해석한다. */
   voice_levels: number[] | null
+  /** 손글씨 획 좌표 파일(handwriting 버킷). 없으면 null. */
+  handwriting_path: string | null
+  handwriting_duration_ms: number | null
   author_id: string | null
   pinned_at: string | null
   author: { id: string; name: string } | null
@@ -68,7 +71,7 @@ export function isRoomPath(path: string | null, roomId: string): path is string 
  */
 export async function signPaths(
   supabase: Supabase,
-  bucket: 'media' | 'voice',
+  bucket: 'media' | 'voice' | 'handwriting',
   paths: string[],
 ): Promise<Map<string, string>> {
   const urlByPath = new Map<string, string>()
@@ -215,12 +218,20 @@ export async function buildMemoryCards(options: {
         .filter((path): path is string => isRoomPath(path, roomId)),
     ),
   )
+  const handwritingPaths = Array.from(
+    new Set(
+      sorted
+        .map(({ memory }) => memory.handwriting_path)
+        .filter((path): path is string => isRoomPath(path, roomId)),
+    ),
+  )
 
   const memoryIds = sorted.map(({ memory }) => memory.id)
 
   const [
     photoUrlByPath,
     voiceUrlByPath,
+    handwritingUrlByPath,
     likesResult,
     savesResult,
     nicknameByUser,
@@ -228,6 +239,7 @@ export async function buildMemoryCards(options: {
   ] = await Promise.all([
     signPaths(supabase, 'media', photoPaths),
     signPaths(supabase, 'voice', voicePaths),
+    signPaths(supabase, 'handwriting', handwritingPaths),
     supabase
       .from('memory_likes')
       // 누가 눌렀는지까지 가져와야 **내 하트가 채워졌는지**를 알 수 있다.
@@ -301,6 +313,10 @@ export async function buildMemoryCards(options: {
         : null,
       voiceDurationSec: memory.voice_duration_sec,
       voiceLevels: memory.voice_levels,
+      handwritingUrl: isRoomPath(memory.handwriting_path, roomId)
+        ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
+        : null,
+      handwritingDurationMs: memory.handwriting_duration_ms,
       likeCount: likeCountByMemory.get(memory.id) ?? 0,
       likedByMe: likedByMe.has(memory.id),
       commentCount: commentCountByMemory.get(memory.id) ?? 0,
@@ -355,6 +371,9 @@ export type MemoryDetailView = {
   voiceDurationSec: number | null
   /** 녹음할 때 재어 둔 파형 막대 높이. 없으면 재생할 때 파일을 해석한다. */
   voiceLevels: number[] | null
+  /** 서명된 handwriting 버킷 주소. 못 만들었으면 null. */
+  handwritingUrl: string | null
+  handwritingDurationMs: number | null
   likeCount: number
   likedByMe: boolean
   isPinned: boolean
@@ -364,7 +383,7 @@ export type MemoryDetailView = {
 
 /** 상세에서 읽는 컬럼들. 카드와 달리 사진 수를 자르지 않는다(한 줄로 둔다 — 타입 추론). */
 const MEMORY_DETAIL_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 댓글 한 줄을 읽을 때 쓰는 컬럼들. */
 const COMMENT_SELECT =
@@ -436,10 +455,21 @@ export async function loadMemoryDetail(options: {
     ),
   )
 
-  const [photoUrlByPath, voiceUrlByPath, likesResult, saveResult, nicknameByUser] =
-    await Promise.all([
+  const handwritingPaths = isRoomPath(memory.handwriting_path, roomId)
+    ? [memory.handwriting_path]
+    : []
+
+  const [
+    photoUrlByPath,
+    voiceUrlByPath,
+    handwritingUrlByPath,
+    likesResult,
+    saveResult,
+    nicknameByUser,
+  ] = await Promise.all([
       signPaths(supabase, 'media', photoPaths),
       signPaths(supabase, 'voice', voicePaths),
+      signPaths(supabase, 'handwriting', handwritingPaths),
       supabase.from('memory_likes').select('user_id').eq('memory_id', memoryId),
       supabase
         .from('memory_saves')
@@ -483,6 +513,10 @@ export async function loadMemoryDetail(options: {
       : null,
     voiceDurationSec: memory.voice_duration_sec,
     voiceLevels: memory.voice_levels,
+    handwritingUrl: isRoomPath(memory.handwriting_path, roomId)
+      ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
+      : null,
+    handwritingDurationMs: memory.handwriting_duration_ms,
     likeCount: likes.length,
     likedByMe: likes.some((like) => like.user_id === viewerId),
     isPinned: memory.pinned_at !== null,
