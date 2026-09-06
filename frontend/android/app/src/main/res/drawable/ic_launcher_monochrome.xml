@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 테마 아이콘(Android 13+) 단색 레이어. 하트 + 봉투 플랩 선. 좌표계는 public/brand/logo.svg 와 같다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="370.1" android:viewportHeight="373.0">
+    <path android:fillColor="#000000" android:pathData="M-40,67.5 L184,291.5 L184,309.5 L-40,85.5 Z"/>
+    <path android:fillColor="#000000" android:pathData="M410.1,65.4 L184,291.5 L184,309.5 L410.1,83.4 Z"/>
+    <path android:fillColor="#000000" android:pathData="M64.1,190.1 A74.2,74.2 0 0 1 135.6,96.1 C161.6,96.1 182.0,126.0 184.0,128.0 C186.0,126.0 206.4,96.1 232.4,96.1 A74.2,74.2 0 0 1 303.9,190.1 L198.1,295.9 A20,20 0 0 1 169.9,295.9 Z"/>
+</vector>

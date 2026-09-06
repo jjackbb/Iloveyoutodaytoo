@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#5b4be0',
+  themeColor: '#bf3f0d',
   // 시니어 사용자가 확대해서 볼 수 있어야 하므로 확대를 막지 않는다
   initialScale: 1,
   width: 'device-width',
