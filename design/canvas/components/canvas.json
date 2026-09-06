@@ -1,6 +1,10 @@
 {
   "pages": [
     {
+      "id": "page-card-3",
+      "name": "앨범방 카드 · 3차 (뱃지·위치·아바타)"
+    },
+    {
       "id": "page-card-toss",
       "name": "앨범방 카드 · 토스식 3안"
     },
@@ -26,6 +30,38 @@
     }
   ],
   "artboards": [
+    {
+      "file": "CardU1.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 450,
+      "page": "page-card-3"
+    },
+    {
+      "file": "CardU2.dc.html",
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 450,
+      "page": "page-card-3"
+    },
+    {
+      "file": "CardU3.dc.html",
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 450,
+      "page": "page-card-3"
+    },
+    {
+      "file": "CardU4.dc.html",
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 520,
+      "page": "page-card-3"
+    },
     {
       "file": "CardT1.dc.html",
       "x": 0,
@@ -173,6 +209,14 @@
   ],
   "annotations": [
     {
+      "id": "guide-card-3",
+      "page": "page-card-3",
+      "x": 0,
+      "y": -200,
+      "w": 720,
+      "text": "앨범방 카드 · 3차 — 세 가지 논의를 그대로 그렸습니다\n\n공통: 토스식 · 4:3 · 하트는 사진 우상단(흰 획만)\n\n① 안 읽은 수를 뱃지로 → U① U② U③ 전부 적용, U④에서 표현 3종 비교(숫자 / 점 / 글자)\n② 정보를 좌하단에 → U③ (사진 위 좌하단, 아래 띠 없음) vs U① (아래 띠, 왼쪽 정렬)\n③ 아바타 있나 없나 → U① (없음) vs U② (있음)\n\n주황은 임시 의미색입니다. 강조색과 별개로 정할 수 있지만 지금은 앱의 첫 번째 색이 됩니다."
+    },
+    {
       "id": "guide-card-toss",
       "page": "page-card-toss",
       "x": 0,
@@ -223,6 +267,6 @@
   ],
   "launch": {
     "view": "canvas",
-    "page": "page-card-toss"
+    "page": "page-card-3"
   }
 }

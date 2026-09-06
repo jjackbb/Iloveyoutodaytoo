@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  4×2 셀. minWidth/minHeight 는 (셀수 * 70 - 30)dp 공식으로 잡았다.
+  targetCellWidth/Height·previewLayout·description 은 API 31+ 에서만 읽히고,
+  그 아래에서는 minWidth/minHeight 로 자동 계산된다(무시돼도 무해).
+
+  updatePeriodMillis 는 30분. 시스템이 이보다 자주는 절대 안 불러 주므로,
+  즉시 갱신이 필요한 순간(앱 onResume, 톡톡 직후)에는 코드에서 직접 브로드캐스트한다.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/widget_latest"
+    android:minHeight="110dp"
+    android:minWidth="250dp"
+    android:previewLayout="@layout/widget_latest"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellHeight="2"
+    android:targetCellWidth="4"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen" />

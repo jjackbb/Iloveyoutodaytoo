@@ -317,6 +317,10 @@ export type Database = {
           pinned_at: string | null
           /** 게시물 문구(캡처 12 "문구 선택"). 선택 사항이라 비어 있을 수 있다. */
           description: string | null
+          /** 손글씨 획 좌표 파일(handwriting 버킷의 {room_id}/파일.json). 목소리(voice_path)와 같은 구조. */
+          handwriting_path: string | null
+          /** 첫 획부터 마지막 획까지(ms). 타임랩스는 최대 4초로 압축해 재생한다. */
+          handwriting_duration_ms: number | null
           id: string
           media_type: Database['public']['Enums']['media_type']
           /** (폐지) 사진은 memory_photos로 옮겼다. 새 게시물은 null이다. */
@@ -339,6 +343,8 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          handwriting_path?: string | null
+          handwriting_duration_ms?: number | null
           id?: string
           media_type?: Database['public']['Enums']['media_type']
           media_url?: string | null
@@ -354,6 +360,8 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          handwriting_path?: string | null
+          handwriting_duration_ms?: number | null
           id?: string
           media_type?: Database['public']['Enums']['media_type']
           media_url?: string | null
@@ -913,6 +921,42 @@ export type Database = {
         }
         Relationships: []
       }
+      /**
+       * 홈 화면 위젯 전용 토큰(해시만). 위젯은 웹뷰 밖에서 살아 로그인 세션을 못 보므로
+       * 따로 둔다. 토큰이 할 수 있는 것은 최근 표현 1건 읽기와 톡톡뿐. RLS 정책 0개(DEFINER 함수로만).
+       */
+      widget_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          last_used_at: string | null
+          token_hash: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          token_hash: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          token_hash?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'widget_tokens_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       withdrawal_reasons: {
         Row: {
           created_at: string
@@ -999,6 +1043,41 @@ export type Database = {
        * 잠긴 마음이면 false를 돌려주고 아무것도 하지 않는다.
        */
       mark_heart_read: { Args: { p_id: string }; Returns: boolean }
+      /** 위젯 전용 토큰 발급. 로그인 사용자. 평문은 이때 한 번만 온다(DB 는 해시만 둔다). */
+      issue_widget_token: { Args: never; Returns: string }
+      /** 로그아웃 때 내 위젯 토큰 전부 회수. 탈퇴는 FK cascade 가 처리한다. */
+      revoke_widget_tokens: { Args: never; Returns: number }
+      /** 보호자 인증 행 24시간 정리(pg_cron 이 매일 돌린다). 앱 코드에서 부를 일은 없다. */
+      purge_guardian_verifications: { Args: never; Returns: number }
+      /** 위젯: 최근 표현 1건. 토큰 무효면 빈 배열. 사진은 경로만 — 서명은 API 라우트가. */
+      widget_latest: {
+        Args: { p_token: string }
+        Returns: {
+          memory_id: string
+          room_id: string
+          room_name: string
+          author_id: string
+          author_name: string
+          created_at: string
+          photo_path: string | null
+          voice_duration_sec: number | null
+          handwriting_path: string | null
+          caption: string | null
+          is_mine: boolean
+        }[]
+      }
+      /** 위젯 톡톡. 같은 방·차단 아님일 때만 true. 보내는 쪽 제한 없음(사용자 결정). */
+      widget_knock: {
+        Args: { p_token: string; p_target: string; p_memory?: string }
+        Returns: boolean
+      }
+      /** 내부용. anon 실행 권한 회수됨 — 위 두 함수 안에서만 돈다. */
+      widget_user_from_token: { Args: { p_token: string }; Returns: string }
+      /** 회원 탈퇴. 사유 기록 → 혼자 쓰던 방 정리 → 방장 승계 → auth.users 삭제. */
+      withdraw_account: {
+        Args: { p_reason?: string; p_detail?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       notification_type:
@@ -1006,6 +1085,8 @@ export type Database = {
         | 'comment_created'
         | 'member_joined'
         | 'heart_received'
+        /** 위젯 톡톡 — '○○님이 톡톡했어요'. room_id 필수. */
+        | 'knock'
       auth_provider: 'email' | 'kakao' | 'google' | 'phone'
       media_type: 'photo' | 'video'
       member_role: 'admin' | 'member'

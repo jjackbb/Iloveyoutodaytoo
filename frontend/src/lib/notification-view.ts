@@ -46,6 +46,12 @@ export function notificationHref(row: {
     case 'heart_received':
       // 사서함의 '받은 마음'으로 보낸다. 마음 하나만 보는 화면은 없다.
       return '/mailbox'
+    case 'knock':
+      // 위젯 톡톡. 어떤 추억을 보다가 눌렀는지 알면 그 추억으로, 아니면 그 방으로.
+      if (row.room_id && row.memory_id) {
+        return `/rooms/${row.room_id}/memories/${row.memory_id}`
+      }
+      return row.room_id ? `/rooms/${row.room_id}` : null
   }
 }
 
@@ -67,5 +73,8 @@ export function notificationText(n: AppNotification): string {
       return `${who}님이 앨범방에 들어왔어요`
     case 'heart_received':
       return `${who}님에게서 마음이 도착했어요`
+    case 'knock':
+      // 위젯의 [톡톡] 단추. 문장은 PRD §4 WIDGET-01 의 원안 그대로.
+      return `${who}님이 톡톡했어요`
   }
 }

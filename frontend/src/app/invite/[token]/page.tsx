@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { InviteLetter } from '@/components/invite/InviteLetter'
 import { ButtonLink } from '@/components/ui/Button'
 import { getCurrentUser } from '@/lib/auth'
+import { isNativeAppUserAgent, playStoreUrlForInvite } from '@/lib/native'
 import { createClient } from '@/lib/supabase/server'
 import { AcceptPanel } from './accept-panel'
 
@@ -57,6 +59,16 @@ export default async function InvitePreviewPage({
   }
 
   const user = await getCurrentUser()
+
+  /*
+    앱 안에서 열린 초대장인가, 브라우저에서 열린 초대장인가.
+
+    이 화면은 proxy.ts 가 브라우저에도 열어두는 몇 안 되는 곳이다(PRD §6⑮).
+    초대 링크는 문자·카카오톡으로 오가다 브라우저에서 열리는 일이 훨씬 많아서,
+    여기서 "가입하세요"라고 하면 웹에 계정만 만들고 끝난다.
+    브라우저에서는 가입 대신 스토어로 안내한다.
+  */
+  const isApp = isNativeAppUserAgent((await headers()).get('user-agent'))
 
   // ① 이미 이 방에 있는 분인지를 used·expired 확인보다 먼저 본다.
   // accept_invitation도 이 순서다 — 이미 구성원이면 링크가 이미 쓰였든 기간이
@@ -169,7 +181,7 @@ export default async function InvitePreviewPage({
           defaultLabel={invitation.relationship_label}
           roomName={invitation.room_name}
         />
-      ) : (
+      ) : isApp ? (
         <div className="flex flex-col gap-3">
           <ButtonLink
             href={`/login?next=/invite/${encodeURIComponent(token)}`}
@@ -186,6 +198,27 @@ export default async function InvitePreviewPage({
               가입하기
             </Link>
             를 눌러 짧게 등록하고 오시면 돼요.
+          </p>
+        </div>
+      ) : (
+        /*
+          브라우저로 열린 초대장. 여기서 가입시키지 않는다 —
+          PRD §6⑮로 웹은 폐기했고, 웹에서 가입해도 다음 화면부터 막힌다.
+
+          위의 초대장 미리보기(누가·어느 방으로 부르는지)는 그대로 둔다.
+          그것이 앱을 받겠다고 마음먹게 하는 정보다. 그것 없이 스토어로 보내면
+          "왜 받아야 하지"에 답이 없다.
+
+          스토어 주소에 초대 토큰을 referrer 로 실어 보낸다 — 설치 뒤 첫 실행에서
+          앱이 Play Install Referrer 로 읽어 이 초대장으로 되돌아온다.
+        */
+        <div className="flex flex-col gap-3">
+          <ButtonLink href={playStoreUrlForInvite(token)} fullWidth>
+            앱에서 열기
+          </ButtonLink>
+          <p className="text-center text-base text-muted">
+            ‘오늘도 사랑해’ 앱에서 초대를 받을 수 있어요. 앱이 없다면 Google Play에서
+            받으시면, 설치한 뒤 이 초대장으로 바로 이어져요.
           </p>
         </div>
       )}
