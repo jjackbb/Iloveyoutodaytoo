@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import { SocialSoonDrawer } from '@/app/start/social-soon-button'
 import { BrandMark } from '@/components/brand/BrandMark'
-import { Mongsil } from '@/components/brand/Mongsil'
 import { ButtonLink } from '@/components/ui/Button'
 import { safeNextPath } from '@/lib/safe-redirect'
 
@@ -20,8 +19,9 @@ export const metadata: Metadata = { title: '시작하기 · 오늘도 사랑해'
  *
  * 바뀐 것 셋:
  *
- * 1. **몽실이가 화면 한가운데로.** 이 서비스에서 색과 성격을 내는 건 몽실이뿐이고
- *    바탕은 조용히 있는다. 캐릭터가 먼저 말을 걸고 글이 받는다.
+ * 1. ~~몽실이가 화면 한가운데로.~~ **🗑 2026-09-06 폐기.** 캐릭터를 걷어냈다.
+ *    ⚠️ 그 자리가 지금 **비어 있다.** 새 로고가 나오면 디자인 관문을 밟아
+ *    이 화면을 다시 짠다 — 지금은 임시로 문구만 남긴 상태다.
  * 2. **되는 길 하나만 큰 버튼.** 준비 중 셋은 [다른 방법으로 시작하기] 안에 접었다.
  *    지우지는 않았다 — 이유는 SocialSoonDrawer 주석에 적었다.
  * 3. **문구가 찌르지 않고 받아준다.** "못 한 말이 있죠"는 첫 화면에서 사람을 내보낸다.
@@ -41,7 +41,7 @@ export default async function StartPage({ searchParams }: PageProps<'/start'>) {
 
   return (
     // 100dvh: 모바일 주소창이 접혔다 펴져도 높이가 흔들리지 않는다.
-    // 안쪽은 위(브랜드) / 가운데(몽실이+문구) / 아래(행동) 3단이고,
+    // 안쪽은 위(브랜드) / 가운데(문구) / 아래(행동) 3단이고,
     // 가운데는 남는 자리를 나눠 가져 화면이 길든 짧든 균형이 유지된다.
     <main className="mx-auto flex min-h-[100dvh] w-full max-w-md flex-1 flex-col px-screen-x pb-screen-b">
       <div className="flex items-center gap-2 pt-7">
@@ -55,15 +55,14 @@ export default async function StartPage({ searchParams }: PageProps<'/start'>) {
       <div className="min-h-0 flex-1" />
 
       {/*
-        몽실이가 말을 건다. 말풍선이 먼저고 몽실이가 그 아래에 있다 —
-        위에서 내려다보는 게 아니라 **아래에서 올려다보며 말하는** 자세다.
+        ⚠️ 임시. 여기에 몽실이가 있었다(2026-09-06 폐기).
+        말풍선의 꼬리는 가리킬 대상이 없어져서 함께 걷어냈다.
+        새 로고가 정해지면 이 자리를 다시 짠다 — 그때까지는 문구만 둔다.
       */}
       <div className="flex flex-col items-center">
-        <p className="relative max-w-[85%] rounded-[20px] bg-surface-soft px-5 py-3 text-center text-base font-semibold tracking-[-0.02em] break-keep text-ink after:absolute after:bottom-[-8px] after:left-1/2 after:h-2.5 after:w-[18px] after:-translate-x-1/2 after:bg-surface-soft after:[clip-path:polygon(0_0,100%_0,50%_100%)] after:content-['']">
+        <p className="max-w-[85%] rounded-[20px] bg-surface-soft px-5 py-3 text-center text-base font-semibold tracking-[-0.02em] break-keep text-ink">
           쑥스러워도 괜찮아요.
         </p>
-
-        <Mongsil className="mt-1 w-[62%] max-w-[250px]" />
       </div>
 
       <h1 className="mt-5 text-center text-[27px] leading-[1.42] font-bold tracking-[-0.04em] break-keep text-ink">

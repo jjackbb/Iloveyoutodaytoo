@@ -316,15 +316,6 @@ function MessageCard({
 }
 
 function MessageBody({ item, title }: { item: MailboxItem; title: string }) {
-  /*
-    답장 미션으로 잠긴 마음 (PRD [MISSION-01]).
-
-    서버가 내용을 아예 안 실어 보내므로 여기서 가릴 것도 없다 — 대신 **왜 잠겼고
-    어떻게 풀리는지**를 적는다. 잠긴 이유를 안 적으면 시니어 사용자에게는
-    고장 난 카드로 보인다.
-  */
-  if (item.locked) return <LockedHeart item={item} />
-
   if (item.type === 'text') {
     return (
       <p className="mt-1 whitespace-pre-wrap break-words text-lg leading-relaxed text-ink">
@@ -361,7 +352,9 @@ function MessageBody({ item, title }: { item: MailboxItem; title: string }) {
         levels={item.voiceLevels}
         label={`${title}의 음성`}
         /*
-          답장 미션의 "들었다"를 여기서 찍는다 (PRD [MISSION-01]).
+          "들었다"를 여기서 찍는다. 락은 2026-09-06에 걷어냈지만
+          **읽음 표시 자체는 남긴다** — 나중에 "○○님이 이번 주 3번 남겼어요"
+          같은 신호를 만들 때 쓸 데이터가 이것이다 (PRD §4 MISSION-01).
           목록에 뜬 것만으로는 안 찍고 **실제로 재생했을 때**만 찍는다
           (사용자 결정 2026-08-19).
 
@@ -370,33 +363,6 @@ function MessageBody({ item, title }: { item: MailboxItem; title: string }) {
         */
         onFirstPlay={() => void markHeartRead(item.id)}
       />
-    </div>
-  )
-}
-
-/**
- * 잠긴 마음 자리.
- *
- * PRD는 "상대방에게 마음을 표현해보세요! 답장 후 확인이 가능합니다"를 띄우라고 한다.
- * 그 문장을 쓰되, 시니어 사용자가 무엇을 해야 하는지 알 수 있게 버튼까지 붙였다.
- */
-function LockedHeart({ item }: { item: MailboxItem }) {
-  const who = item.partnerName ?? '이분'
-
-  return (
-    <div className="mt-1 flex flex-col gap-3 rounded-[14px] bg-surface-soft px-4 py-4">
-      <p className="text-base leading-relaxed break-keep text-ink">
-        <span aria-hidden>🔒 </span>
-        {who}님께 마음을 표현해보세요. 답장하면 이 마음을 확인할 수 있어요.
-      </p>
-
-      <p className="text-sm break-keep text-muted">
-        {who}님이 보낸 마음 {item.unrepliedCount}개를 아직 답장하지 않았어요.
-      </p>
-
-      <ButtonLink href="/mailbox/send" variant="secondary">
-        마음 보내기
-      </ButtonLink>
     </div>
   )
 }
