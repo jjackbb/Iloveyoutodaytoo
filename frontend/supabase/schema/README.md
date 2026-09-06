@@ -25,6 +25,7 @@ RLS 정책 63개·함수 28개·트리거 11개를 되살릴 방법이 없었다
 | `04_triggers.sql` | 트리거 (auth.users 것 1개 포함) | 11 |
 | `05_rls_public.sql` | `enable row level security` + public 정책 | 56 |
 | `06_storage.sql` | 버킷 4개 + storage.objects 정책 | 7 |
+| `07_cron.sql` | pg_cron 예약 작업 | 1 |
 
 ## 이 스냅샷의 한계 — 반드시 읽을 것
 
@@ -42,6 +43,7 @@ RLS 정책 63개·함수 28개·트리거 11개를 되살릴 방법이 없었다
 
 지금부터의 스키마 변경은 **여기에 파일로 먼저 남기고** DB에 적용한다.
 그래야 다음에 같은 일이 나도 되살릴 수 있다.
+`07_cron.sql` 이 그 첫 사례다.
 
 ## 내려 적으면서 눈에 띈 것
 
