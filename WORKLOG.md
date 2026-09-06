@@ -60,3 +60,29 @@
 - Recraft에서 4안(A 호 / B 그릇+알약 / C 띠 / D 닫히지 않은 하트) 뽑아오면
   → 66dp·모노크롬·48dp 검증 → BrandMark.tsx 인라인 SVG → 적응형 3레이어 + Play 512
   → globals.css 강조색 4줄 확정(219곳 따라옴) → /start 가운데 채우기 → design.md 작성
+
+## 2026-09-06 (밤) — 로고·강조색 확정, 코드 반영 완료
+
+**한 것**
+- Recraft에서 나온 로고(봉투에서 나오는 하트)를 원본 픽셀 기준으로 벡터화 — 일치율 98.6%.
+  하트 로브 원 r74.2·d48.4, 아래 변 45°, 플랩 밴드 18px, 꼭짓점 필렛 20, 모서리는 실측 스쿼클 프로파일.
+- 강조색 **선명한 번트 #BF3F0D** 확정 → `globals.css` 4줄 + 버튼 그림자 + 브랜드 토큰, themeColor, manifest.
+- `BrandMark.tsx` 인라인 SVG. `public/brand/`(logo.svg·mark.svg·playstore-512·logo-512), public 아이콘 3종.
+- 안드로이드: mipmap 5밀도 × 3종, `values/ic_launcher_background.xml`, 모노크롬 벡터 드로어블 + adaptive xml.
+- 루트 `design.md` 신설. tsc·lint 통과. 실행 중인 dev 서버 `/start` 스크린샷으로 확인.
+
+**결정과 이유**
+- 두 톤은 앞면 밝기 −1.5(#B83D0D) — "자세히 봐야 보이는" 정도. 사용자 결정.
+- 하트·플랩은 투명 컷아웃이 아니라 **크림 면**(#F8F2EC) — 안드로이드 아이콘은 배경이 뭐가 될지 모른다.
+- Pro 요금제: 루틴 3종 미실행 + 실사용 $346/주 → 전환해도 됨(Opus 주간 버킷만 미지수). 사용자 결정 대기.
+
+**함정**
+- Recraft 원본은 하트가 뚫린 투명이었고 #C17753 은 AA 미달(3.48:1) — 그대로 못 쓴다.
+- 시안 브리프에 명사를 주면 관습 아이콘이 나온다(파형→보이스메모). 메모리 `logo-brief-geometry-not-nouns`.
+- superdesign 무료 크레딧 소진(82cr, 전부 반려). 결제하지 않기로.
+- chrome-devtools MCP가 "browser already running"으로 막힘 → 헤드리스 크롬 CLI로 스크린샷.
+
+**다음**
+- DESIGN-03: 아이콘 한 벌(63개 SVG·획 9종 → 1종), 모서리 하드코딩 6종 정리 — `design.md` §5.
+- 안드로이드 실기기/에뮬레이터에서 런처·테마 아이콘 확인(Gradle 빌드는 openjdk@21).
+- `/start`는 웹 폐기 랜딩으로 바뀌어 있어 "가운데 빈자리" 숙제는 소멸 — 앱 안 홈(`/`) 상단 마크만 확인하면 됨.

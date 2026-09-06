@@ -8,6 +8,8 @@ import { ButtonLink } from '@/components/ui/Button'
 import { BottomNav } from '@/components/nav/BottomNav'
 import { NotificationBell } from '@/components/notification/NotificationBell'
 import { loadNotifications } from '@/lib/notifications'
+import { loadDailySlot } from '@/lib/daily'
+import { DailySlot } from '@/components/home/DailySlot'
 import { resolveRoomCover, roomDisplayName } from '@/lib/room-name'
 
 export const metadata: Metadata = { title: '오늘도 사랑해' }
@@ -33,6 +35,8 @@ export default async function HomePage() {
 
   // 알림은 방 목록과 무관하니 같이 출발시킨다 — 순서대로 기다리면 그만큼 늦어진다.
   const notificationsPromise = loadNotifications()
+  // 매일 자리(DAILY-01)도 방 목록과 무관하다. 같이 출발.
+  const dailyPromise = loadDailySlot(supabase, user.id)
 
   // RLS가 걸려 있어 내가 속한 방만 돌아온다. 방을 나간(left) 기록은 제외한다.
   const { data: memberships, error } = await supabase
@@ -57,6 +61,7 @@ export default async function HomePage() {
   })
 
   const notifications = await notificationsPromise
+  const daily = await dailyPromise
 
   const roomIds = rows.map((row) => row.rooms?.id).filter((id) => id != null)
 
@@ -208,6 +213,12 @@ export default async function HomePage() {
             .filter(Boolean)
             .join(' ')}
         >
+          {/*
+            매일 바뀌는 자리(DAILY-01). 방이 하나도 없으면 셀 것도 없으니 접는다 —
+            빈 화면의 세로 가운데 정렬도 흐트러뜨리지 않는다.
+          */}
+          {rows.length > 0 ? <DailySlot data={daily} /> : null}
+
           {error ? (
             <p
               role="alert"

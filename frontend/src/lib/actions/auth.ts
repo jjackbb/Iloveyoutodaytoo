@@ -342,6 +342,18 @@ export async function signUp(
 /** 로그아웃 */
 export async function signOut() {
   const supabase = await createClient()
+
+  /*
+    위젯 토큰을 **먼저** 회수한다(WIDGET-01). 세션을 끊은 뒤에는 auth.uid() 가 없어
+    revoke_widget_tokens 가 "로그인이 필요합니다"로 막힌다 — 순서가 중요하다.
+    실패해도 로그아웃은 막지 않는다. 기기에 남은 토큰은 WidgetTokenSync 가
+    다음 화면에서 "세션 없음"을 보고 지운다.
+  */
+  const { error: revokeError } = await supabase.rpc('revoke_widget_tokens')
+  if (revokeError) {
+    console.error('[로그아웃] 위젯 토큰 회수 실패:', revokeError.message)
+  }
+
   await supabase.auth.signOut()
 
   // 큰 글자 설정은 사람에 붙는 값이다. 안 지우면 다음에 로그인한 사람이
