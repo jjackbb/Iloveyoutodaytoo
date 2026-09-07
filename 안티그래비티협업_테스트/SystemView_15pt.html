@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>오늘도 사랑해 - 찐토스 15pt 시스템</title>
+  <style>
+    body { 
+      margin: 0; 
+      background: #e5e8eb; 
+      padding: 40px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif; 
+      -webkit-font-smoothing: antialiased;
+    }
+    .info-header { margin-bottom: 24px; text-align: center; }
+    .mobile-frame { 
+      width: 390px; 
+      background: #ffffff; 
+      border-radius: 36px; 
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1); 
+      overflow: hidden; 
+      border: 12px solid #191f28; 
+      padding-bottom: 20px; 
+    }
+    .header { padding: 32px 20px 16px; }
+    .header h1 { font-size: 20pt; margin: 0; color: #191f28; font-weight: 700; letter-spacing: -0.02em; }
+    .section { padding: 24px 20px; border-bottom: 8px solid #f2f4f6; }
+    .section:last-child { border-bottom: none; }
+    .section-title { font-size: 11pt; font-weight: 600; color: #8b95a1; margin: 0 0 16px 0; }
+    
+    /* Card */
+    .card { background: #ffffff; border-radius: 16px; box-shadow: 0 8px 24px rgba(25,31,40,0.08); padding: 24px; position: relative; border: 1px solid #f2f4f6;}
+    .card-dot { position: absolute; top: 16px; right: 16px; width: 6px; height: 6px; background: #bf3f0d; border-radius: 50%; }
+    .card-tag { display: inline-block; padding: 6px 10px; background: #f2f4f6; color: #4e5968; font-size: 11pt; font-weight: 600; border-radius: 8px; margin-bottom: 16px; }
+    .card-title { font-size: 15pt; font-weight: 700; color: #191f28; margin: 0 0 8px 0; line-height: 1.4; word-break: keep-all; }
+    .card-sub { font-size: 12pt; color: #8b95a1; margin: 0; line-height: 1.5; font-weight: 500; }
+    
+    /* Field */
+    .field-label { font-size: 12pt; font-weight: 600; color: #4e5968; display: block; margin-bottom: 8px; }
+    .field-input { width: 100%; height: 56px; background: #f2f4f6; color: #191f28; border: none; border-radius: 16px; padding: 0 16px; box-sizing: border-box; font-size: 15pt; font-weight: 600; outline: none; }
+    .field-input::placeholder { color: #8b95a1; }
+    
+    /* Chips */
+    .chip-container { display: flex; gap: 8px; }
+    .chip { padding: 12px 20px; border-radius: 12px; font-size: 15pt; font-weight: 600; cursor: pointer; }
+    .chip.active { background: #333d4b; color: #ffffff; }
+    .chip.inactive { background: #f2f4f6; color: #4e5968; }
+    
+    /* Inner */
+    .inner-box { background: #f2f4f6; border-radius: 16px; padding: 20px; display: flex; gap: 12px; align-items: flex-start; }
+    .inner-text { font-size: 15pt; line-height: 1.5; color: #4e5968; margin: 0; font-weight: 600; word-break: keep-all;}
+    
+    /* Buttons */
+    .btn { width: 100%; height: 56px; border: none; border-radius: 16px; font-size: 15pt; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+    .btn.primary { background: #bf3f0d; color: #ffffff; }
+    .btn.secondary { background: #f2f4f6; color: #4e5968; margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <div class="info-header">
+    <h2 style="margin:0 0 8px; color: #191f28;">15pt 찐토스 통합 UI 시안</h2>
+    <p style="margin:0; color: #4e5968;">앨범방, 입력칸, 버튼 등 모든 메인 텍스트 요소에 15pt를 일괄 적용했습니다.</p>
+  </div>
+  
+  <div class="mobile-frame">
+    <div class="header">
+      <h1>새로운 앨범방 만들기</h1>
+    </div>
+    
+    <div class="section">
+      <p class="section-title">1. 입력칸 (Text Field)</p>
+      <label class="field-label">앨범방 이름</label>
+      <input type="text" class="field-input" value="사랑하는 우리가족">
+    </div>
+
+    <div class="section">
+      <p class="section-title">2. 칩 & 뱃지 (Chips)</p>
+      <label class="field-label">공개 설정</label>
+      <div class="chip-container">
+        <div class="chip active">가족 공개</div>
+        <div class="chip inactive">나만 보기</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">3. 안쪽 면 (Inner Box)</p>
+      <div class="inner-box">
+        <span style="font-size: 15pt; margin-top: 2px;">💡</span>
+        <p class="inner-text">가족으로 등록된 멤버들에게만 이 앨범방이 보여집니다.</p>
+      </div>
+    </div>
+    
+    <div class="section">
+      <p class="section-title">4. 앨범방 카드 (Card)</p>
+      <label class="field-label">카드 미리보기</label>
+      <div class="card">
+        <div class="card-dot"></div>
+        <div class="card-tag">가족 앨범</div>
+        <p class="card-title">사랑하는 우리가족</p>
+        <p class="card-sub">멤버 4명 · 방금 전 개설됨</p>
+      </div>
+    </div>
+
+    <div class="section" style="border-bottom: none;">
+      <p class="section-title">5. 버튼 (Buttons)</p>
+      <button class="btn primary">완료</button>
+      <button class="btn secondary">취소</button>
+    </div>
+
+  </div>
+</body>
+</html>

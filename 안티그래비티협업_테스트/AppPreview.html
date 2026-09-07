@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>오늘도 사랑해 - 앱 미리보기 (13pt)</title>
+  <style>
+    body { 
+      margin: 0; 
+      background: #e5e8eb; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif; 
+      -webkit-font-smoothing: antialiased;
+    }
+    .phone { 
+      width: 390px; 
+      height: 844px; /* iPhone 12/13/14 size */
+      background: #f7f8fa; 
+      border-radius: 40px; 
+      box-shadow: 0 24px 80px rgba(0,0,0,0.15); 
+      border: 14px solid #191f28; 
+      position: relative; 
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Common UI */
+    .header { padding: 24px 20px 12px; display: flex; justify-content: space-between; align-items: center; background: #f7f8fa; z-index: 10;}
+    .header-title { font-size: 16pt; font-weight: 800; color: #191f28; margin: 0; letter-spacing: -0.02em;}
+    .scroll-body { flex: 1; overflow-y: auto; padding: 0 20px 40px; }
+    .scroll-body::-webkit-scrollbar { display: none; }
+    
+    /* Screen 1: Home */
+    #screen-home { display: flex; flex-direction: column; height: 100%; }
+    .chip-scroll { display: flex; gap: 8px; padding: 10px 20px 20px; overflow-x: auto; white-space: nowrap; }
+    .chip-scroll::-webkit-scrollbar { display: none; }
+    .chip { padding: 10px 16px; border-radius: 12px; font-size: 13pt; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .chip.active { background: #bf3f0d; color: #ffffff; }
+    .chip.inactive { background: #f2f4f6; color: #4e5968; }
+    
+    .card { background: #ffffff; border-radius: 20px; padding: 24px; position: relative; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(25,31,40,0.04); cursor: pointer; }
+    .card-dot { position: absolute; top: 16px; right: 16px; width: 8px; height: 8px; background: #bf3f0d; border-radius: 50%; }
+    .card-tag { display: inline-block; padding: 4px 8px; background: #f2f4f6; color: #4e5968; font-size: 10pt; font-weight: 700; border-radius: 8px; margin-bottom: 12px; }
+    .card-title { font-size: 14pt; font-weight: 800; color: #191f28; margin: 0 0 8px 0; line-height: 1.4; word-break: keep-all; }
+    .card-sub { font-size: 11pt; color: #8b95a1; margin: 0; font-weight: 600; }
+    
+    .fab { position: absolute; bottom: 30px; right: 20px; width: 56px; height: 56px; background: #bf3f0d; border-radius: 28px; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 28px; font-weight: 300; box-shadow: 0 12px 24px rgba(191, 63, 13, 0.3); cursor: pointer; z-index: 100;}
+
+    /* Screen 2: Create */
+    #screen-create { display: none; flex-direction: column; height: 100%; background: #ffffff;}
+    #screen-create .header { background: #ffffff; padding-top: 30px;}
+    .back-btn { font-size: 14pt; color: #191f28; cursor: pointer; font-weight: 600;}
+    .input-section { margin-top: 24px; }
+    .field-label { font-size: 11pt; font-weight: 700; color: #4e5968; display: block; margin-bottom: 10px; }
+    .field-input { width: 100%; height: 56px; background: #f2f4f6; color: #191f28; border: none; border-radius: 16px; padding: 0 16px; box-sizing: border-box; font-size: 13pt; font-weight: 700; outline: none; margin-bottom: 24px;}
+    .field-input::placeholder { color: #8b95a1; }
+    
+    .inner-box { background: #f2f4f6; border-radius: 16px; padding: 20px; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 40px;}
+    .inner-text { font-size: 12pt; line-height: 1.5; color: #4e5968; margin: 0; font-weight: 600; word-break: keep-all;}
+    
+    .bottom-fixed { padding: 16px 20px 30px; background: #ffffff; }
+    .btn-main { width: 100%; height: 56px; background: #bf3f0d; color: #ffffff; border: none; border-radius: 16px; font-size: 14pt; font-weight: 800; cursor: pointer; }
+  </style>
+</head>
+<body>
+  
+  <div class="phone">
+    
+    <!-- 홈 화면 -->
+    <div id="screen-home">
+      <div class="header">
+        <h1 class="header-title">오늘도 사랑해</h1>
+        <div style="font-size: 16pt;">⚙️</div>
+      </div>
+      
+      <div class="chip-scroll">
+        <div class="chip active">전체보기</div>
+        <div class="chip inactive">가족 앨범</div>
+        <div class="chip inactive">친구들</div>
+        <div class="chip inactive">1:1 대화</div>
+      </div>
+      
+      <div class="scroll-body">
+        <div class="card" onclick="alert('앨범으로 들어갑니다.')">
+          <div class="card-dot"></div>
+          <div class="card-tag">가족 앨범</div>
+          <p class="card-title">가을맞이 남이섬 피크닉 🍁</p>
+          <p class="card-sub">사진 128장 · 엄마가 1시간 전 남김</p>
+        </div>
+        
+        <div class="card" onclick="alert('앨범으로 들어갑니다.')">
+          <div class="card-tag">친구들</div>
+          <p class="card-title">동창회 강원도 여행 🚄</p>
+          <p class="card-sub">사진 45장 · 3일 전 업데이트</p>
+        </div>
+        
+        <div class="card" onclick="alert('앨범으로 들어갑니다.')">
+          <div class="card-dot"></div>
+          <div class="card-tag">가족 앨범</div>
+          <p class="card-title">할머니 팔순 잔치 🎂</p>
+          <p class="card-sub">목소리 3개 · 방금 전 개설됨</p>
+        </div>
+      </div>
+      
+      <!-- 플로팅 액션 버튼 (방 만들기) -->
+      <div class="fab" onclick="showScreen('screen-create')">+</div>
+    </div>
+    
+    <!-- 앨범방 만들기 화면 -->
+    <div id="screen-create">
+      <div class="header">
+        <div class="back-btn" onclick="showScreen('screen-home')">← 뒤로</div>
+        <h1 class="header-title" style="font-size: 14pt;">새 앨범방 만들기</h1>
+        <div style="width: 50px;"></div> <!-- balance -->
+      </div>
+      
+      <div class="scroll-body">
+        <div class="input-section">
+          <label class="field-label">앨범방 이름</label>
+          <input type="text" class="field-input" placeholder="어떤 추억을 담을까요?">
+        </div>
+        
+        <div class="input-section">
+          <label class="field-label">참여할 가족 초대</label>
+          <input type="text" class="field-input" placeholder="이름이나 전화번호 검색">
+        </div>
+        
+        <div class="inner-box">
+          <span style="font-size: 14pt;">💡</span>
+          <p class="inner-text">초대된 가족과 친구들에게만 이 앨범방의 사진과 목소리가 보여집니다. 언제든지 멤버를 추가할 수 있어요.</p>
+        </div>
+      </div>
+      
+      <div class="bottom-fixed">
+        <button class="btn-main" onclick="showScreen('screen-home')">앨범방 완성하기</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showScreen(id) {
+      document.getElementById('screen-home').style.display = 'none';
+      document.getElementById('screen-create').style.display = 'none';
+      document.getElementById(id).style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

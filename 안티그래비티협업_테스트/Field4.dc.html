@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    .sheet { font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+  </style>
+</helmet>
+<div class="sheet" style="width: 390px; padding: 20px 20px 28px; background: #ffffff; color: #191f28; box-sizing: border-box;">
+  <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 24px;">
+    <div style="display: flex; align-items: baseline; gap: 8px;">
+      <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em; color: #191f28;">입력칸 ④</span>
+      <span style="font-size: 14px; font-weight: 600; color: #bf3f0d;">찐 토스식 — 회색 블록</span>
+    </div>
+    <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: #8b95a1;">선(Border)을 아예 그리지 않습니다. 연한 회색 배경(#F2F4F6)에 16px의 부드러운 모서리만 주어, 시각적 피로도 없이 입력에 집중하게 합니다.</p>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <label style="font-size: 14px; font-weight: 600; color: #4e5968;">이름</label>
+      <input type="text" placeholder="이름을 입력하세요" style="width: 100%; height: 56px; background: #f2f4f6; color: #191f28; font-size: 17px; font-weight: 500; border: none; border-radius: 16px; padding: 0 16px; box-sizing: border-box; outline: none;">
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
