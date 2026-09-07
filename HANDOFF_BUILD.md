@@ -1,7 +1,46 @@
 # 인수인계 — 기능 구현 세션
 
 > 이 파일 하나만 읽고 시작할 수 있게 썼다. 대화 요약이 아니라 **결정된 것**만 담았다.
-> 마지막 갱신 2026-09-06. 원본 기획은 `PRD.md` — 충돌하면 PRD가 맞다.
+> 마지막 갱신 2026-09-07. 원본 기획은 `PRD.md` — 충돌하면 PRD가 맞다.
+
+---
+
+## ✅ 2026-09-07 — 아래 여섯 개는 전부 붙였다
+
+**이 문서의 "할 일" 1~6번은 끝났다.** 남은 것은 맨 아래 "지금 남은 것"뿐이다.
+결정의 이유를 쉬운 말로 푼 것은 `DECISIONS_2026-09-06.md`, 코드 변경은 `PRD.md` §8,
+함정은 `WORKLOG.md` 2026-09-07 항목에 있다.
+
+| # | 무엇 | 어디에 |
+| :--- | :--- | :--- |
+| 1 | 위젯 + 톡톡 | `android/…/widget/` · `src/app/api/widget/` · `src/components/native/WidgetTokenSync.tsx` |
+| 2 | 앱 전환 (Capacitor) | `capacitor.config.ts` · `android/` · `src/lib/native.ts` |
+| 3 | 손글씨 | `src/lib/handwriting.ts` · `src/components/handwriting/` |
+| 4 | 타임랩스 재생 | `src/components/handwriting/HandwritingPlayer.tsx` |
+| 5 | 매일 바뀌는 자리 | `src/lib/daily.ts` · `src/components/home/DailySlot.tsx` |
+| 6 | 보호자 인증 행 정리 | `supabase/schema/07_cron.sql` (2026-09-06 완료) |
+
+**바뀐 것 하나** — PRD 의 *"위젯을 꾹 누르면"* 은 **불가능하다**. 안드로이드가 길게 누르기를
+시스템(이동·크기조절)에 쓴다. 위젯 안 **[톡톡] 단추**로 바꿨다(사용자 확인).
+
+## 지금 남은 것
+
+**사람이 해줘야 진행됨**
+- Vercel 환경변수 `SUPABASE_SERVICE_ROLE_KEY` — 없으면 위젯에 **사진이 안 뜬다**(글만)
+- Vercel 환경변수 `ANDROID_CERT_SHA256` — 없으면 초대 링크가 **앱으로 안 열린다**.
+  디버그 지문: `71:28:58:AD:A8:CF:61:CC:8A:D2:28:EA:D6:64:79:CB:43:AC:31:F6:C4:6B:E1:DC:16:C5:D7:50:18:91:23:45`
+- Firebase(`google-services.json`) — 앱 푸시(FCM). 톡톡이 앱 밖 알림으로 가려면
+- 플레이스토어 등록 — 스토어 링크·Install Referrer 가 살아나려면
+
+**실기기에서 확인 못 한 것**
+- 위젯이 홈 화면에 실제로 그려지는 것, 톡톡 왕복
+- 설치 뒤 초대 복원(Install Referrer) — 에뮬레이터는 미지원
+- 손글씨를 실제로 쓰고 피드·상세에서 재생되는 것
+
+**코드로 남은 것**
+- `memories_voice_pair` 제약의 NULL 구멍(손글씨 쪽만 고쳤다 — `supabase/schema/11`)
+- 브랜드가 정해졌으니(`#BF3F0D`) `/welcome`·손글씨 판·위젯 색을 **디자인 관문**으로 다시
+- 사서함이 "치운 id 전부"를 URL 에 싣는 문제 — 데이터가 없어 검증을 못 해 안 고쳤다
 
 ---
 
