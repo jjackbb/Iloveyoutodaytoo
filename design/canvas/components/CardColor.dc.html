@@ -127,7 +127,60 @@
   </div></div><p style="margin: 14px 0 0; font-size: 12.5px; line-height: 1.65; color: #8b95a1; max-width: 620px;">
     배지 자체는 <b>숫자 흰 글자가 18px 밖에 안 되는 아주 작은 면</b>이라 4.5:1 규정 대상이 아니다(대형 텍스트·비텍스트 UI 컴포넌트 규정 3:1이 적용). 
     그래서 <b>버튼·본문 텍스트의 강조색은 지금 값 그대로 두고, 배지 같은 작은 신호 요소만 더 밝은 톤을 쓰는 절충</b>도 가능하다 — 다만 이건 브랜드 토큰을 늘리는 결정이라 로고 세션과 함께 정할 일이다.
-  </p>
+  </p><div style="margin-top: 28px; padding-top: 22px; border-top: 1px solid #e5e8eb;">
+    <p style="margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #191f28;">--color-primary-light 적용해보면</p>
+    <p style="margin: 0 0 16px; font-size: 12.5px; line-height: 1.6; color: #8b95a1; max-width: 560px;">
+      지금 앱에서 실제로 쓰는 토큰이다(버튼 그라데이션의 밝은 쪽 끝). primary 단독과 나란히 놓았다.
+    </p>
+    <div style="display: flex; gap: 24px; align-items: flex-end; margin-bottom: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">primary 단색 · #bf3f0d · 5.34:1</span>
+    <button style="min-height: 52px; padding: 0 24px; border: 0; border-radius: 17px; font-size: 17px; font-weight: 600; color: #ffffff; background: #bf3f0d; width: 220px; box-shadow: 0 12px 22px -10px rgb(25 31 40 / 0.30); cursor: default;">시작하기</button>
+  </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">primary-light 단색 · #d2450e · 4.57:1</span>
+    <button style="min-height: 52px; padding: 0 24px; border: 0; border-radius: 17px; font-size: 17px; font-weight: 600; color: #ffffff; background: #d2450e; width: 220px; box-shadow: 0 12px 22px -10px rgb(25 31 40 / 0.30); cursor: default;">시작하기</button>
+  </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">지금 버튼 — 그라데이션(둘 다)</span>
+    <button style="min-height: 52px; padding: 0 24px; border: 0; border-radius: 17px; font-size: 17px; font-weight: 600; color: #ffffff; background: linear-gradient(135deg, #bf3f0d 0%, #d2450e 100%); width: 220px; box-shadow: 0 12px 22px -10px rgb(25 31 40 / 0.30); cursor: default;">시작하기</button>
+  </div>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">배지: primary · #bf3f0d</span>
+    <div style="background: #ffffff; border: 1px solid #e5e8eb; border-radius: 16px; overflow: hidden; width: 150px;">
+      <div style="position: relative; aspect-ratio: 4 / 3; background: radial-gradient(ellipse 60% 45% at 18% 78%, #fdfdfb 0%, rgb(253 253 251 / 0) 60%),radial-gradient(ellipse 40% 50% at 70% 30%, #2b2f36 0%, rgb(43 47 54 / 0) 55%),radial-gradient(ellipse 55% 35% at 85% 85%, #f2e9d8 0%, rgb(242 233 216 / 0) 60%),linear-gradient(160deg, #8a949e 0%, #5d6670 50%, #c9cfd8 100%);">
+        <span style="position: absolute; left: 0; bottom: 0; display: inline-block;">
+          <span style="position: relative; display: flex; align-items: center; height: 26px; padding: 0 8px; background: #ffffff; border-top-right-radius: 9px; box-sizing: border-box;">
+            <span style="font-size: 13px; font-weight: 600; color: #191f28; line-height: 1;">가족방</span>
+            <span style="position: absolute; top: -6px; right: -6px; display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 100px; background: #bf3f0d; border: 2px solid #ffffff; box-sizing: border-box; color: #ffffff; font-size: 9px; font-weight: 700;">3</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">배지: primary-light · #d2450e</span>
+    <div style="background: #ffffff; border: 1px solid #e5e8eb; border-radius: 16px; overflow: hidden; width: 150px;">
+      <div style="position: relative; aspect-ratio: 4 / 3; background: radial-gradient(ellipse 60% 45% at 18% 78%, #fdfdfb 0%, rgb(253 253 251 / 0) 60%),radial-gradient(ellipse 40% 50% at 70% 30%, #2b2f36 0%, rgb(43 47 54 / 0) 55%),radial-gradient(ellipse 55% 35% at 85% 85%, #f2e9d8 0%, rgb(242 233 216 / 0) 60%),linear-gradient(160deg, #8a949e 0%, #5d6670 50%, #c9cfd8 100%);">
+        <span style="position: absolute; left: 0; bottom: 0; display: inline-block;">
+          <span style="position: relative; display: flex; align-items: center; height: 26px; padding: 0 8px; background: #ffffff; border-top-right-radius: 9px; box-sizing: border-box;">
+            <span style="font-size: 13px; font-weight: 600; color: #191f28; line-height: 1;">가족방</span>
+            <span style="position: absolute; top: -6px; right: -6px; display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 100px; background: #d2450e; border: 2px solid #ffffff; box-sizing: border-box; color: #ffffff; font-size: 9px; font-weight: 700;">3</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+    </div>
+    <p style="margin: 14px 0 0; font-size: 12.5px; line-height: 1.65; color: #8b95a1; max-width: 620px;">
+      primary-light 는 <b>4.57:1로 아직 AA를 넘긴다</b> — 못 쓰는 색이 아니라 지금 버튼에도 이미 쓰고 있는 색이다.
+      배지에 놓으면 primary 보다 살짝 밝아지지만 사진 위에서 그 차이가 크게 느껴지진 않는다.
+      "너무 어둡다"는 인상을 실제로 바꾸려면 <b>primary-light 로는 부족하고</b>, 앞서 본 것처럼
+      AA 밖(밝은 번트 이상)으로 나가야 뚜렷해진다.
+    </p>
+  </div>
 </x-dc>
 </body>
 </html>
