@@ -263,6 +263,14 @@
       "w": 390,
       "h": 1000,
       "page": "page-card-ref"
+    },
+    {
+      "file": "CardColor.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 720,
+      "h": 980,
+      "page": "page-color"
     }
   ],
   "annotations": [
@@ -371,6 +379,10 @@
     {
       "id": "page-card-f",
       "name": "앨범방 카드 · 칸 폭 3안"
+    },
+    {
+      "id": "page-color",
+      "name": "강조색, 너무 어두운가"
     },
     {
       "id": "page-card-ref",

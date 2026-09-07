@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; }
+    a { color: #191f28; } a:hover { color: #000000; }
+    .sheet { font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif; -webkit-font-smoothing: antialiased; word-break: keep-all; }
+  </style>
+</helmet>
+<div class="sheet" style="width: 720px; padding: 24px 24px 32px; background: #ffffff; color: #191f28; box-sizing: border-box;"><div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+    <span style="font-size: 19px; font-weight: 700; letter-spacing: -0.02em;">우리 색, 너무 어두운가?</span>
+    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #8b95a1; max-width: 560px;">감이 아니라 계산으로 본다. WCAG 상대휘도 공식으로 흰 배경/흰 글자 대비를 직접 구했다.</p>
+  </div><p style="margin: 16px 0 8px; font-size: 13px; font-weight: 700;">지금 토큰 (globals.css)</p><div style="display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #e5e8eb; border-radius: 12px;">
+    <div style="width: 44px; height: 44px; border-radius: 10px; background: #bf3f0d; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);"></div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 14px; font-weight: 700; color: #191f28;">--color-primary</span>
+        <span style="font-size: 12px; font-family: monospace; color: #8b95a1;">#bf3f0d</span>
+      </div>
+      <span style="font-size: 11.5px; color: #8b95a1; font-variant-numeric: tabular-nums;">H 16.9° · S 87.3% · L 40.0% · 지금 카드 배지 색</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none;">
+      <span style="font-size: 13px; font-weight: 700; color: #191f28; font-variant-numeric: tabular-nums;">5.34:1</span>
+      <span style="font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 100px; background: #e3efed; color: #0d6660;">AA 통과</span>
+    </div>
+  </div><div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #e5e8eb; border-radius: 12px;">
+    <div style="width: 44px; height: 44px; border-radius: 10px; background: #99320a; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);"></div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 14px; font-weight: 700; color: #191f28;">--color-primary-active</span>
+        <span style="font-size: 12px; font-family: monospace; color: #8b95a1;">#99320a</span>
+      </div>
+      <span style="font-size: 11.5px; color: #8b95a1; font-variant-numeric: tabular-nums;">H 16.8° · S 87.7% · L 32.0%</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none;">
+      <span style="font-size: 13px; font-weight: 700; color: #191f28; font-variant-numeric: tabular-nums;">7.46:1</span>
+      <span style="font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 100px; background: #e3efed; color: #0d6660;">AA 통과</span>
+    </div>
+  </div><div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #e5e8eb; border-radius: 12px;">
+    <div style="width: 44px; height: 44px; border-radius: 10px; background: #d2450e; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);"></div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 14px; font-weight: 700; color: #191f28;">--color-primary-light</span>
+        <span style="font-size: 12px; font-family: monospace; color: #8b95a1;">#d2450e</span>
+      </div>
+      <span style="font-size: 11.5px; color: #8b95a1; font-variant-numeric: tabular-nums;">H 16.8° · S 87.5% · L 43.9% · 상한선 — 여기서 더 밝히면 미달</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none;">
+      <span style="font-size: 13px; font-weight: 700; color: #191f28; font-variant-numeric: tabular-nums;">4.57:1</span>
+      <span style="font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 100px; background: #e3efed; color: #0d6660;">AA 통과</span>
+    </div>
+  </div></div><p style="margin: 20px 0 8px; font-size: 13px; font-weight: 700;">더 밝은 탐색안 — 확정 아님</p><div style="display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #e5e8eb; border-radius: 12px;">
+    <div style="width: 44px; height: 44px; border-radius: 10px; background: #e8540f; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);"></div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 14px; font-weight: 700; color: #191f28;">밝은 번트</span>
+        <span style="font-size: 12px; font-family: monospace; color: #8b95a1;">#e8540f</span>
+      </div>
+      <span style="font-size: 11.5px; color: #8b95a1; font-variant-numeric: tabular-nums;">H 19.1° · S 87.9% · L 48.4%</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none;">
+      <span style="font-size: 13px; font-weight: 700; color: #191f28; font-variant-numeric: tabular-nums;">3.68:1</span>
+      <span style="font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 100px; background: #f7e7e7; color: #a81e28;">AA 미달</span>
+    </div>
+  </div><div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid #e5e8eb; border-radius: 12px;">
+    <div style="width: 44px; height: 44px; border-radius: 10px; background: #ff6a1a; flex: none; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);"></div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span style="font-size: 14px; font-weight: 700; color: #191f28;">당근풍 비비드</span>
+        <span style="font-size: 12px; font-family: monospace; color: #8b95a1;">#ff6a1a</span>
+      </div>
+      <span style="font-size: 11.5px; color: #8b95a1; font-variant-numeric: tabular-nums;">H 21.0° · S 100.0% · L 55.1% · 채도 100%</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none;">
+      <span style="font-size: 13px; font-weight: 700; color: #191f28; font-variant-numeric: tabular-nums;">2.87:1</span>
+      <span style="font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 100px; background: #f7e7e7; color: #a81e28;">AA 미달</span>
+    </div>
+  </div></div><div style="margin-top: 22px; padding: 14px 16px; background: #fff4e8; border: 1px solid #ffe3c2; border-radius: 10px;">
+    <p style="margin: 0; font-size: 13px; line-height: 1.7; color: #7a3d00;">
+    <b>어두운 게 취향이 아니라 계산의 결과다.</b> 색상(H)은 17~24°로 당근풍과 같은 붉은 주황 계열이다 —
+    다른 건 <b>명도(L)</b>다. 지금 색은 L 40%, 밝은 탐색안은 L 55~62%.
+    문제는 <b>버튼 위 흰 글자 대비</b> — L을 48% 이상으로 올리면 4.5:1 밑으로 떨어져 <b>AA 미달</b>이 된다.
+    즉 "당근처럼 밝게"는 <b>흰 글자가 있는 버튼·헤더에는 못 쓴다.</b>
+    </p>
+  </div><p style="margin: 22px 0 10px; font-size: 13px; font-weight: 700;">그런데 배지는 글자를 안 얹는다 — 여기서만 밝혀보면</p><div style="display: flex; gap: 20px; align-items: flex-start;"><div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">지금 (L 40%)</span>
+    <div style="background: #ffffff; border: 1px solid #e5e8eb; border-radius: 16px; overflow: hidden; width: 150px;">
+      <div style="position: relative; aspect-ratio: 4 / 3; background: radial-gradient(ellipse 60% 45% at 18% 78%, #fdfdfb 0%, rgb(253 253 251 / 0) 60%),radial-gradient(ellipse 40% 50% at 70% 30%, #2b2f36 0%, rgb(43 47 54 / 0) 55%),radial-gradient(ellipse 55% 35% at 85% 85%, #f2e9d8 0%, rgb(242 233 216 / 0) 60%),linear-gradient(160deg, #8a949e 0%, #5d6670 50%, #c9cfd8 100%);">
+        <span style="position: absolute; left: 0; bottom: 0; display: inline-block;">
+          <span style="position: relative; display: flex; align-items: center; height: 26px; padding: 0 8px; background: #ffffff; border-top-right-radius: 9px; box-sizing: border-box;">
+            <span style="font-size: 13px; font-weight: 600; color: #191f28; line-height: 1;">가족방</span>
+            <span style="position: absolute; top: -6px; right: -6px; display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 100px; background: #bf3f0d; border: 2px solid #ffffff; box-sizing: border-box; color: #ffffff; font-size: 9px; font-weight: 700;">3</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div><div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">밝은 번트 (L 48%)</span>
+    <div style="background: #ffffff; border: 1px solid #e5e8eb; border-radius: 16px; overflow: hidden; width: 150px;">
+      <div style="position: relative; aspect-ratio: 4 / 3; background: radial-gradient(ellipse 60% 45% at 18% 78%, #fdfdfb 0%, rgb(253 253 251 / 0) 60%),radial-gradient(ellipse 40% 50% at 70% 30%, #2b2f36 0%, rgb(43 47 54 / 0) 55%),radial-gradient(ellipse 55% 35% at 85% 85%, #f2e9d8 0%, rgb(242 233 216 / 0) 60%),linear-gradient(160deg, #8a949e 0%, #5d6670 50%, #c9cfd8 100%);">
+        <span style="position: absolute; left: 0; bottom: 0; display: inline-block;">
+          <span style="position: relative; display: flex; align-items: center; height: 26px; padding: 0 8px; background: #ffffff; border-top-right-radius: 9px; box-sizing: border-box;">
+            <span style="font-size: 13px; font-weight: 600; color: #191f28; line-height: 1;">가족방</span>
+            <span style="position: absolute; top: -6px; right: -6px; display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 100px; background: #e8540f; border: 2px solid #ffffff; box-sizing: border-box; color: #ffffff; font-size: 9px; font-weight: 700;">3</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div><div style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 12px; font-weight: 600; color: #8b95a1;">당근풍 비비드 (L 55%)</span>
+    <div style="background: #ffffff; border: 1px solid #e5e8eb; border-radius: 16px; overflow: hidden; width: 150px;">
+      <div style="position: relative; aspect-ratio: 4 / 3; background: radial-gradient(ellipse 60% 45% at 18% 78%, #fdfdfb 0%, rgb(253 253 251 / 0) 60%),radial-gradient(ellipse 40% 50% at 70% 30%, #2b2f36 0%, rgb(43 47 54 / 0) 55%),radial-gradient(ellipse 55% 35% at 85% 85%, #f2e9d8 0%, rgb(242 233 216 / 0) 60%),linear-gradient(160deg, #8a949e 0%, #5d6670 50%, #c9cfd8 100%);">
+        <span style="position: absolute; left: 0; bottom: 0; display: inline-block;">
+          <span style="position: relative; display: flex; align-items: center; height: 26px; padding: 0 8px; background: #ffffff; border-top-right-radius: 9px; box-sizing: border-box;">
+            <span style="font-size: 13px; font-weight: 600; color: #191f28; line-height: 1;">가족방</span>
+            <span style="position: absolute; top: -6px; right: -6px; display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 3px; border-radius: 100px; background: #ff6a1a; border: 2px solid #ffffff; box-sizing: border-box; color: #ffffff; font-size: 9px; font-weight: 700;">3</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div></div><p style="margin: 14px 0 0; font-size: 12.5px; line-height: 1.65; color: #8b95a1; max-width: 620px;">
+    배지 자체는 <b>숫자 흰 글자가 18px 밖에 안 되는 아주 작은 면</b>이라 4.5:1 규정 대상이 아니다(대형 텍스트·비텍스트 UI 컴포넌트 규정 3:1이 적용). 
+    그래서 <b>버튼·본문 텍스트의 강조색은 지금 값 그대로 두고, 배지 같은 작은 신호 요소만 더 밝은 톤을 쓰는 절충</b>도 가능하다 — 다만 이건 브랜드 토큰을 늘리는 결정이라 로고 세션과 함께 정할 일이다.
+  </p>
+</x-dc>
+</body>
+</html>
