@@ -3,23 +3,11 @@ import Link from 'next/link'
 
 import { BrandMark } from '@/components/brand/BrandMark'
 import { ButtonLink } from '@/components/ui/Button'
-import { PLAY_STORE_URL } from '@/lib/native'
 
 /**
- * ⚠️ **임시 화면이다. 디자인 관문(시안 비교·구현)을 밟지 않았다.**
- *
- * 사용자 결정(2026-09-06): "지금은 길만 막고, 랜딩 디자인은 로고 뒤에."
- * 브랜드(새 로고·강조색)가 아직 안 정해졌는데 랜딩을 예쁘게 짜면,
- * 로고가 나오는 순간 통째로 다시 짜게 된다. 그래서 지금은
- * **브라우저로 온 사람이 막다른 길에 서지 않게 하는 것**만 한다.
- *
- * 로고와 강조색이 확정되면 이 파일은 디자인 관문 7단계를 밟아 다시 짠다.
- * 그때까지 여기에 색·장식을 더하지 마라 — 어차피 버릴 것이다.
- *
- * ── 이 화면이 왜 있나 ──
- * PRD §6⑮로 웹 서비스는 폐기했다(안드로이드 앱 하나로 간다).
- * 그래서 proxy.ts 가 앱이 아닌 접속을 전부 여기로 보낸다.
- * 로그인 여부와 상관없이 누구에게나 같은 화면을 보여준다.
+ * 브라우저 방문자를 포트폴리오 데모로 안내한다(2026-09-22 사용자 결정).
+ * 기존 소개 레이아웃은 유지하고 설치 대신 체험 진입을 연결했다.
+ * 소개 문구와 화면 전체의 최종 디자인은 별도 사용자 검토 대상이다.
  */
 export const metadata: Metadata = {
   title: '오늘도 사랑해',
@@ -42,18 +30,19 @@ export default function WelcomePage() {
         </p>
       </div>
 
-      {/*
-        들어오는 길은 앱 하나다. 웹으로 가입시키지 않는다 —
-        웹에서 가입해봐야 다음 화면부터 다시 여기로 돌아온다.
-      */}
+      {/* 실제 가입과 분리된 가상 가족방 체험. */}
       <ButtonLink
-        href={PLAY_STORE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+        href="/demo"
         fullWidth
       >
-        Google Play에서 받기
+        데모 체험하기
       </ButtonLink>
+
+      <p className="text-sm leading-relaxed text-muted">
+        가입 없이 가상의 가족방을 둘러보세요.
+        <br />
+        체험한 내용은 이 브라우저에만 저장돼요.
+      </p>
 
       <p className="text-base text-muted">
         <Link href="/legal/terms" className="underline">

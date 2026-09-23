@@ -119,12 +119,15 @@ export interface VoiceRecorderProps {
   onChange: (recording: VoiceRecording | null) => void
   /** 전송 중처럼 손대면 안 되는 동안 잠근다. */
   disabled?: boolean
+  /** 녹음 중 다른 입력으로 넘어가 마이크가 숨겨지지 않도록 부모에게 알린다. */
+  onActivityChange?: (active: boolean) => void
 }
 
 export function VoiceRecorder({
   value,
   onChange,
   disabled = false,
+  onActivityChange,
 }: VoiceRecorderProps) {
   const [ownPhase, setPhase] = useState<RecorderPhase>(
     value ? 'recorded' : 'idle',
@@ -143,6 +146,11 @@ export function VoiceRecorder({
   */
   const phase: RecorderPhase =
     ownPhase === 'idle' && value ? 'recorded' : ownPhase
+
+  useEffect(() => {
+    onActivityChange?.(phase === 'preparing' || phase === 'recording')
+    return () => onActivityChange?.(false)
+  }, [phase, onActivityChange])
   const [elapsedSec, setElapsedSec] = useState(0)
   const [error, setError] = useState<string | null>(null)
   /**
@@ -154,6 +162,7 @@ export function VoiceRecorder({
   const [stoppedAtMax, setStoppedAtMax] = useState(false)
 
   const recorderRef = useRef<MediaRecorder | null>(null)
+  const mountedRef = useRef(false)
   const streamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<BlobPart[]>([])
   const startedAtRef = useRef(0)
@@ -246,7 +255,9 @@ export function VoiceRecorder({
 
   // 화면을 떠날 때 뒷정리.
   useEffect(() => {
+    mountedRef.current = true
     return () => {
+      mountedRef.current = false
       clearTick()
       stopMetering()
       try {
@@ -291,8 +302,14 @@ export function VoiceRecorder({
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     } catch (micError) {
+      if (!mountedRef.current) return
       setError(describeMicError(micError))
       setPhase('idle')
+      return
+    }
+
+    if (!mountedRef.current) {
+      stream.getTracks().forEach((track) => track.stop())
       return
     }
 
@@ -327,6 +344,7 @@ export function VoiceRecorder({
       clearTick()
       stopMetering()
       releaseStream()
+      if (!mountedRef.current) return
 
       // MediaRecorder가 만든 파일은 길이 정보가 없는 경우가 많다.
       // 그래서 시작~정지 사이 실제 경과 시간을 길이로 삼는다.

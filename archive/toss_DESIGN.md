@@ -1,5 +1,7 @@
 # Toss (토스) Reference Design System
 
+> **보관 안내 · 2026-09-22:** 아래는 과거 기록이다. 현재 입구는 [README](../README.md), 현재 계획은 [PLAN](../PLAN.md)이다. 본문의 당시 작업 지시·상태를 현재 실행 기준으로 사용하지 않는다.
+
 <!-- design-md:section experience -->
 ## 1. Experience
 

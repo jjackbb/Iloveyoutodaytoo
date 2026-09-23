@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 import { isNativeAppUserAgent } from '@/lib/native'
+import { isDemoPresentationPath } from '@/lib/demo-route'
 
 /**
  * 로그인하지 않아도 들어갈 수 있는 경로.
@@ -92,6 +93,12 @@ function isBrowserAllowed(pathname: string) {
  */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // 포트폴리오 체험은 로컬 예시만 사용한다. 키·쿠키 유무와 무관하게
+  // Supabase 클라이언트를 만들기 전에 끝낸다(2026-09-22 사용자 결정).
+  if (isDemoPresentationPath(pathname)) {
+    return NextResponse.next({ request })
+  }
 
   /*
     앱이 아닌 접속은 여기서 끝난다(PRD §6⑮ — 웹 서비스 폐기).

@@ -6,7 +6,7 @@
 ## 2026-09-06 — 앨범방 카드
 
 캔버스: https://claude.ai/code/artifact/ae8f84d1-4d66-42cf-a3dc-67746d5b6cdd (페이지 "앨범방 카드 · 확정")
-작업 파일: `design/canvas/components/Main.dc.html`
+작업 파일: [확정 카드 시안](../archive/design/canvas/components/Main.dc.html). 2026-09-22 캔버스 묶음을 보관 폴더로 이동했으며 확정 규격의 근거로 계속 참조한다.
 
 | | 결정 | 왜 |
 | :--- | :--- | :--- |
@@ -49,7 +49,7 @@
 
 | | 표현 | 근거 |
 | :--- | :--- | :--- |
-| ④ 토스식 | 이름 위에 텍스트 뱃지 **"NEW"**(파랑 `#3182f6` 채움) | ✅ **근거 있음** — `toss_DESIGN.md` §4 TDS Mobile Badge: "fill or weak; semantic colors" "descriptive rather than interactive" |
+| ④ 토스식 | 이름 위에 텍스트 뱃지 **"NEW"**(파랑 `#3182f6` 채움) | ✅ **근거 있음** — [toss_DESIGN.md](../archive/toss_DESIGN.md) §4 TDS Mobile Badge: "fill or weak; semantic colors" "descriptive rather than interactive" |
 | ⑤ 당근마켓식 | 이름표 **우상단 모서리에 걸친** 숫자 원형 뱃지(흰 테두리) | ⚠️ **미검증** — 이 세션에서 당근마켓 공식 문서나 화면을 확인하지 못했다. 색(`#ff8a3d`)·크기·위치 전부 "숫자 원형 뱃지"라는 일반 관례를 재현한 것이지 실측이 아니다 |
 
 **채택하지 않았다.** 우리가 이미 고른 점(dot)은 이 둘 사이 어딘가다 — 토스보다 조용하고
@@ -73,7 +73,7 @@
 ### 2026-09-08 — 강조색이 어두운가? (계산으로 답함)
 
 당근마켓 참고를 보고 "우리 강조색(#BF3F0D)이 너무 어둡나"라는 질문이 나왔다.
-WCAG 상대휘도 공식으로 직접 계산했다(design/canvas/components/CardColor.dc.html).
+WCAG 상대휘도 공식으로 직접 계산했다([색 비교 시안](../archive/design/canvas/components/CardColor.dc.html)).
 
 | 색 | H | S | L | 흰 배경 대비 | 결과 |
 | :--- | ---: | ---: | ---: | ---: | :--- |

@@ -1,0 +1,1981 @@
+{
+  "date": "2026-09-22",
+  "purpose": "보관 자료 이동 및 문서 안내 정리",
+  "file_count": 282,
+  "files": [
+    {
+      "from": "PORTFOLIO_PLAN.md",
+      "to": "archive/PORTFOLIO_PLAN.md",
+      "sha256_before": "4de84b38549b725cfabf18c1893d9ea813be9eb8877371bfaeba6dbcf159fbd8",
+      "sha256_after": "344e667f8f7cf79d9fff9c04f0ac310fa7407f09d6dd589cc4aa56911f10e1a2",
+      "documentation_updated": true
+    },
+    {
+      "from": "WORKLOG.md",
+      "to": "archive/WORKLOG.md",
+      "sha256_before": "fef5b9554a68b230543e34e49a7ffebb0f98bb8418d3550ea21ca32bfebe1cdf",
+      "sha256_after": "ef650f8b4791447319edbae96dc88862d5b76bfbce9ceaf350a718eac21832d4",
+      "documentation_updated": true
+    },
+    {
+      "from": "HANDOFF_BUILD.md",
+      "to": "archive/HANDOFF_BUILD.md",
+      "sha256_before": "0db0726d7ee1bfb0b21f7b185d5eca2d926a25a6434572d94e4b2e9d4ec643aa",
+      "sha256_after": "ad73de9c70c149456c8b9ec8360b2319b6674f190e869c7dfe7eb6e90c5caa6e",
+      "documentation_updated": true
+    },
+    {
+      "from": "DECISIONS_2026-09-06.md",
+      "to": "archive/DECISIONS_2026-09-06.md",
+      "sha256_before": "6c2d38a41e54048fb2abbe770357030e77e5d695c5c04022d2f00dca5f3c3674",
+      "sha256_after": "8fd6885ee2829e8f53f452624df3af182d3ebaa72bcdb8aadba32babeecb4ccb",
+      "documentation_updated": true
+    },
+    {
+      "from": "HANDOFF_LOGO.md",
+      "to": "archive/HANDOFF_LOGO.md",
+      "sha256_before": "92f23c9a262b7a0a4317038ff9a4e024a95f23b16d4d24005093948ef153b5a8",
+      "sha256_after": "87bdb1a0bccf5a9deae35d6ff8a5250fc87df1b46aa1d24ab5418aaf24cd1796",
+      "documentation_updated": true
+    },
+    {
+      "from": "toss_DESIGN.md",
+      "to": "archive/toss_DESIGN.md",
+      "sha256_before": "5fbe9dd6bfc92580a1a0f3cd1c9dcf598c1e404abd9da60c9d31a7831f7b3715",
+      "sha256_after": "b76c49654106b3fe92ffb371adc36cd1b87ca5a8aa86381bdcb22b0d70d47260",
+      "documentation_updated": true
+    },
+    {
+      "from": "Senior UX_Spread.pdf",
+      "to": "archive/Senior UX_Spread.pdf",
+      "sha256_before": "b4a132820371952437927dfd7c3916069aa2b86efa72a235f4bd03067e32e5ab",
+      "sha256_after": "b4a132820371952437927dfd7c3916069aa2b86efa72a235f4bd03067e32e5ab",
+      "documentation_updated": false
+    },
+    {
+      "from": "logo.png",
+      "to": "archive/logo.png",
+      "sha256_before": "2ddaad984df78dd5de7aabb823ef93ab6432d5db1203b73611319f12416d8c21",
+      "sha256_after": "2ddaad984df78dd5de7aabb823ef93ab6432d5db1203b73611319f12416d8c21",
+      "documentation_updated": false
+    },
+    {
+      "from": "app_Iloveyoutodaytoo/PRD.md",
+      "to": "archive/app_Iloveyoutodaytoo/PRD.md",
+      "sha256_before": "773c5e25c38921ba19614a7b79cd7a847147787007db0c9c842d921299119918",
+      "sha256_after": "f43f9a8c9502b96c5800c5e208e65885b36b70363a64841ef0092d0d68e2e5d3",
+      "documentation_updated": true
+    },
+    {
+      "from": "frontend/_workspace/00_token_diff.md",
+      "to": "archive/frontend/_workspace/00_token_diff.md",
+      "sha256_before": "6ebb62288d7c322ec3a1e6ced8ab54b266226deca60c63fdb18c9cd95ce5038e",
+      "sha256_after": "6ebb62288d7c322ec3a1e6ced8ab54b266226deca60c63fdb18c9cd95ce5038e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/01_home_port.md",
+      "to": "archive/frontend/_workspace/01_home_port.md",
+      "sha256_before": "55bc945b66b110496ccc1b46a1d7e2429fbb1dda37be6301eaa3d51d661ea040",
+      "sha256_after": "55bc945b66b110496ccc1b46a1d7e2429fbb1dda37be6301eaa3d51d661ea040",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/01_home_prd.md",
+      "to": "archive/frontend/_workspace/01_home_prd.md",
+      "sha256_before": "638330d10c645b4b0ade4f894e0d7f36cf08cb0c3267dbbc17b0ee3f6f4f3fd6",
+      "sha256_after": "638330d10c645b4b0ade4f894e0d7f36cf08cb0c3267dbbc17b0ee3f6f4f3fd6",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/01_home_qa.md",
+      "to": "archive/frontend/_workspace/01_home_qa.md",
+      "sha256_before": "b8792c591488ad131616d3b1565fcc8249b37ea4a34431164d25dcdf141738c8",
+      "sha256_after": "b8792c591488ad131616d3b1565fcc8249b37ea4a34431164d25dcdf141738c8",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/01_home_spec.md",
+      "to": "archive/frontend/_workspace/01_home_spec.md",
+      "sha256_before": "d50fa6c02421c1f318cd1da36dfe670be3a3f234ef34536d5830ba6e70168af4",
+      "sha256_after": "d50fa6c02421c1f318cd1da36dfe670be3a3f234ef34536d5830ba6e70168af4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/02_detail_port.md",
+      "to": "archive/frontend/_workspace/02_detail_port.md",
+      "sha256_before": "b5ef34682b6e21feca710015cc13615aa0ce48771dc3a74a65041f6cfe135f38",
+      "sha256_after": "b5ef34682b6e21feca710015cc13615aa0ce48771dc3a74a65041f6cfe135f38",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/02_detail_spec.md",
+      "to": "archive/frontend/_workspace/02_detail_spec.md",
+      "sha256_before": "767a113dbf3aa0f1aadd6df083b45932ed7f401e3c8adbd08458b4ba30b9e3ef",
+      "sha256_after": "767a113dbf3aa0f1aadd6df083b45932ed7f401e3c8adbd08458b4ba30b9e3ef",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/03_capture_flow.md",
+      "to": "archive/frontend/_workspace/03_capture_flow.md",
+      "sha256_before": "217b6ec4b468cc6496d783ba33366b689a04afc247649bc8721298901d9ec8d1",
+      "sha256_after": "217b6ec4b468cc6496d783ba33366b689a04afc247649bc8721298901d9ec8d1",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/04_auth_port.md",
+      "to": "archive/frontend/_workspace/04_auth_port.md",
+      "sha256_before": "3c95efc84e31607c3454dea6da1f778f767a68a01dbc8c3874de0f37ae554581",
+      "sha256_after": "3c95efc84e31607c3454dea6da1f778f767a68a01dbc8c3874de0f37ae554581",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/05_stage2_prd.md",
+      "to": "archive/frontend/_workspace/05_stage2_prd.md",
+      "sha256_before": "20cc4906dfc3de317df1565e1cef95fc1233661aa3e229c98dc9306a492f06a2",
+      "sha256_after": "20cc4906dfc3de317df1565e1cef95fc1233661aa3e229c98dc9306a492f06a2",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/05_stage2_qa.md",
+      "to": "archive/frontend/_workspace/05_stage2_qa.md",
+      "sha256_before": "2449f07a1293b458dc6e6436768254040eee59d8bd19f8b8ebf8bb35fedc744b",
+      "sha256_after": "2449f07a1293b458dc6e6436768254040eee59d8bd19f8b8ebf8bb35fedc744b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/06_cover_crop_port.md",
+      "to": "archive/frontend/_workspace/06_cover_crop_port.md",
+      "sha256_before": "3d6ed270e5d6522bd6d48d40259fc3393655ec54615344788904a8648ce1a259",
+      "sha256_after": "3d6ed270e5d6522bd6d48d40259fc3393655ec54615344788904a8648ce1a259",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/06_service_report.html",
+      "to": "archive/frontend/_workspace/06_service_report.html",
+      "sha256_before": "bc3d476addfd4555705dff5ef77a9dc8fffad87f1f5b490a67b4a858f3fc3ea1",
+      "sha256_after": "bc3d476addfd4555705dff5ef77a9dc8fffad87f1f5b490a67b4a858f3fc3ea1",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/07_round3_prd.md",
+      "to": "archive/frontend/_workspace/07_round3_prd.md",
+      "sha256_before": "bbe36d1fa0a6a2c838ceba93372ba71caa38b1e46accec0db7f0bc83da084751",
+      "sha256_after": "bbe36d1fa0a6a2c838ceba93372ba71caa38b1e46accec0db7f0bc83da084751",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/07_round3_qa.md",
+      "to": "archive/frontend/_workspace/07_round3_qa.md",
+      "sha256_before": "de583e9d2e428943ba7ba83d7bb14c6caa752ef07d98babc05338144f1a5f956",
+      "sha256_after": "de583e9d2e428943ba7ba83d7bb14c6caa752ef07d98babc05338144f1a5f956",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/08_invite_contacts_port.md",
+      "to": "archive/frontend/_workspace/08_invite_contacts_port.md",
+      "sha256_before": "e20d97a57d00582e40aedaab62a339752c07ca65f2c964ef45c8538f06f097ef",
+      "sha256_after": "e20d97a57d00582e40aedaab62a339752c07ca65f2c964ef45c8538f06f097ef",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/09_my_profile_port.md",
+      "to": "archive/frontend/_workspace/09_my_profile_port.md",
+      "sha256_before": "792dc7d3655ddd5ff7ec36658585e0e47e51672f9e6d560a0b7e92ff4a363fe7",
+      "sha256_after": "792dc7d3655ddd5ff7ec36658585e0e47e51672f9e6d560a0b7e92ff4a363fe7",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/10_detail_comments_port.md",
+      "to": "archive/frontend/_workspace/10_detail_comments_port.md",
+      "sha256_before": "ff6a5e840c7d6be8fa5b1dbfd42e732967435444d1e3d4aba9ca70e26627d3a5",
+      "sha256_after": "ff6a5e840c7d6be8fa5b1dbfd42e732967435444d1e3d4aba9ca70e26627d3a5",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/11_mailbox_send_port.md",
+      "to": "archive/frontend/_workspace/11_mailbox_send_port.md",
+      "sha256_before": "b9c78079ff03b0ef0b238659fb8d9e1bc001a099e53b82268e75c87c6628adba",
+      "sha256_after": "b9c78079ff03b0ef0b238659fb8d9e1bc001a099e53b82268e75c87c6628adba",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/12_ux_baseline.md",
+      "to": "archive/frontend/_workspace/12_ux_baseline.md",
+      "sha256_before": "e60fa89e3af01d3e2ab406f20e4960d4c838dc2859ef1f201745baf0e069a2f8",
+      "sha256_after": "e60fa89e3af01d3e2ab406f20e4960d4c838dc2859ef1f201745baf0e069a2f8",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/14_decisions_2026-08-24.md",
+      "to": "archive/frontend/_workspace/14_decisions_2026-08-24.md",
+      "sha256_before": "c977c7b705827cea3f73461b4df3aebde35bc2d6ea8681c50b4ebf10f3fa8157",
+      "sha256_after": "c977c7b705827cea3f73461b4df3aebde35bc2d6ea8681c50b4ebf10f3fa8157",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/15_process_notes.md",
+      "to": "archive/frontend/_workspace/15_process_notes.md",
+      "sha256_before": "b8eea6749a34cc6f03e2f6e4146af9ca94ae6783357d2b6df1290d9a00c73813",
+      "sha256_after": "b8eea6749a34cc6f03e2f6e4146af9ca94ae6783357d2b6df1290d9a00c73813",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/16_prd_qa_legacy.md",
+      "to": "archive/frontend/_workspace/16_prd_qa_legacy.md",
+      "sha256_before": "ccbd0f167772de2ea9ebe872bc3578cfe8479b152cf16360b78a9431012fa760",
+      "sha256_after": "ccbd0f167772de2ea9ebe872bc3578cfe8479b152cf16360b78a9431012fa760",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/PROGRESS.md",
+      "to": "archive/frontend/_workspace/PROGRESS.md",
+      "sha256_before": "e030a5e7057717a872ded1187c6f443fc07c12d35aa2cc6e13c252ad97a0cfb5",
+      "sha256_after": "e030a5e7057717a872ded1187c6f443fc07c12d35aa2cc6e13c252ad97a0cfb5",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/dev-cream.png",
+      "to": "archive/frontend/_workspace/mock/logo/dev-cream.png",
+      "sha256_before": "698838a1ced4048e2f97bc16abd7b88d7a1642eca41dca2a7988904fcd2703ab",
+      "sha256_after": "698838a1ced4048e2f97bc16abd7b88d7a1642eca41dca2a7988904fcd2703ab",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/dev-heartfill.png",
+      "to": "archive/frontend/_workspace/mock/logo/dev-heartfill.png",
+      "sha256_before": "f6500d3e78ecd0f751a904a653473ea6c14af92156180a1f009ed3f8efb447c2",
+      "sha256_after": "f6500d3e78ecd0f751a904a653473ea6c14af92156180a1f009ed3f8efb447c2",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/dev-markonly-bo.png",
+      "to": "archive/frontend/_workspace/mock/logo/dev-markonly-bo.png",
+      "sha256_before": "719716146d22af7a01a76bb29633859cee27e3eb93aea9e648e8ca6e04ac1f6e",
+      "sha256_after": "719716146d22af7a01a76bb29633859cee27e3eb93aea9e648e8ca6e04ac1f6e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/dev-twotone-heart.png",
+      "to": "archive/frontend/_workspace/mock/logo/dev-twotone-heart.png",
+      "sha256_before": "7de4e0d66fa4058e67028d6b5e00b3418b0a81f9db427926799f476323634066",
+      "sha256_after": "7de4e0d66fa4058e67028d6b5e00b3418b0a81f9db427926799f476323634066",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/dev-twotone.png",
+      "to": "archive/frontend/_workspace/mock/logo/dev-twotone.png",
+      "sha256_before": "22a4d207406f0805a6b91d6944dd1ed12bc5870c02d1a278b550b7ab3c704254",
+      "sha256_after": "22a4d207406f0805a6b91d6944dd1ed12bc5870c02d1a278b550b7ab3c704254",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/dev-zoom.png",
+      "to": "archive/frontend/_workspace/mock/logo/dev-zoom.png",
+      "sha256_before": "e5cd8268091878bd001469b1dcf4c53a125645c4f00b2f63fc9fd1c471f966c4",
+      "sha256_after": "e5cd8268091878bd001469b1dcf4c53a125645c4f00b2f63fc9fd1c471f966c4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/filled-deep-teal.png",
+      "to": "archive/frontend/_workspace/mock/logo/filled-deep-teal.png",
+      "sha256_before": "1bbcf56de88a8c529bb96465ada36dafe6e94da0a91aad1c34b3e778366f7d23",
+      "sha256_after": "1bbcf56de88a8c529bb96465ada36dafe6e94da0a91aad1c34b3e778366f7d23",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/filled-ink-navy.png",
+      "to": "archive/frontend/_workspace/mock/logo/filled-ink-navy.png",
+      "sha256_before": "3b0d7feb09707c9997ddccce254c50bd053f126bf67e011a675e5d1aeaea833b",
+      "sha256_after": "3b0d7feb09707c9997ddccce254c50bd053f126bf67e011a675e5d1aeaea833b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/filled-terracotta-dark.png",
+      "to": "archive/frontend/_workspace/mock/logo/filled-terracotta-dark.png",
+      "sha256_before": "46bba64f8b449e96123783688a82f8176a24d111ffd4693b8a1b040e39044bc5",
+      "sha256_after": "46bba64f8b449e96123783688a82f8176a24d111ffd4693b8a1b040e39044bc5",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-a.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-a.png",
+      "sha256_before": "e26d21f23c38e40a9bc69274949247f71256713492fedd0d0492d79bb8b87d2e",
+      "sha256_after": "e26d21f23c38e40a9bc69274949247f71256713492fedd0d0492d79bb8b87d2e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-b.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-b.png",
+      "sha256_before": "2ecf0fde353989b52642756f1e13b1c4b7f526d5c1d68d2ee667a5ff58262626",
+      "sha256_after": "2ecf0fde353989b52642756f1e13b1c4b7f526d5c1d68d2ee667a5ff58262626",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-solid.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-solid.png",
+      "sha256_before": "09124fdb88c98053ae2a8bab2c1cb2bda3855c221bdbb73413e0c487459163a9",
+      "sha256_after": "09124fdb88c98053ae2a8bab2c1cb2bda3855c221bdbb73413e0c487459163a9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-twotone-1.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-twotone-1.png",
+      "sha256_before": "46f4eebd6456804be71b5ea557a78e213b9ac58493a36334959067c7f30ae004",
+      "sha256_after": "46f4eebd6456804be71b5ea557a78e213b9ac58493a36334959067c7f30ae004",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-twotone-15.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-twotone-15.png",
+      "sha256_before": "eec4129024a804fd0e742204e1c61fef342780bfca095b423a32a36b25ea4b3e",
+      "sha256_after": "eec4129024a804fd0e742204e1c61fef342780bfca095b423a32a36b25ea4b3e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-twotone-2.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-twotone-2.png",
+      "sha256_before": "f8b0118673350a95a563e29b1cabbc86a7dcb6303256810443b2beea7b1c20ff",
+      "sha256_after": "f8b0118673350a95a563e29b1cabbc86a7dcb6303256810443b2beea7b1c20ff",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/final-twotone.png",
+      "to": "archive/frontend/_workspace/mock/logo/final-twotone.png",
+      "sha256_before": "30748f966559641ffa40d20a4352459a019227914b5900e34613011ca00dde49",
+      "sha256_after": "30748f966559641ffa40d20a4352459a019227914b5900e34613011ca00dde49",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/markonly.png",
+      "to": "archive/frontend/_workspace/mock/logo/markonly.png",
+      "sha256_before": "43f519f9dc74c26706acbd3f8eddda54b2054e48b33fdcfe40bca13c7a658fc1",
+      "sha256_after": "43f519f9dc74c26706acbd3f8eddda54b2054e48b33fdcfe40bca13c7a658fc1",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/original.png",
+      "to": "archive/frontend/_workspace/mock/logo/original.png",
+      "sha256_before": "c4bb3749daae20e21aef653d6aacf2f9bcc574e3dde5dd23506b16e6ded017b2",
+      "sha256_after": "c4bb3749daae20e21aef653d6aacf2f9bcc574e3dde5dd23506b16e6ded017b2",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-amber-brown.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-amber-brown.png",
+      "sha256_before": "831034abc2c15526e75c87bd31a3e8d6d45666dd89ceb8bd23268fc481796d26",
+      "sha256_after": "831034abc2c15526e75c87bd31a3e8d6d45666dd89ceb8bd23268fc481796d26",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-amber.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-amber.png",
+      "sha256_before": "c46710f619fd31456210866cee91a5377662d06722546d3a62df46d9232656a9",
+      "sha256_after": "c46710f619fd31456210866cee91a5377662d06722546d3a62df46d9232656a9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-clay.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-clay.png",
+      "sha256_before": "550118c63bdde42b3d8dc74f5fc9356ee6c5522e72c8d8387f59ef78c669d662",
+      "sha256_after": "550118c63bdde42b3d8dc74f5fc9356ee6c5522e72c8d8387f59ef78c669d662",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-copper.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-copper.png",
+      "sha256_before": "bf4dd3d2e38ce5c16a2ca49a3558707a0e87691e9546abef0603d6531998126f",
+      "sha256_after": "bf4dd3d2e38ce5c16a2ca49a3558707a0e87691e9546abef0603d6531998126f",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-deep.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-deep.png",
+      "sha256_before": "07b27eb53b6f896b3af43071fdd73163950aa3bd4f95e081a63dde80187db044",
+      "sha256_after": "07b27eb53b6f896b3af43071fdd73163950aa3bd4f95e081a63dde80187db044",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-ember.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-ember.png",
+      "sha256_before": "befa074d11266bd7f56531110872d406e006fee4529ae0d2a6ef8e4e26c78945",
+      "sha256_after": "befa074d11266bd7f56531110872d406e006fee4529ae0d2a6ef8e4e26c78945",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-light.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-light.png",
+      "sha256_before": "1c38586384835064247a1cfe3dcb91c3383b2e10c497b625dc48860b2ed95aa1",
+      "sha256_after": "1c38586384835064247a1cfe3dcb91c3383b2e10c497b625dc48860b2ed95aa1",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-muted.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-muted.png",
+      "sha256_before": "83e8ce2b4befc8dd1ba4ddbd9afd4178ed39325dd57891c72ab8c8c096e1143d",
+      "sha256_after": "83e8ce2b4befc8dd1ba4ddbd9afd4178ed39325dd57891c72ab8c8c096e1143d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-red.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-red.png",
+      "sha256_before": "d09175f0c3a9670acad869a8b2615c00c7edafefa8bce840454d0d89e08d41d3",
+      "sha256_after": "d09175f0c3a9670acad869a8b2615c00c7edafefa8bce840454d0d89e08d41d3",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-rust.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-rust.png",
+      "sha256_before": "eea218c7b989c0baca377109f9c876ac2c43e0b4809d6a3d05c01f56babf5690",
+      "sha256_after": "eea218c7b989c0baca377109f9c876ac2c43e0b4809d6a3d05c01f56babf5690",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-bo-vivid.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-bo-vivid.png",
+      "sha256_before": "09124fdb88c98053ae2a8bab2c1cb2bda3855c221bdbb73413e0c487459163a9",
+      "sha256_after": "09124fdb88c98053ae2a8bab2c1cb2bda3855c221bdbb73413e0c487459163a9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-brick.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-brick.png",
+      "sha256_before": "bc848dbf7398a0db0c48105c89e7ed8e002be0146e866d64076230c219c54bf5",
+      "sha256_after": "bc848dbf7398a0db0c48105c89e7ed8e002be0146e866d64076230c219c54bf5",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-burgundy.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-burgundy.png",
+      "sha256_before": "add3a098f77a3eff8f5707f2927680e17d0410b3e63661a1ad103dbba3dfd9e4",
+      "sha256_after": "add3a098f77a3eff8f5707f2927680e17d0410b3e63661a1ad103dbba3dfd9e4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-burnt-orange.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-burnt-orange.png",
+      "sha256_before": "c191c5422d6e00e203ddb0004921f9325563af7bb1fd2fe645f1eadbd928a072",
+      "sha256_after": "c191c5422d6e00e203ddb0004921f9325563af7bb1fd2fe645f1eadbd928a072",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-cocoa.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-cocoa.png",
+      "sha256_before": "335cd35cfb0a323fa01633007f1b9f91683de5aa1f25b5d46d490339dc38415f",
+      "sha256_after": "335cd35cfb0a323fa01633007f1b9f91683de5aa1f25b5d46d490339dc38415f",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-deep-teal.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-deep-teal.png",
+      "sha256_before": "b6a028316838ab546dec25543e0f7a20b9193b851f38ad2478ef6fcc9574c8c4",
+      "sha256_after": "b6a028316838ab546dec25543e0f7a20b9193b851f38ad2478ef6fcc9574c8c4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-ink-navy.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-ink-navy.png",
+      "sha256_before": "60fabd9a9afe25e16cb1db4c2f6dd3c0f51833b81fd18f9881dde1c5756cea52",
+      "sha256_after": "60fabd9a9afe25e16cb1db4c2f6dd3c0f51833b81fd18f9881dde1c5756cea52",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-moss.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-moss.png",
+      "sha256_before": "959fd181dceb9633dba7534e21881431ec5a6e70fb609f35306a1826ca38195b",
+      "sha256_after": "959fd181dceb9633dba7534e21881431ec5a6e70fb609f35306a1826ca38195b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-original.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-original.png",
+      "sha256_before": "c4bb3749daae20e21aef653d6aacf2f9bcc574e3dde5dd23506b16e6ded017b2",
+      "sha256_after": "c4bb3749daae20e21aef653d6aacf2f9bcc574e3dde5dd23506b16e6ded017b2",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-slate-blue.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-slate-blue.png",
+      "sha256_before": "7f2cd1178c2817bfa16b74f1bc1d625db5695a709eb7a23db5d08a092f930a65",
+      "sha256_after": "7f2cd1178c2817bfa16b74f1bc1d625db5695a709eb7a23db5d08a092f930a65",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/recolor-terracotta-dark.png",
+      "to": "archive/frontend/_workspace/mock/logo/recolor-terracotta-dark.png",
+      "sha256_before": "9f834f1178d830ac8a08b0ffa7da826fc2440bd150b77ee9b1e8583fd2f4fea4",
+      "sha256_after": "9f834f1178d830ac8a08b0ffa7da826fc2440bd150b77ee9b1e8583fd2f4fea4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/safe-deep-teal.png",
+      "to": "archive/frontend/_workspace/mock/logo/safe-deep-teal.png",
+      "sha256_before": "61a536c7dd1fcefb0cff5f17f418efd0757cd4eeb4511170cf5679d9fffbc391",
+      "sha256_after": "61a536c7dd1fcefb0cff5f17f418efd0757cd4eeb4511170cf5679d9fffbc391",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/safe-ink-navy.png",
+      "to": "archive/frontend/_workspace/mock/logo/safe-ink-navy.png",
+      "sha256_before": "530c00eda81e52c704d19dd3d00062816a44825da0907dccbad47dad89e2ee3d",
+      "sha256_after": "530c00eda81e52c704d19dd3d00062816a44825da0907dccbad47dad89e2ee3d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo/safe-terracotta-dark.png",
+      "to": "archive/frontend/_workspace/mock/logo/safe-terracotta-dark.png",
+      "sha256_before": "41c0267ebeb4b7a322f22a2489ee1f3937ceda237ff0d99213b1965cdf9bf72c",
+      "sha256_after": "41c0267ebeb4b7a322f22a2489ee1f3937ceda237ff0d99213b1965cdf9bf72c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo-burnt.html",
+      "to": "archive/frontend/_workspace/mock/logo-burnt.html",
+      "sha256_before": "a2ad607962aef7915f198d4a4c88da85516480ff146d178a873cd27f92f73ced",
+      "sha256_after": "a2ad607962aef7915f198d4a4c88da85516480ff146d178a873cd27f92f73ced",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo-final.html",
+      "to": "archive/frontend/_workspace/mock/logo-final.html",
+      "sha256_before": "a1e832f28ee999c1878f49ad7ca537d21faa6dbc3ef68f125a44f100c76ca58a",
+      "sha256_after": "a1e832f28ee999c1878f49ad7ca537d21faa6dbc3ef68f125a44f100c76ca58a",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/mock/logo-variants.html",
+      "to": "archive/frontend/_workspace/mock/logo-variants.html",
+      "sha256_before": "80cdfd89e0e1db472890a618b84ed82e1a42fd2f368f641605a296604f503d7b",
+      "sha256_after": "80cdfd89e0e1db472890a618b84ed82e1a42fd2f368f641605a296604f503d7b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/_workspace/recraft-prompting.md",
+      "to": "archive/frontend/_workspace/recraft-prompting.md",
+      "sha256_before": "124c3e1c33f9afebaa476f40a0f4b2fe8fe03e47d4bac09720f219b23e588897",
+      "sha256_after": "124c3e1c33f9afebaa476f40a0f4b2fe8fe03e47d4bac09720f219b23e588897",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/01.png",
+      "to": "archive/frontend/catch/_crop/01.png",
+      "sha256_before": "b15b3c3e0833c5c1253efd732545d4e988fa6b970b5c9ae268c80f5fcb12ca3a",
+      "sha256_after": "b15b3c3e0833c5c1253efd732545d4e988fa6b970b5c9ae268c80f5fcb12ca3a",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/02.png",
+      "to": "archive/frontend/catch/_crop/02.png",
+      "sha256_before": "ca110d4340d266edb51f247f340da12e1f16b64b8d6750417d77a55b9f335e0d",
+      "sha256_after": "ca110d4340d266edb51f247f340da12e1f16b64b8d6750417d77a55b9f335e0d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/03.png",
+      "to": "archive/frontend/catch/_crop/03.png",
+      "sha256_before": "08906ade33bb4ee8d13bac13b03901cb6625040eafea721b1b83df3e2c77b89d",
+      "sha256_after": "08906ade33bb4ee8d13bac13b03901cb6625040eafea721b1b83df3e2c77b89d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/04.png",
+      "to": "archive/frontend/catch/_crop/04.png",
+      "sha256_before": "2b6bb944a2baa4b5cef89ff3a2e218fa68a9805734e5321d01effa13ee22bd54",
+      "sha256_after": "2b6bb944a2baa4b5cef89ff3a2e218fa68a9805734e5321d01effa13ee22bd54",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/05.png",
+      "to": "archive/frontend/catch/_crop/05.png",
+      "sha256_before": "5fbfa905b69a02f9a52542934ea32aaf546a88a9c151642f11867be53b0824bf",
+      "sha256_after": "5fbfa905b69a02f9a52542934ea32aaf546a88a9c151642f11867be53b0824bf",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/06.png",
+      "to": "archive/frontend/catch/_crop/06.png",
+      "sha256_before": "0609f48e41c44b833d3263988679b4de5491814031da27cb820638c4fc482ccf",
+      "sha256_after": "0609f48e41c44b833d3263988679b4de5491814031da27cb820638c4fc482ccf",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/07.png",
+      "to": "archive/frontend/catch/_crop/07.png",
+      "sha256_before": "43b7c511a7ad8cfcf464a6c15ddf5e240fa9521f9b1d44e4bf140c4b4c538f3c",
+      "sha256_after": "43b7c511a7ad8cfcf464a6c15ddf5e240fa9521f9b1d44e4bf140c4b4c538f3c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/08.png",
+      "to": "archive/frontend/catch/_crop/08.png",
+      "sha256_before": "f59ba4a740646c01ed602de3e87bfb36d103c237e6dc414d95c1ecde79382faa",
+      "sha256_after": "f59ba4a740646c01ed602de3e87bfb36d103c237e6dc414d95c1ecde79382faa",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/09.png",
+      "to": "archive/frontend/catch/_crop/09.png",
+      "sha256_before": "5946d9b5c51a1d836d3120ee7c406eb907d567cb23f5dd4266a3fe849132984c",
+      "sha256_after": "5946d9b5c51a1d836d3120ee7c406eb907d567cb23f5dd4266a3fe849132984c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/10.png",
+      "to": "archive/frontend/catch/_crop/10.png",
+      "sha256_before": "5cd06a0cb2ebc21b9cd0db6250d919495646013782eed8d467ff60a73c97199b",
+      "sha256_after": "5cd06a0cb2ebc21b9cd0db6250d919495646013782eed8d467ff60a73c97199b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/11.png",
+      "to": "archive/frontend/catch/_crop/11.png",
+      "sha256_before": "e7cbd9b972a2157d8ff3091c2851cee61f2fc33695848c08f10713a43bb73ada",
+      "sha256_after": "e7cbd9b972a2157d8ff3091c2851cee61f2fc33695848c08f10713a43bb73ada",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/12.png",
+      "to": "archive/frontend/catch/_crop/12.png",
+      "sha256_before": "96117550a8c25d9086408a7b2704fc9d96921a118819a9cf0b08f469ca3886b3",
+      "sha256_after": "96117550a8c25d9086408a7b2704fc9d96921a118819a9cf0b08f469ca3886b3",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/13.png",
+      "to": "archive/frontend/catch/_crop/13.png",
+      "sha256_before": "d877e845e65cc85ddf58acdd36654e1b13e490738b07638efb0d279f84bdab07",
+      "sha256_after": "d877e845e65cc85ddf58acdd36654e1b13e490738b07638efb0d279f84bdab07",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/14.png",
+      "to": "archive/frontend/catch/_crop/14.png",
+      "sha256_before": "7cfdec84649eefd9feb54725b77fc5d1fc7c2363ceceb4771f75c880264a067e",
+      "sha256_after": "7cfdec84649eefd9feb54725b77fc5d1fc7c2363ceceb4771f75c880264a067e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/15.png",
+      "to": "archive/frontend/catch/_crop/15.png",
+      "sha256_before": "3eedd9366ea927a66f71da672b56762d296bc88f46725d1010dbf2b56ad0dcb9",
+      "sha256_after": "3eedd9366ea927a66f71da672b56762d296bc88f46725d1010dbf2b56ad0dcb9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/16.png",
+      "to": "archive/frontend/catch/_crop/16.png",
+      "sha256_before": "de2b9e1509cb0657d0bd9f3d07c7f70b2088c87c9af6ffbf6176e47de9d94e6b",
+      "sha256_after": "de2b9e1509cb0657d0bd9f3d07c7f70b2088c87c9af6ffbf6176e47de9d94e6b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/17.png",
+      "to": "archive/frontend/catch/_crop/17.png",
+      "sha256_before": "c80b4ce1530c39e4c5f5bba9efb62b64e51df963385eade242e0392069cd956c",
+      "sha256_after": "c80b4ce1530c39e4c5f5bba9efb62b64e51df963385eade242e0392069cd956c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/18.png",
+      "to": "archive/frontend/catch/_crop/18.png",
+      "sha256_before": "9812682785cc976d3f57a3f3c338b2f1631dd3f6018ed1601c21c3c367597d8d",
+      "sha256_after": "9812682785cc976d3f57a3f3c338b2f1631dd3f6018ed1601c21c3c367597d8d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/19.png",
+      "to": "archive/frontend/catch/_crop/19.png",
+      "sha256_before": "6f2cc15eafeb2eb683431773391118489069dd07ed318eedb67cfc16e7cee7f3",
+      "sha256_after": "6f2cc15eafeb2eb683431773391118489069dd07ed318eedb67cfc16e7cee7f3",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/20.png",
+      "to": "archive/frontend/catch/_crop/20.png",
+      "sha256_before": "8f439fb70ae461b69b32d7af4fcb71e6b74998a8e46501a6fad5146cd2ee7d85",
+      "sha256_after": "8f439fb70ae461b69b32d7af4fcb71e6b74998a8e46501a6fad5146cd2ee7d85",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/21.png",
+      "to": "archive/frontend/catch/_crop/21.png",
+      "sha256_before": "7541571a754fb45114db499ec88ab5bb88814eac58c9fb451101a1d0cbd89bd7",
+      "sha256_after": "7541571a754fb45114db499ec88ab5bb88814eac58c9fb451101a1d0cbd89bd7",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/22.png",
+      "to": "archive/frontend/catch/_crop/22.png",
+      "sha256_before": "9e37679e39b74235494fea66514081c26c803116e12a5fbaeb578f090b105b22",
+      "sha256_after": "9e37679e39b74235494fea66514081c26c803116e12a5fbaeb578f090b105b22",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/23.png",
+      "to": "archive/frontend/catch/_crop/23.png",
+      "sha256_before": "c598407d0963f1b93c469c30b3f0059ae92c3b4d62ed4eb728b42d41b2706d2f",
+      "sha256_after": "c598407d0963f1b93c469c30b3f0059ae92c3b4d62ed4eb728b42d41b2706d2f",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/24.png",
+      "to": "archive/frontend/catch/_crop/24.png",
+      "sha256_before": "32633cfaa0d8fa0061ffa8212ea2cfa5da1bbbf94bb22959c5bf142b693c733b",
+      "sha256_after": "32633cfaa0d8fa0061ffa8212ea2cfa5da1bbbf94bb22959c5bf142b693c733b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/25.png",
+      "to": "archive/frontend/catch/_crop/25.png",
+      "sha256_before": "16658a52eda9f0d12e34380dae70db010576fdf0ec68a3fb990f4db8aba3f2ec",
+      "sha256_after": "16658a52eda9f0d12e34380dae70db010576fdf0ec68a3fb990f4db8aba3f2ec",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/26.png",
+      "to": "archive/frontend/catch/_crop/26.png",
+      "sha256_before": "41174779ab141be9f06bb6b3786ce9cb0e0ac537a11486be17fafe51efef7498",
+      "sha256_after": "41174779ab141be9f06bb6b3786ce9cb0e0ac537a11486be17fafe51efef7498",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/27.png",
+      "to": "archive/frontend/catch/_crop/27.png",
+      "sha256_before": "8313de1ee90c861977984cfd805f7b02287c3f4b96e994efae05871beb42ebe8",
+      "sha256_after": "8313de1ee90c861977984cfd805f7b02287c3f4b96e994efae05871beb42ebe8",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/28.png",
+      "to": "archive/frontend/catch/_crop/28.png",
+      "sha256_before": "8313de1ee90c861977984cfd805f7b02287c3f4b96e994efae05871beb42ebe8",
+      "sha256_after": "8313de1ee90c861977984cfd805f7b02287c3f4b96e994efae05871beb42ebe8",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/29.png",
+      "to": "archive/frontend/catch/_crop/29.png",
+      "sha256_before": "89932dcc547e293e9c91abf8d6b2596ee3afe5649e0130940e73f0a3f3391cf8",
+      "sha256_after": "89932dcc547e293e9c91abf8d6b2596ee3afe5649e0130940e73f0a3f3391cf8",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/30.png",
+      "to": "archive/frontend/catch/_crop/30.png",
+      "sha256_before": "4a417179fdf50a83f55210f1b5edd27cdc81cae988f5cc84d50fef7e92574b69",
+      "sha256_after": "4a417179fdf50a83f55210f1b5edd27cdc81cae988f5cc84d50fef7e92574b69",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/31.png",
+      "to": "archive/frontend/catch/_crop/31.png",
+      "sha256_before": "b5cc473e352c6c72e04b00d9b857e944b6dd13f965f77837a56c7c42c448eaa4",
+      "sha256_after": "b5cc473e352c6c72e04b00d9b857e944b6dd13f965f77837a56c7c42c448eaa4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/32.png",
+      "to": "archive/frontend/catch/_crop/32.png",
+      "sha256_before": "6b7d2bcc914f7669fe09683fea30119ba24ad152b62274403d60a4b55ec56f1b",
+      "sha256_after": "6b7d2bcc914f7669fe09683fea30119ba24ad152b62274403d60a4b55ec56f1b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/33.png",
+      "to": "archive/frontend/catch/_crop/33.png",
+      "sha256_before": "0587f2e70d8af3ea147ed762667264594630091f0edb75e1e26ecc62a20cacda",
+      "sha256_after": "0587f2e70d8af3ea147ed762667264594630091f0edb75e1e26ecc62a20cacda",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/34.png",
+      "to": "archive/frontend/catch/_crop/34.png",
+      "sha256_before": "8a999579633f90a482a61c7c0f364ed82ab8f85bea82549c64ad30cf47bb6096",
+      "sha256_after": "8a999579633f90a482a61c7c0f364ed82ab8f85bea82549c64ad30cf47bb6096",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/35.png",
+      "to": "archive/frontend/catch/_crop/35.png",
+      "sha256_before": "b6d23b5b14e725cef843d5fa2e7d5285c3b3b64853be74cd8b959a28182e520c",
+      "sha256_after": "b6d23b5b14e725cef843d5fa2e7d5285c3b3b64853be74cd8b959a28182e520c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/36.png",
+      "to": "archive/frontend/catch/_crop/36.png",
+      "sha256_before": "56bf00c9094015242177175c22100e05abd4e4a084e2be7392420312e689dc99",
+      "sha256_after": "56bf00c9094015242177175c22100e05abd4e4a084e2be7392420312e689dc99",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/37.png",
+      "to": "archive/frontend/catch/_crop/37.png",
+      "sha256_before": "05a838b2e506f5f6b79473be322936e3f2cdf65f92ef6fecaf90c9437472c4ad",
+      "sha256_after": "05a838b2e506f5f6b79473be322936e3f2cdf65f92ef6fecaf90c9437472c4ad",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/38.png",
+      "to": "archive/frontend/catch/_crop/38.png",
+      "sha256_before": "fbcdb3e580afdf03346e0cfec9870a7076299c2f4ea2dd5d5c683fd9a28ff204",
+      "sha256_after": "fbcdb3e580afdf03346e0cfec9870a7076299c2f4ea2dd5d5c683fd9a28ff204",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/39.png",
+      "to": "archive/frontend/catch/_crop/39.png",
+      "sha256_before": "70ef55ba70ffbd567ec210c4151d2032fa41ee3c57786d74a32a2b93ba032d24",
+      "sha256_after": "70ef55ba70ffbd567ec210c4151d2032fa41ee3c57786d74a32a2b93ba032d24",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/40.png",
+      "to": "archive/frontend/catch/_crop/40.png",
+      "sha256_before": "42bf0719d00784c3be98f94aa6abf07dc6833ec36a0e78ad890d16ba9e439a3b",
+      "sha256_after": "42bf0719d00784c3be98f94aa6abf07dc6833ec36a0e78ad890d16ba9e439a3b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/41.png",
+      "to": "archive/frontend/catch/_crop/41.png",
+      "sha256_before": "91b984d61fa87c79c72b17035465f1c285de6230da2dbd3131e40c0eeb279bd5",
+      "sha256_after": "91b984d61fa87c79c72b17035465f1c285de6230da2dbd3131e40c0eeb279bd5",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/42.png",
+      "to": "archive/frontend/catch/_crop/42.png",
+      "sha256_before": "927d35640724583466c70d04eb5d7dd763c5e7514a7de8c79a96263abcd39a5e",
+      "sha256_after": "927d35640724583466c70d04eb5d7dd763c5e7514a7de8c79a96263abcd39a5e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/43.png",
+      "to": "archive/frontend/catch/_crop/43.png",
+      "sha256_before": "2c5328d124fbf80e709f742c5133d7a6217199732ce93188ff8f803bf380b030",
+      "sha256_after": "2c5328d124fbf80e709f742c5133d7a6217199732ce93188ff8f803bf380b030",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/44.png",
+      "to": "archive/frontend/catch/_crop/44.png",
+      "sha256_before": "c1a929c166bc2f5554c9ff5b7c4033644e4161c44edeed17adaa80a9d8d3016d",
+      "sha256_after": "c1a929c166bc2f5554c9ff5b7c4033644e4161c44edeed17adaa80a9d8d3016d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/45.png",
+      "to": "archive/frontend/catch/_crop/45.png",
+      "sha256_before": "474998ab8bd11e503569d1c72b05eceeca641cb35fb0ab13e708abf1d0b024e0",
+      "sha256_after": "474998ab8bd11e503569d1c72b05eceeca641cb35fb0ab13e708abf1d0b024e0",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/46.png",
+      "to": "archive/frontend/catch/_crop/46.png",
+      "sha256_before": "5ffb038f24e9b586d4eb06159a8e4d2ba6436a6e2685767b1df87f8a1cc06d11",
+      "sha256_after": "5ffb038f24e9b586d4eb06159a8e4d2ba6436a6e2685767b1df87f8a1cc06d11",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/47.png",
+      "to": "archive/frontend/catch/_crop/47.png",
+      "sha256_before": "d52ee5226d7702d9d10b2995ad650b1f6ce2d45622e4892ff73596d459215ad0",
+      "sha256_after": "d52ee5226d7702d9d10b2995ad650b1f6ce2d45622e4892ff73596d459215ad0",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/48.png",
+      "to": "archive/frontend/catch/_crop/48.png",
+      "sha256_before": "b7fb648d2dc4c15f360f38d9491f2ed4a8287e132963ff5c6575f9ac52e74fbd",
+      "sha256_after": "b7fb648d2dc4c15f360f38d9491f2ed4a8287e132963ff5c6575f9ac52e74fbd",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/_crop/49.png",
+      "to": "archive/frontend/catch/_crop/49.png",
+      "sha256_before": "498ba3197c537230428a79841d0705578244aeab5da7a7dc805e79f6c3932036",
+      "sha256_after": "498ba3197c537230428a79841d0705578244aeab5da7a7dc805e79f6c3932036",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.23.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.23.png",
+      "sha256_before": "a9f3661f75f57c7d8ab6b3491423f311613c22aab20fc6e6ac19ac637f607bb2",
+      "sha256_after": "a9f3661f75f57c7d8ab6b3491423f311613c22aab20fc6e6ac19ac637f607bb2",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.26.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.26.png",
+      "sha256_before": "bf6ff214f6baa0547ab0133ae4ebd51ce285be77780ba210789aa22cecfc971f",
+      "sha256_after": "bf6ff214f6baa0547ab0133ae4ebd51ce285be77780ba210789aa22cecfc971f",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.27.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.27.png",
+      "sha256_before": "18fd38f0747d288a59138b90216dc227f9912e09267dbe90d940215d7b876022",
+      "sha256_after": "18fd38f0747d288a59138b90216dc227f9912e09267dbe90d940215d7b876022",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.39.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.39.png",
+      "sha256_before": "80c661e450a42eb4577872e24032714b63994057ddbdaa586ccd52ea946ef8b9",
+      "sha256_after": "80c661e450a42eb4577872e24032714b63994057ddbdaa586ccd52ea946ef8b9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.41.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.41.png",
+      "sha256_before": "edcd875f866172cb96c35fc6df4e6096864a04958a5d616c80b06e61cafa651d",
+      "sha256_after": "edcd875f866172cb96c35fc6df4e6096864a04958a5d616c80b06e61cafa651d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.45.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.45.png",
+      "sha256_before": "0047fc77f9c9a0e548db5d6d3d203f05a694fdd140c44b30e48bb64b7427746f",
+      "sha256_after": "0047fc77f9c9a0e548db5d6d3d203f05a694fdd140c44b30e48bb64b7427746f",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.38.59.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.38.59.png",
+      "sha256_before": "ddd43cb9cff83138fb9bbaa0b4cf9dbd16fde8f43dc8988207d08d3372871296",
+      "sha256_after": "ddd43cb9cff83138fb9bbaa0b4cf9dbd16fde8f43dc8988207d08d3372871296",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.01.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.01.png",
+      "sha256_before": "d9e96b1e9d802fc07f3a9e35d2a33fe57452c6eb0bb7407e3f23a8a4fae063bb",
+      "sha256_after": "d9e96b1e9d802fc07f3a9e35d2a33fe57452c6eb0bb7407e3f23a8a4fae063bb",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.12.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.12.png",
+      "sha256_before": "7edc7b3c4877ce3ac6ff263284d5f330ab0df708853cfdb4a8693e8b5086e1d9",
+      "sha256_after": "7edc7b3c4877ce3ac6ff263284d5f330ab0df708853cfdb4a8693e8b5086e1d9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.15.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.15.png",
+      "sha256_before": "d3f9fa2b05d7f894e41f0b6c8ec466f529584225ed8b2368152668c03adfceb9",
+      "sha256_after": "d3f9fa2b05d7f894e41f0b6c8ec466f529584225ed8b2368152668c03adfceb9",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.19.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.19.png",
+      "sha256_before": "d03a0fe28397c6f8d54587210c559a96145effb4fb1821ed634b09a87436ce2c",
+      "sha256_after": "d03a0fe28397c6f8d54587210c559a96145effb4fb1821ed634b09a87436ce2c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.26.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.26.png",
+      "sha256_before": "29e9b8d295a2f4e58113e67e4b980922f7987f96f69d0d20d7fc8def1acb49b6",
+      "sha256_after": "29e9b8d295a2f4e58113e67e4b980922f7987f96f69d0d20d7fc8def1acb49b6",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.32.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.32.png",
+      "sha256_before": "969a07efc31508175a53938551c78d2fa3b69e25705944ba590b2fb73e00d120",
+      "sha256_after": "969a07efc31508175a53938551c78d2fa3b69e25705944ba590b2fb73e00d120",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.47.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.47.png",
+      "sha256_before": "cfbf4d2491428dd36d56458a71aad6b5d52abed4525cc0837c0f2e64e0059127",
+      "sha256_after": "cfbf4d2491428dd36d56458a71aad6b5d52abed4525cc0837c0f2e64e0059127",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.39.51.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.39.51.png",
+      "sha256_before": "d3c9ec77a70f37b1c4b4c803af8c769458201025b380bdc70096948193cb5396",
+      "sha256_after": "d3c9ec77a70f37b1c4b4c803af8c769458201025b380bdc70096948193cb5396",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.03.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.03.png",
+      "sha256_before": "17b2cae46a9fda5b078f645f910bc3579099f7bd4e488e10dd9dd7495a44ea51",
+      "sha256_after": "17b2cae46a9fda5b078f645f910bc3579099f7bd4e488e10dd9dd7495a44ea51",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.09.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.09.png",
+      "sha256_before": "babdbc7ef127fa61e58a904112b34775783503dbc9c62dc9f280f7894fd776d6",
+      "sha256_after": "babdbc7ef127fa61e58a904112b34775783503dbc9c62dc9f280f7894fd776d6",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.22.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.22.png",
+      "sha256_before": "178dbf38fad8632541c41fedc327a59d13cfa1e5bab3087dcc3ee6791a2e4a75",
+      "sha256_after": "178dbf38fad8632541c41fedc327a59d13cfa1e5bab3087dcc3ee6791a2e4a75",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.26.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.26.png",
+      "sha256_before": "eac0bc322134b77f1d881ce6a83975ee1253172e9b0db34119e3460627512dfe",
+      "sha256_after": "eac0bc322134b77f1d881ce6a83975ee1253172e9b0db34119e3460627512dfe",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.32.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.32.png",
+      "sha256_before": "9706e92ee28ec5f5ef4aa41447099cb10497d50184757f80966d78186c11e3ab",
+      "sha256_after": "9706e92ee28ec5f5ef4aa41447099cb10497d50184757f80966d78186c11e3ab",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.39.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.39.png",
+      "sha256_before": "5b6c1aae37784a2b2ff177cda2041d44ba5271e7dd2540e9c453708648c23d4b",
+      "sha256_after": "5b6c1aae37784a2b2ff177cda2041d44ba5271e7dd2540e9c453708648c23d4b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.41.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.41.png",
+      "sha256_before": "9062634a193f8f0143b0e20fe87e6e3c05859585f9082de0f8f7da7dcd17355a",
+      "sha256_after": "9062634a193f8f0143b0e20fe87e6e3c05859585f9082de0f8f7da7dcd17355a",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.51.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.51.png",
+      "sha256_before": "752e28bd067cfcaaf436fdcc60adfb826fd4c67f63101c1c63d62709989c651e",
+      "sha256_after": "752e28bd067cfcaaf436fdcc60adfb826fd4c67f63101c1c63d62709989c651e",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.40.54.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.40.54.png",
+      "sha256_before": "5601578bceb9d15704a333f3700154ad279f7a9986f2d6379971331d25e2d374",
+      "sha256_after": "5601578bceb9d15704a333f3700154ad279f7a9986f2d6379971331d25e2d374",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.00.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.00.png",
+      "sha256_before": "cdc53aedba2e11ded484fd808d5d04eb1374d035da66f245e0306ee821f491aa",
+      "sha256_after": "cdc53aedba2e11ded484fd808d5d04eb1374d035da66f245e0306ee821f491aa",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.03.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.03.png",
+      "sha256_before": "e9c8b6b8b4293f659f986982b54cac051d18e5d4d151ab149c54f6d414b78d56",
+      "sha256_after": "e9c8b6b8b4293f659f986982b54cac051d18e5d4d151ab149c54f6d414b78d56",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.05.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.05.png",
+      "sha256_before": "a2b928e3a28e934123eb21c156d02a5f56bdc09310c0462e48ed56431683c736",
+      "sha256_after": "a2b928e3a28e934123eb21c156d02a5f56bdc09310c0462e48ed56431683c736",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.06.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.06.png",
+      "sha256_before": "a2b928e3a28e934123eb21c156d02a5f56bdc09310c0462e48ed56431683c736",
+      "sha256_after": "a2b928e3a28e934123eb21c156d02a5f56bdc09310c0462e48ed56431683c736",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.12.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.12.png",
+      "sha256_before": "e76f4c724627eb296f9dd647e72bbf3285577591c08a591e2d2d8a2cd09bb08d",
+      "sha256_after": "e76f4c724627eb296f9dd647e72bbf3285577591c08a591e2d2d8a2cd09bb08d",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.15.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.15.png",
+      "sha256_before": "e5cee296ef8ca24e738daa275a7a6f650468ec6c3aea4a9e5613c77e2e534a7f",
+      "sha256_after": "e5cee296ef8ca24e738daa275a7a6f650468ec6c3aea4a9e5613c77e2e534a7f",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.17.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.17.png",
+      "sha256_before": "6a7a7fa72358de5371638252fecfc85f7a8790152ac3fa4de4778d5ddea29499",
+      "sha256_after": "6a7a7fa72358de5371638252fecfc85f7a8790152ac3fa4de4778d5ddea29499",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.20.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.20.png",
+      "sha256_before": "e1a67bcb74827b9051eed4a75fe2ece2bbacded6650758938aaa2d2c9d896190",
+      "sha256_after": "e1a67bcb74827b9051eed4a75fe2ece2bbacded6650758938aaa2d2c9d896190",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.25.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.25.png",
+      "sha256_before": "26bdc168716389a9b6420bfe329ce6f02a7b90f02a86070cbba5708217e600a4",
+      "sha256_after": "26bdc168716389a9b6420bfe329ce6f02a7b90f02a86070cbba5708217e600a4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.28.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.28.png",
+      "sha256_before": "c19858efa441ca53de4ad36304be5eb129641af5a400b400154eb0709ca4ff56",
+      "sha256_after": "c19858efa441ca53de4ad36304be5eb129641af5a400b400154eb0709ca4ff56",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.32.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.32.png",
+      "sha256_before": "04e102f2c44ad4a3aa0b7a62640c16aa170a73b35cab3083d5fb76c17c163b20",
+      "sha256_after": "04e102f2c44ad4a3aa0b7a62640c16aa170a73b35cab3083d5fb76c17c163b20",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.35.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.35.png",
+      "sha256_before": "1a337d4156f6a10df069a21f3ba9712fc7b0f851ede6807c9351e520cb7be702",
+      "sha256_after": "1a337d4156f6a10df069a21f3ba9712fc7b0f851ede6807c9351e520cb7be702",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.47.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.47.png",
+      "sha256_before": "7fc55de420b6846a4a84bd820c64b5651cc55cd60bf4c337ba257da4ffba808c",
+      "sha256_after": "7fc55de420b6846a4a84bd820c64b5651cc55cd60bf4c337ba257da4ffba808c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.55.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.55.png",
+      "sha256_before": "5b192c6e584300d870d65a040c67bce9faf83c51c6dc2113da7c1c260dbefe80",
+      "sha256_after": "5b192c6e584300d870d65a040c67bce9faf83c51c6dc2113da7c1c260dbefe80",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.56.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.56.png",
+      "sha256_before": "d4a6ac4318a21a9ccc49342c5dbd8f0c9619a8c52b786e4aa695fffb56b54d73",
+      "sha256_after": "d4a6ac4318a21a9ccc49342c5dbd8f0c9619a8c52b786e4aa695fffb56b54d73",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.41.59.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.41.59.png",
+      "sha256_before": "07e2063e653bb0eee108ae3785199fbe99a1681aa65f34a33bde637c6b54d63a",
+      "sha256_after": "07e2063e653bb0eee108ae3785199fbe99a1681aa65f34a33bde637c6b54d63a",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.05.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.05.png",
+      "sha256_before": "1e6b1bef37a251bb8d0472ab31c62145a96949d64760a5fcf3fe6f24c929ff0c",
+      "sha256_after": "1e6b1bef37a251bb8d0472ab31c62145a96949d64760a5fcf3fe6f24c929ff0c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.06.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.06.png",
+      "sha256_before": "423fa13f5cd1183176b12e549d51f1f91967c6e575eb70f885b6e1aa36eed79c",
+      "sha256_after": "423fa13f5cd1183176b12e549d51f1f91967c6e575eb70f885b6e1aa36eed79c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.10.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.10.png",
+      "sha256_before": "c64211ee378be4ef1d0faa932fbdc7fb79d87ec0ca2b09f28b3250905bdaa63b",
+      "sha256_after": "c64211ee378be4ef1d0faa932fbdc7fb79d87ec0ca2b09f28b3250905bdaa63b",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.12.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.12.png",
+      "sha256_before": "05c85226e2136311a6f8b8ae7233ad9eca861ff882b898401c011f0c3b72caa6",
+      "sha256_after": "05c85226e2136311a6f8b8ae7233ad9eca861ff882b898401c011f0c3b72caa6",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.15.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.15.png",
+      "sha256_before": "4aae78228727002eae315e4a461d883214e787b24f5def4badf7ec3c9113cc1a",
+      "sha256_after": "4aae78228727002eae315e4a461d883214e787b24f5def4badf7ec3c9113cc1a",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.29.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.29.png",
+      "sha256_before": "b4367a0cc9992fbe6a90db20c11bb3be10dd6e54c94bdd8871488669792f1fc4",
+      "sha256_after": "b4367a0cc9992fbe6a90db20c11bb3be10dd6e54c94bdd8871488669792f1fc4",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.31.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.31.png",
+      "sha256_before": "cbe3789a8fc4a80ded269f124b52354a0c19147639e2a0251fd7800dceaf2e97",
+      "sha256_after": "cbe3789a8fc4a80ded269f124b52354a0c19147639e2a0251fd7800dceaf2e97",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.34.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.34.png",
+      "sha256_before": "bae96fca1195bbd7fe93bf35ac4bbecfa2cc4ff6b8a636cff0aecf1c39c0d27c",
+      "sha256_after": "bae96fca1195bbd7fe93bf35ac4bbecfa2cc4ff6b8a636cff0aecf1c39c0d27c",
+      "documentation_updated": false
+    },
+    {
+      "from": "frontend/catch/스크린샷 2026-08-09 오후 6.42.36.png",
+      "to": "archive/frontend/catch/스크린샷 2026-08-09 오후 6.42.36.png",
+      "sha256_before": "8e274303dad53662af64df8d084d3f11c311f7bead1a491902934b8dd669c441",
+      "sha256_after": "8e274303dad53662af64df8d084d3f11c311f7bead1a491902934b8dd669c441",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/AUDIT.md",
+      "to": "archive/design/AUDIT.md",
+      "sha256_before": "c1dc8c4df060aad2d31b74ec6533f7bdd309b0bdd9f97f71007886ab6ceda44e",
+      "sha256_after": "9a937162d058865e1a0a4af6ff6d7b71ea25ec68c6b759050a64355f98415d0e",
+      "documentation_updated": true
+    },
+    {
+      "from": "design/audit.py",
+      "to": "archive/design/audit.py",
+      "sha256_before": "0609579ab593524b75b6ba03b0dcac96d8a31b4b30363044583b4b0d2ab2b95b",
+      "sha256_after": "0609579ab593524b75b6ba03b0dcac96d8a31b4b30363044583b4b0d2ab2b95b",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/Main.dc.html",
+      "to": "archive/design/canvas/Main.dc.html",
+      "sha256_before": "bd98760196b6f8e968452df69c135373333170d0f9c49eb65f55c5e0409b597a",
+      "sha256_after": "bd98760196b6f8e968452df69c135373333170d0f9c49eb65f55c5e0409b597a",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/PlanB.dc.html",
+      "to": "archive/design/canvas/PlanB.dc.html",
+      "sha256_before": "5cb315c09d3eb6b0b3d864955a56334dc4e49780126c618be2a8180d28d8b44f",
+      "sha256_after": "5cb315c09d3eb6b0b3d864955a56334dc4e49780126c618be2a8180d28d8b44f",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/PlanC.dc.html",
+      "to": "archive/design/canvas/PlanC.dc.html",
+      "sha256_before": "4130196868b012182761efd816ca1e3d1ad3c1c07af8ffb5983c77ac7300e180",
+      "sha256_after": "4130196868b012182761efd816ca1e3d1ad3c1c07af8ffb5983c77ac7300e180",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/canvas.json",
+      "to": "archive/design/canvas/canvas.json",
+      "sha256_before": "bf22a73cc1f999b2ad77d9549a7cb01d6c18c6eea72f232ed87856b3030f3ce4",
+      "sha256_after": "bf22a73cc1f999b2ad77d9549a7cb01d6c18c6eea72f232ed87856b3030f3ce4",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Button1.dc.html",
+      "to": "archive/design/canvas/components/Button1.dc.html",
+      "sha256_before": "518952d3880e5331dae1137479836765e58217fdad4efe8a505d1c2e486fb767",
+      "sha256_after": "518952d3880e5331dae1137479836765e58217fdad4efe8a505d1c2e486fb767",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Button2.dc.html",
+      "to": "archive/design/canvas/components/Button2.dc.html",
+      "sha256_before": "1be3b49c71549a4b92090a36d8eff7ec0ed6f7cede1a1cfcbe353bd68036bb32",
+      "sha256_after": "1be3b49c71549a4b92090a36d8eff7ec0ed6f7cede1a1cfcbe353bd68036bb32",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Button3.dc.html",
+      "to": "archive/design/canvas/components/Button3.dc.html",
+      "sha256_before": "7a1ee84fe4b938ead77bb12e28ee44f5a28009dd845b7cee7ec073612dace1a6",
+      "sha256_after": "7a1ee84fe4b938ead77bb12e28ee44f5a28009dd845b7cee7ec073612dace1a6",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Card1.dc.html",
+      "to": "archive/design/canvas/components/Card1.dc.html",
+      "sha256_before": "9523a47e238a37b0323fa829d4d429d1ad9c8137c81b5e888507daa9636129f8",
+      "sha256_after": "9523a47e238a37b0323fa829d4d429d1ad9c8137c81b5e888507daa9636129f8",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Card2.dc.html",
+      "to": "archive/design/canvas/components/Card2.dc.html",
+      "sha256_before": "d8009dc3a52d2ecab6c0d9447ec49f3975730d1538819c9c0f7b3f9c17f4ea79",
+      "sha256_after": "d8009dc3a52d2ecab6c0d9447ec49f3975730d1538819c9c0f7b3f9c17f4ea79",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Card3.dc.html",
+      "to": "archive/design/canvas/components/Card3.dc.html",
+      "sha256_before": "8f36e4f4196d12e45a17c9f3eae736161694d19524e6c34460230d5d83363faa",
+      "sha256_after": "8f36e4f4196d12e45a17c9f3eae736161694d19524e6c34460230d5d83363faa",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardColor.dc.html",
+      "to": "archive/design/canvas/components/CardColor.dc.html",
+      "sha256_before": "897cc755cf570043fb53d75733244ef4abd6acd9321e14696b75c2c14783f57f",
+      "sha256_after": "897cc755cf570043fb53d75733244ef4abd6acd9321e14696b75c2c14783f57f",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardF1.dc.html",
+      "to": "archive/design/canvas/components/CardF1.dc.html",
+      "sha256_before": "0a6844aaf8c94c8c405252fb076891b1e49f4bbdbd1521d4a8fdc45b510ba3be",
+      "sha256_after": "0a6844aaf8c94c8c405252fb076891b1e49f4bbdbd1521d4a8fdc45b510ba3be",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardF2.dc.html",
+      "to": "archive/design/canvas/components/CardF2.dc.html",
+      "sha256_before": "acc99ca6257006e916a386dc6ffa89fd2e18a8db64ff1eedabc2b4a510aa2135",
+      "sha256_after": "acc99ca6257006e916a386dc6ffa89fd2e18a8db64ff1eedabc2b4a510aa2135",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardF3.dc.html",
+      "to": "archive/design/canvas/components/CardF3.dc.html",
+      "sha256_before": "e94c491fd47fb0fd084b68ec476abf9e625dd34722d357370fb418fd12421ad4",
+      "sha256_after": "e94c491fd47fb0fd084b68ec476abf9e625dd34722d357370fb418fd12421ad4",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardT1.dc.html",
+      "to": "archive/design/canvas/components/CardT1.dc.html",
+      "sha256_before": "806f596594cc4a80b6713f371d7bb36572fc1daba01008a77d2ccd6d357a0c34",
+      "sha256_after": "806f596594cc4a80b6713f371d7bb36572fc1daba01008a77d2ccd6d357a0c34",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardT2.dc.html",
+      "to": "archive/design/canvas/components/CardT2.dc.html",
+      "sha256_before": "02b42bb2274485124b6e936ce35336ab11205aa53697a45e872469d5406b21d9",
+      "sha256_after": "02b42bb2274485124b6e936ce35336ab11205aa53697a45e872469d5406b21d9",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardT3.dc.html",
+      "to": "archive/design/canvas/components/CardT3.dc.html",
+      "sha256_before": "302c76a0053f0554ebfff0543d5e8cf9826281a7e2c1bf366bfda05c376f1739",
+      "sha256_after": "302c76a0053f0554ebfff0543d5e8cf9826281a7e2c1bf366bfda05c376f1739",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardU1.dc.html",
+      "to": "archive/design/canvas/components/CardU1.dc.html",
+      "sha256_before": "3c9d236d64b4e58a192f49d61c66a4b7e3bf4e151f5ad65c9d2405f9f5ae41f0",
+      "sha256_after": "3c9d236d64b4e58a192f49d61c66a4b7e3bf4e151f5ad65c9d2405f9f5ae41f0",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardU2.dc.html",
+      "to": "archive/design/canvas/components/CardU2.dc.html",
+      "sha256_before": "26965b0730821ea3b7b32ce071e137313849eaffbc779574b771b48360cf373f",
+      "sha256_after": "26965b0730821ea3b7b32ce071e137313849eaffbc779574b771b48360cf373f",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardU3.dc.html",
+      "to": "archive/design/canvas/components/CardU3.dc.html",
+      "sha256_before": "e64da138080838951942fe2800769a067da385f8f99b0cea2274198eb2f74981",
+      "sha256_after": "e64da138080838951942fe2800769a067da385f8f99b0cea2274198eb2f74981",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardU4.dc.html",
+      "to": "archive/design/canvas/components/CardU4.dc.html",
+      "sha256_before": "e96306e31f054cbdcb8ea28211990fd32056f0cc538473a1f7a3a3ff7a48452d",
+      "sha256_after": "e96306e31f054cbdcb8ea28211990fd32056f0cc538473a1f7a3a3ff7a48452d",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardW0.dc.html",
+      "to": "archive/design/canvas/components/CardW0.dc.html",
+      "sha256_before": "bd19e8f51b3c15456fda4e442ef54b15c35a1589030534388705dfbdd5282b58",
+      "sha256_after": "bd19e8f51b3c15456fda4e442ef54b15c35a1589030534388705dfbdd5282b58",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardW1.dc.html",
+      "to": "archive/design/canvas/components/CardW1.dc.html",
+      "sha256_before": "2f74f9eb475a5c4a359c63493dc5c0b465c3a643329a1e84de61fd87546f205a",
+      "sha256_after": "2f74f9eb475a5c4a359c63493dc5c0b465c3a643329a1e84de61fd87546f205a",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardW2.dc.html",
+      "to": "archive/design/canvas/components/CardW2.dc.html",
+      "sha256_before": "d43724486eda8fb512be6236750cc53ac41cb4f55b06edb4d8e81352a75e8dfa",
+      "sha256_after": "d43724486eda8fb512be6236750cc53ac41cb4f55b06edb4d8e81352a75e8dfa",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardW3.dc.html",
+      "to": "archive/design/canvas/components/CardW3.dc.html",
+      "sha256_before": "026ce3cad30c8920b433df64d7687fa38166ddac216fd35245f20d2ba3d5146b",
+      "sha256_after": "026ce3cad30c8920b433df64d7687fa38166ddac216fd35245f20d2ba3d5146b",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardX4.dc.html",
+      "to": "archive/design/canvas/components/CardX4.dc.html",
+      "sha256_before": "0f0f406d23e1fb78b8f81b17f358737bc226bc6d367aa9431f92eabb6ce83072",
+      "sha256_after": "0f0f406d23e1fb78b8f81b17f358737bc226bc6d367aa9431f92eabb6ce83072",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardX5.dc.html",
+      "to": "archive/design/canvas/components/CardX5.dc.html",
+      "sha256_before": "dc1b016c06a3276234ab83419df1f89b0827cd2ef38c34e04994fc700a053afb",
+      "sha256_after": "dc1b016c06a3276234ab83419df1f89b0827cd2ef38c34e04994fc700a053afb",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/CardX6.dc.html",
+      "to": "archive/design/canvas/components/CardX6.dc.html",
+      "sha256_before": "3cc3f98869d07676eb090955f66a6c17b16bfb470edf309968b42ae4a3bdcc28",
+      "sha256_after": "3cc3f98869d07676eb090955f66a6c17b16bfb470edf309968b42ae4a3bdcc28",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Chip1.dc.html",
+      "to": "archive/design/canvas/components/Chip1.dc.html",
+      "sha256_before": "cb24480c68eb4de3c3b31a1ce2cbf868e8e19259650005797cfa46dbadbdbc30",
+      "sha256_after": "cb24480c68eb4de3c3b31a1ce2cbf868e8e19259650005797cfa46dbadbdbc30",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Chip2.dc.html",
+      "to": "archive/design/canvas/components/Chip2.dc.html",
+      "sha256_before": "fd2abf4bf4f4ceda29f5e0412c7aaa51c7a8de4c52acd1b1026386d30c250a4e",
+      "sha256_after": "fd2abf4bf4f4ceda29f5e0412c7aaa51c7a8de4c52acd1b1026386d30c250a4e",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Chip3.dc.html",
+      "to": "archive/design/canvas/components/Chip3.dc.html",
+      "sha256_before": "e64c1a6a9119af732a61e6ee882f7208e4584e2de4f3b30e15df56cf29b07088",
+      "sha256_after": "e64c1a6a9119af732a61e6ee882f7208e4584e2de4f3b30e15df56cf29b07088",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Field1.dc.html",
+      "to": "archive/design/canvas/components/Field1.dc.html",
+      "sha256_before": "89e5fc26faeb499b87c0eba7a30eb5aab70dbaa55cab3c65d7efef5d6f849996",
+      "sha256_after": "89e5fc26faeb499b87c0eba7a30eb5aab70dbaa55cab3c65d7efef5d6f849996",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Field2.dc.html",
+      "to": "archive/design/canvas/components/Field2.dc.html",
+      "sha256_before": "77c3a297e6bb080c2a524f868e6d80013c9531bd330b2f161d293c2d9a95add1",
+      "sha256_after": "77c3a297e6bb080c2a524f868e6d80013c9531bd330b2f161d293c2d9a95add1",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Field3.dc.html",
+      "to": "archive/design/canvas/components/Field3.dc.html",
+      "sha256_before": "f49b7354c0aea45a791f0236bf9c2b7413702901faa5f81e0943af509f9b1b2e",
+      "sha256_after": "f49b7354c0aea45a791f0236bf9c2b7413702901faa5f81e0943af509f9b1b2e",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Inner1.dc.html",
+      "to": "archive/design/canvas/components/Inner1.dc.html",
+      "sha256_before": "fc0e1d4a8959f78ce47c10291ada111aa3dfeee24709ca18f94a80168c6e68c0",
+      "sha256_after": "fc0e1d4a8959f78ce47c10291ada111aa3dfeee24709ca18f94a80168c6e68c0",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Inner2.dc.html",
+      "to": "archive/design/canvas/components/Inner2.dc.html",
+      "sha256_before": "c0b2bfe68dce713cd0681ffe5928bc3c7b648a7f64e0764d4db1c8c5fbf300de",
+      "sha256_after": "c0b2bfe68dce713cd0681ffe5928bc3c7b648a7f64e0764d4db1c8c5fbf300de",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Inner3.dc.html",
+      "to": "archive/design/canvas/components/Inner3.dc.html",
+      "sha256_before": "d1fdce6a507adfc4e5feaf0a0574ef9d320b2895c5ef9d8c4aa707eb7191443e",
+      "sha256_after": "d1fdce6a507adfc4e5feaf0a0574ef9d320b2895c5ef9d8c4aa707eb7191443e",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/Main.dc.html",
+      "to": "archive/design/canvas/components/Main.dc.html",
+      "sha256_before": "e4598f7dc0ace37e5d51b2e54cc560e6013d70c50bfc225afb7c5e3868cb9327",
+      "sha256_after": "e4598f7dc0ace37e5d51b2e54cc560e6013d70c50bfc225afb7c5e3868cb9327",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/canvas.json",
+      "to": "archive/design/canvas/components/canvas.json",
+      "sha256_before": "277076f4ccfa4ebf8950416a584c317732b62713faff091c227bf6da4de75507",
+      "sha256_after": "277076f4ccfa4ebf8950416a584c317732b62713faff091c227bf6da4de75507",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/components/component-drafts.html",
+      "to": "archive/design/canvas/components/component-drafts.html",
+      "sha256_before": "e27de1b0255a78c8b608b0beddcf9f9257a781b2eed237e8bbd4ccc53edc5820",
+      "sha256_after": "e27de1b0255a78c8b608b0beddcf9f9257a781b2eed237e8bbd4ccc53edc5820",
+      "documentation_updated": false
+    },
+    {
+      "from": "design/canvas/radius-spacing-specs.html",
+      "to": "archive/design/canvas/radius-spacing-specs.html",
+      "sha256_before": "1ac97c22cfa76f747915e00d002c046b2a30ff45913fa26fd2cc0090a6bdf453",
+      "sha256_after": "1ac97c22cfa76f747915e00d002c046b2a30ff45913fa26fd2cc0090a6bdf453",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/AppPreview.html",
+      "to": "archive/안티그래비티협업_테스트/AppPreview.html",
+      "sha256_before": "ce3765056863fa95af1bcaa59ffed097c60f294f2f7a3bc08531843aca40b946",
+      "sha256_after": "ce3765056863fa95af1bcaa59ffed097c60f294f2f7a3bc08531843aca40b946",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Button1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Button1.dc.html",
+      "sha256_before": "518952d3880e5331dae1137479836765e58217fdad4efe8a505d1c2e486fb767",
+      "sha256_after": "518952d3880e5331dae1137479836765e58217fdad4efe8a505d1c2e486fb767",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Button2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Button2.dc.html",
+      "sha256_before": "e2c249253e4f0b667f609817d25a11eed072f63977798c31be065d26a7a52ab7",
+      "sha256_after": "e2c249253e4f0b667f609817d25a11eed072f63977798c31be065d26a7a52ab7",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Button3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Button3.dc.html",
+      "sha256_before": "7a1ee84fe4b938ead77bb12e28ee44f5a28009dd845b7cee7ec073612dace1a6",
+      "sha256_after": "7a1ee84fe4b938ead77bb12e28ee44f5a28009dd845b7cee7ec073612dace1a6",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Button4.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Button4.dc.html",
+      "sha256_before": "79e5a36a417863b693a20d4a9f91943ae4535b3b4a3603ee19cd9f748515b7bf",
+      "sha256_after": "79e5a36a417863b693a20d4a9f91943ae4535b3b4a3603ee19cd9f748515b7bf",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Card1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Card1.dc.html",
+      "sha256_before": "9523a47e238a37b0323fa829d4d429d1ad9c8137c81b5e888507daa9636129f8",
+      "sha256_after": "9523a47e238a37b0323fa829d4d429d1ad9c8137c81b5e888507daa9636129f8",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Card2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Card2.dc.html",
+      "sha256_before": "d8009dc3a52d2ecab6c0d9447ec49f3975730d1538819c9c0f7b3f9c17f4ea79",
+      "sha256_after": "d8009dc3a52d2ecab6c0d9447ec49f3975730d1538819c9c0f7b3f9c17f4ea79",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Card3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Card3.dc.html",
+      "sha256_before": "8f36e4f4196d12e45a17c9f3eae736161694d19524e6c34460230d5d83363faa",
+      "sha256_after": "8f36e4f4196d12e45a17c9f3eae736161694d19524e6c34460230d5d83363faa",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardF1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardF1.dc.html",
+      "sha256_before": "216621ab1adf108c41d71efcc0677af7f8f451456ffd89255b0406b730a9d2e6",
+      "sha256_after": "216621ab1adf108c41d71efcc0677af7f8f451456ffd89255b0406b730a9d2e6",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardF2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardF2.dc.html",
+      "sha256_before": "e63bb3bc1bf2ad7434912a4fe9774a454fe4d6f929ab420dd91a3787bfc856d0",
+      "sha256_after": "e63bb3bc1bf2ad7434912a4fe9774a454fe4d6f929ab420dd91a3787bfc856d0",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardF3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardF3.dc.html",
+      "sha256_before": "3ead9c149e8b8ebd8f80b70b7d6187dec5e8de3b791079752a29405b8bac709a",
+      "sha256_after": "3ead9c149e8b8ebd8f80b70b7d6187dec5e8de3b791079752a29405b8bac709a",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardT1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardT1.dc.html",
+      "sha256_before": "806f596594cc4a80b6713f371d7bb36572fc1daba01008a77d2ccd6d357a0c34",
+      "sha256_after": "806f596594cc4a80b6713f371d7bb36572fc1daba01008a77d2ccd6d357a0c34",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardT2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardT2.dc.html",
+      "sha256_before": "02b42bb2274485124b6e936ce35336ab11205aa53697a45e872469d5406b21d9",
+      "sha256_after": "02b42bb2274485124b6e936ce35336ab11205aa53697a45e872469d5406b21d9",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardT3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardT3.dc.html",
+      "sha256_before": "302c76a0053f0554ebfff0543d5e8cf9826281a7e2c1bf366bfda05c376f1739",
+      "sha256_after": "302c76a0053f0554ebfff0543d5e8cf9826281a7e2c1bf366bfda05c376f1739",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardU1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardU1.dc.html",
+      "sha256_before": "3c9d236d64b4e58a192f49d61c66a4b7e3bf4e151f5ad65c9d2405f9f5ae41f0",
+      "sha256_after": "3c9d236d64b4e58a192f49d61c66a4b7e3bf4e151f5ad65c9d2405f9f5ae41f0",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardU2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardU2.dc.html",
+      "sha256_before": "26965b0730821ea3b7b32ce071e137313849eaffbc779574b771b48360cf373f",
+      "sha256_after": "26965b0730821ea3b7b32ce071e137313849eaffbc779574b771b48360cf373f",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardU3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardU3.dc.html",
+      "sha256_before": "e64da138080838951942fe2800769a067da385f8f99b0cea2274198eb2f74981",
+      "sha256_after": "e64da138080838951942fe2800769a067da385f8f99b0cea2274198eb2f74981",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardU4.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardU4.dc.html",
+      "sha256_before": "e96306e31f054cbdcb8ea28211990fd32056f0cc538473a1f7a3a3ff7a48452d",
+      "sha256_after": "e96306e31f054cbdcb8ea28211990fd32056f0cc538473a1f7a3a3ff7a48452d",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardW0.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardW0.dc.html",
+      "sha256_before": "bd19e8f51b3c15456fda4e442ef54b15c35a1589030534388705dfbdd5282b58",
+      "sha256_after": "bd19e8f51b3c15456fda4e442ef54b15c35a1589030534388705dfbdd5282b58",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardW1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardW1.dc.html",
+      "sha256_before": "2f74f9eb475a5c4a359c63493dc5c0b465c3a643329a1e84de61fd87546f205a",
+      "sha256_after": "2f74f9eb475a5c4a359c63493dc5c0b465c3a643329a1e84de61fd87546f205a",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardW2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardW2.dc.html",
+      "sha256_before": "d43724486eda8fb512be6236750cc53ac41cb4f55b06edb4d8e81352a75e8dfa",
+      "sha256_after": "d43724486eda8fb512be6236750cc53ac41cb4f55b06edb4d8e81352a75e8dfa",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/CardW3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/CardW3.dc.html",
+      "sha256_before": "026ce3cad30c8920b433df64d7687fa38166ddac216fd35245f20d2ba3d5146b",
+      "sha256_after": "026ce3cad30c8920b433df64d7687fa38166ddac216fd35245f20d2ba3d5146b",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Chip1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Chip1.dc.html",
+      "sha256_before": "cb24480c68eb4de3c3b31a1ce2cbf868e8e19259650005797cfa46dbadbdbc30",
+      "sha256_after": "cb24480c68eb4de3c3b31a1ce2cbf868e8e19259650005797cfa46dbadbdbc30",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Chip2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Chip2.dc.html",
+      "sha256_before": "14d3dc2795b94248b9c84ec272e1403bacd7e1bdad9bbd1e20676e997330908c",
+      "sha256_after": "14d3dc2795b94248b9c84ec272e1403bacd7e1bdad9bbd1e20676e997330908c",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Chip3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Chip3.dc.html",
+      "sha256_before": "e64c1a6a9119af732a61e6ee882f7208e4584e2de4f3b30e15df56cf29b07088",
+      "sha256_after": "e64c1a6a9119af732a61e6ee882f7208e4584e2de4f3b30e15df56cf29b07088",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Chip4.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Chip4.dc.html",
+      "sha256_before": "192700e7fb4af99428c78b3e918e6f6b86a5209587fbdea67893b86d8ce6ef97",
+      "sha256_after": "192700e7fb4af99428c78b3e918e6f6b86a5209587fbdea67893b86d8ce6ef97",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Field1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Field1.dc.html",
+      "sha256_before": "89e5fc26faeb499b87c0eba7a30eb5aab70dbaa55cab3c65d7efef5d6f849996",
+      "sha256_after": "89e5fc26faeb499b87c0eba7a30eb5aab70dbaa55cab3c65d7efef5d6f849996",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Field2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Field2.dc.html",
+      "sha256_before": "77c3a297e6bb080c2a524f868e6d80013c9531bd330b2f161d293c2d9a95add1",
+      "sha256_after": "77c3a297e6bb080c2a524f868e6d80013c9531bd330b2f161d293c2d9a95add1",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Field3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Field3.dc.html",
+      "sha256_before": "f49b7354c0aea45a791f0236bf9c2b7413702901faa5f81e0943af509f9b1b2e",
+      "sha256_after": "f49b7354c0aea45a791f0236bf9c2b7413702901faa5f81e0943af509f9b1b2e",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Field4.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Field4.dc.html",
+      "sha256_before": "9009ed6216b391ff4d9b49eb121f21e2a63991472a12a131e70882cbe1eecc12",
+      "sha256_after": "9009ed6216b391ff4d9b49eb121f21e2a63991472a12a131e70882cbe1eecc12",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Inner1.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Inner1.dc.html",
+      "sha256_before": "fc0e1d4a8959f78ce47c10291ada111aa3dfeee24709ca18f94a80168c6e68c0",
+      "sha256_after": "fc0e1d4a8959f78ce47c10291ada111aa3dfeee24709ca18f94a80168c6e68c0",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Inner2.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Inner2.dc.html",
+      "sha256_before": "ffb06061360f53fa750223c4ca990a03acdde58f313ad2ed257dff84f093d051",
+      "sha256_after": "ffb06061360f53fa750223c4ca990a03acdde58f313ad2ed257dff84f093d051",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Inner3.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Inner3.dc.html",
+      "sha256_before": "ad16c8266fff84d86c1be37dc2dba9a9fb073eeb0dff60083c776e6250e58502",
+      "sha256_after": "ad16c8266fff84d86c1be37dc2dba9a9fb073eeb0dff60083c776e6250e58502",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Inner4.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Inner4.dc.html",
+      "sha256_before": "9ac679e2c9e7d51a5a1df0d895a11aea5b0394f83f9f21e75b6435fa52343bda",
+      "sha256_after": "9ac679e2c9e7d51a5a1df0d895a11aea5b0394f83f9f21e75b6435fa52343bda",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/Main.dc.html",
+      "to": "archive/안티그래비티협업_테스트/Main.dc.html",
+      "sha256_before": "26ae9d98c989621072b67a607ce905d5420ae817dfb72f2bbdb44f6401f978d8",
+      "sha256_after": "26ae9d98c989621072b67a607ce905d5420ae817dfb72f2bbdb44f6401f978d8",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/SystemView_15pt.html",
+      "to": "archive/안티그래비티협업_테스트/SystemView_15pt.html",
+      "sha256_before": "ee06f13770f9ae3218825b6ffef8123891d0f5c9fbf484248f3ee75306c053b3",
+      "sha256_after": "ee06f13770f9ae3218825b6ffef8123891d0f5c9fbf484248f3ee75306c053b3",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/SystemView_Compare.html",
+      "to": "archive/안티그래비티협업_테스트/SystemView_Compare.html",
+      "sha256_before": "ff8bed154b02c777c1610bebfd9d9498fe80222cfde362f4eebda46f045dea5a",
+      "sha256_after": "ff8bed154b02c777c1610bebfd9d9498fe80222cfde362f4eebda46f045dea5a",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/add_toss_options.py",
+      "to": "archive/안티그래비티협업_테스트/add_toss_options.py",
+      "sha256_before": "4c4e44ab77eec2e8fde81878a42517e11b212d25db1df4fd6106eb0c51ac1a1f",
+      "sha256_after": "4c4e44ab77eec2e8fde81878a42517e11b212d25db1df4fd6106eb0c51ac1a1f",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/canvas.json",
+      "to": "archive/안티그래비티협업_테스트/canvas.json",
+      "sha256_before": "d83fa025819ad0af639ca00f655fb7d333772927fe8b1ee6e1a82c0caa5df7a0",
+      "sha256_after": "d83fa025819ad0af639ca00f655fb7d333772927fe8b1ee6e1a82c0caa5df7a0",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/check_json.py",
+      "to": "archive/안티그래비티협업_테스트/check_json.py",
+      "sha256_before": "0b38a9899f0d9a70ef1b4124e6fe756e34529c4d642e0ced35954e2777215411",
+      "sha256_after": "0b38a9899f0d9a70ef1b4124e6fe756e34529c4d642e0ced35954e2777215411",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/component-drafts.html",
+      "to": "archive/안티그래비티협업_테스트/component-drafts.html",
+      "sha256_before": "5e53a384c9821e6392fc550c2176015858e65752ddf768e652c1520f9e80817b",
+      "sha256_after": "5e53a384c9821e6392fc550c2176015858e65752ddf768e652c1520f9e80817b",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/enlarge_text.py",
+      "to": "archive/안티그래비티협업_테스트/enlarge_text.py",
+      "sha256_before": "202160c8aba1c77b2153736ee1c46415cbb4f501e66ec014dc6318dac014f250",
+      "sha256_after": "202160c8aba1c77b2153736ee1c46415cbb4f501e66ec014dc6318dac014f250",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/extract.py",
+      "to": "archive/안티그래비티협업_테스트/extract.py",
+      "sha256_before": "418a4ae50b122ac192182e6b4366abe1b88c80c3d054fc40a4680c6df69a3e2c",
+      "sha256_after": "418a4ae50b122ac192182e6b4366abe1b88c80c3d054fc40a4680c6df69a3e2c",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/fix_color_repack.py",
+      "to": "archive/안티그래비티협업_테스트/fix_color_repack.py",
+      "sha256_before": "34a519009cc2b80fdb9f28b43d98fe0823d4ec9865af633b4f7651356e5e97d0",
+      "sha256_after": "34a519009cc2b80fdb9f28b43d98fe0823d4ec9865af633b4f7651356e5e97d0",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/fix_field_size.py",
+      "to": "archive/안티그래비티협업_테스트/fix_field_size.py",
+      "sha256_before": "6f985d9c5f0c21ab5c3f475369d3e1521f717e7fde47fa8223f518b421bb5b2e",
+      "sha256_after": "6f985d9c5f0c21ab5c3f475369d3e1521f717e7fde47fa8223f518b421bb5b2e",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/font-size-test.html",
+      "to": "archive/안티그래비티협업_테스트/font-size-test.html",
+      "sha256_before": "d8edcdc3f9340bec3c9928a9289a439420f303dd9a8bcac585804a7fe58b8d68",
+      "sha256_after": "d8edcdc3f9340bec3c9928a9289a439420f303dd9a8bcac585804a7fe58b8d68",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/generate_comparison.py",
+      "to": "archive/안티그래비티협업_테스트/generate_comparison.py",
+      "sha256_before": "db4b1e5070cba13268f2487baac50db033d4d17615d370a4d01bbf6e8585988d",
+      "sha256_after": "db4b1e5070cba13268f2487baac50db033d4d17615d370a4d01bbf6e8585988d",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/launch_button.py",
+      "to": "archive/안티그래비티협업_테스트/launch_button.py",
+      "sha256_before": "9625a7e2e9e94dccce6ffd8cfbf4b9768982b5fa923a4a8743ef077c973f55e5",
+      "sha256_after": "9625a7e2e9e94dccce6ffd8cfbf4b9768982b5fa923a4a8743ef077c973f55e5",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/launch_chip.py",
+      "to": "archive/안티그래비티협업_테스트/launch_chip.py",
+      "sha256_before": "c3a0e4a68fd8e7dd641dfdd1ee883ebc40a97b7349667325e24797e8a51d34c3",
+      "sha256_after": "c3a0e4a68fd8e7dd641dfdd1ee883ebc40a97b7349667325e24797e8a51d34c3",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/launch_field.py",
+      "to": "archive/안티그래비티협업_테스트/launch_field.py",
+      "sha256_before": "d13a50a2b626537265a063019beb3535b5b68ebff2dc1e912ff08a45c54033ac",
+      "sha256_after": "d13a50a2b626537265a063019beb3535b5b68ebff2dc1e912ff08a45c54033ac",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/launch_inner.py",
+      "to": "archive/안티그래비티협업_테스트/launch_inner.py",
+      "sha256_before": "a92c8aa541627cf6b4427e0b91a084ba463804d913a07c7cfc314cdb0267f7c4",
+      "sha256_after": "a92c8aa541627cf6b4427e0b91a084ba463804d913a07c7cfc314cdb0267f7c4",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/modify.py",
+      "to": "archive/안티그래비티협업_테스트/modify.py",
+      "sha256_before": "5de352999acbf26ea51a55b5fdf5b39b1cb62655bf23ddfc34088f88b7e39cf5",
+      "sha256_after": "5de352999acbf26ea51a55b5fdf5b39b1cb62655bf23ddfc34088f88b7e39cf5",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/modify_chips.py",
+      "to": "archive/안티그래비티협업_테스트/modify_chips.py",
+      "sha256_before": "1ebe6d796ac5cad267693b4dd1eeb344e26c398cb813b824a9408565d415bcaa",
+      "sha256_after": "1ebe6d796ac5cad267693b4dd1eeb344e26c398cb813b824a9408565d415bcaa",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/modify_inner.py",
+      "to": "archive/안티그래비티협업_테스트/modify_inner.py",
+      "sha256_before": "264856f469867f2978d3cc36e71409354dd87ba85a75fa5b3634df67eafadb7f",
+      "sha256_after": "264856f469867f2978d3cc36e71409354dd87ba85a75fa5b3634df67eafadb7f",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/repack.py",
+      "to": "archive/안티그래비티협업_테스트/repack.py",
+      "sha256_before": "be811dd6fdc79dad04ba3542cc23c8945bac80fdfe95121cd682c47d52890d29",
+      "sha256_after": "be811dd6fdc79dad04ba3542cc23c8945bac80fdfe95121cd682c47d52890d29",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/replace_brand_color.py",
+      "to": "archive/안티그래비티협업_테스트/replace_brand_color.py",
+      "sha256_before": "7bede811404cb43374f5f0c64b92ca5f4c9076e716b118b662068ecca305aad8",
+      "sha256_after": "7bede811404cb43374f5f0c64b92ca5f4c9076e716b118b662068ecca305aad8",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/restart_field.py",
+      "to": "archive/안티그래비티협업_테스트/restart_field.py",
+      "sha256_before": "a9fdb79710a1161cc8d6fdbd6556d5547e3baee56bb7b5539ff0847601d61fad",
+      "sha256_after": "a9fdb79710a1161cc8d6fdbd6556d5547e3baee56bb7b5539ff0847601d61fad",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/revert_dot.py",
+      "to": "archive/안티그래비티협업_테스트/revert_dot.py",
+      "sha256_before": "de0640b85210a8730fcaac00c43fcdc5ab922e6b66fd9c82c9e056171bce5787",
+      "sha256_after": "de0640b85210a8730fcaac00c43fcdc5ab922e6b66fd9c82c9e056171bce5787",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/show_field.py",
+      "to": "archive/안티그래비티협업_테스트/show_field.py",
+      "sha256_before": "9e6463b1e6e01f950a3f002fc729797e54cc69b2fbd067d1834198c2502e7424",
+      "sha256_after": "9e6463b1e6e01f950a3f002fc729797e54cc69b2fbd067d1834198c2502e7424",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/step_chip.py",
+      "to": "archive/안티그래비티협업_테스트/step_chip.py",
+      "sha256_before": "5e512f88b65615436e19f7e4ed617316d047e81de7c01b490f49c2c0e6428509",
+      "sha256_after": "5e512f88b65615436e19f7e4ed617316d047e81de7c01b490f49c2c0e6428509",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/step_field.py",
+      "to": "archive/안티그래비티협업_테스트/step_field.py",
+      "sha256_before": "a5d90d878cd817063de39427882977b38126f8df592328328eb60c171b1496e5",
+      "sha256_after": "a5d90d878cd817063de39427882977b38126f8df592328328eb60c171b1496e5",
+      "documentation_updated": false
+    },
+    {
+      "from": "안티그래비티협업_테스트/test_json.js",
+      "to": "archive/안티그래비티협업_테스트/test_json.js",
+      "sha256_before": "b82c152b034d9a889405f2bb0c126bf82155eb9e1318727e72b9f554457941b2",
+      "sha256_after": "b82c152b034d9a889405f2bb0c126bf82155eb9e1318727e72b9f554457941b2",
+      "documentation_updated": false
+    }
+  ]
+}

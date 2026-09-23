@@ -16,6 +16,7 @@
  */
 
 import type { SignupField } from '@/lib/signup-done'
+import { isDemoPresentationPath } from '@/lib/demo-route'
 
 /** 무엇을 올리는 중인가. */
 export type CaptureKind = 'voice' | 'photo' | 'video' | 'caption'
@@ -85,6 +86,7 @@ type Gtag = (command: 'event', name: string, params?: Record<string, unknown>) =
  */
 export function track<K extends keyof AnalyticsEvents>(name: K, ...params: Params<K>): void {
   if (typeof window === 'undefined') return
+  if (isDemoPresentationPath(window.location.pathname)) return
 
   const gtag = (window as unknown as { gtag?: Gtag }).gtag
   if (typeof gtag !== 'function') return
