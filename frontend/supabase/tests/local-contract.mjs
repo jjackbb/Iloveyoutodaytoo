@@ -287,6 +287,19 @@ await expectOk('재입장: B 다시 수락', b.rpc('accept_invitation', { p_toke
   expectEqual('재입장: B는 m3 영상 서명 불가', await canSign(b, 'video', f('v3.mp4')), false)
 }
 
+// 위젯: 남의 글은 방 공유 추억만 뜬다. 지금 방에는 A의 비공개 추억(m1·m3·영상만)과 공유 추억(m2·B의 글)이 있다.
+{
+  const { data: tokenA } = await a.rpc('issue_widget_token')
+  const { data: latest } = await anon.rpc('widget_latest', { p_token: tokenA })
+  record('위젯: A의 위젯에는 B의 공유 추억이 뜸(남의 글 우선)', latest?.[0]?.memory_id === mB, latest?.[0]?.memory_id ?? '없음')
+  const { data: tokenB } = await b.rpc('issue_widget_token')
+  const { data: latestB } = await anon.rpc('widget_latest', { p_token: tokenB })
+  const got = latestB?.[0]?.memory_id
+  // A의 글 중 B가 읽을 수 있는 최신 글은 공유 추억 m2 뿐이다(나머지 A의 글은 모두 private).
+  record('위젯: B의 위젯에는 A의 비공개 추억이 아니라 공유 추억 m2가 뜸', got === m2, got ?? '없음')
+  await expectError('위젯: 무효 토큰은 28000', anon.rpc('widget_latest', { p_token: 'nope' }), '28000')
+}
+
 // ── 7. 삭제 ───────────────────────────────────────────────────
 await expectError('삭제: B는 A의 추억 삭제 불가', b.rpc('delete_memory', { p_memory_id: m2 }), '42501')
 await expectError('삭제: 직접 DELETE 는 정책이 없어 0행(=막힘)', (async () => {
