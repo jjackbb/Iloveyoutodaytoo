@@ -3,10 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { VoicePlayer } from '@/components/media/VoicePlayer'
-import { RuleList } from '@/components/ui/RuleList'
 import { formatClock } from '@/lib/format'
-// 길이 제한은 @/lib/limits 한 곳에만 둔다. 서버 검증(memories.ts)도 같은 값을 본다.
-import { VOICE_MAX_SEC, VOICE_MIN_SEC } from '@/lib/limits'
+import { VOICE_MAX_SEC } from '@/lib/limits'
 import { toBarLevels } from '@/lib/waveform'
 
 /**
@@ -16,10 +14,9 @@ import { toBarLevels } from '@/lib/waveform'
  *   눌기 전  — 빨간 마이크 원 + "마이크를 눌러 녹음을 시작하세요"
  *   녹음 중  — 빨간 원(‖) + 0:00 카운트 + "녹음 중… 마이크를 눌러 멈추기"
  *   녹음 후  — 빨간 마이크 원 + 총 길이 + "녹음 완료 · 아래에서 들어볼 수 있어요" + 재생바
- * 카드 아래에는 조건 한 줄이 붙는다(RuleList): 3초를 채우면 색이 살아나며 체크가 켜진다.
- *
  * 규칙:
- * - 3초 미만은 저장할 수 없다. 60초를 넘길 수 없다(DB CHECK와 같은 값).
+ * - 최소 녹음 시간은 없다. 실제 파일이 비어 있으면 다시 녹음하도록 안내한다.
+ * - 최대 60초다. 저장 경로의 검사와 DB 제약도 같은 범위를 사용한다.
  * - 마이크를 못 쓰는 상황(권한 거부, 마이크 없음, 옛 브라우저)에서는 이유를 그대로 말해준다.
  *
  * 이 컴포넌트는 파일을 업로드하지 않는다. 녹음 결과(Blob)만 부모에게 넘긴다.
@@ -357,10 +354,9 @@ export function VoiceRecorder({
       samplesRef.current = []
       const levels = measured.length > 0 ? toBarLevels(measured) : null
 
-      if (elapsed < VOICE_MIN_SEC) {
-        // 아래 조건 줄이 이미 "3초 이상 녹음"이라고 말하고 있다.
-        // 같은 말을 빨간 글씨로 한 번 더 하지 않고, 처음 상태로 돌려 다시 누르게 한다.
+      if (blob.size === 0) {
         onChange(null)
+        setError('녹음이 담기지 않았어요. 다시 한 번 눌러주세요.')
         setPhase('idle')
         setElapsedSec(0)
         return
@@ -404,9 +400,6 @@ export function VoiceRecorder({
 
   const recording = phase === 'recording'
   const done = phase === 'recorded' && value !== null
-
-  // 배지는 "지금 표현할 수 있는 상태인가"를 말한다(캡처 12 빨강 → 캡처 18 초록).
-  const satisfied = done
 
   function handleMicClick() {
     if (recording) {
@@ -465,18 +458,6 @@ export function VoiceRecorder({
           </div>
         ) : null}
       </div>
-
-      {/*
-        조건 표시 (2026-08-25에 ✕/✓ 배지에서 바꿨다).
-
-        전에는 아직 녹음을 시작도 안 했는데 **✕가 붙어 있어서 실패한 것처럼** 보였다.
-        지금은 가입 폼과 같은 체크 목록이다 — 못 채운 것은 조용히 회색이고,
-        채우면 색이 살아나며 체크가 켜진다. 모양이 함께 바뀌므로 색을 구분하기
-        어려운 분도 알아볼 수 있다(WCAG 1.4.1).
-      */}
-      <RuleList
-        rules={[{ label: `${VOICE_MIN_SEC}초 이상 녹음`, met: satisfied }]}
-      />
 
       {stoppedAtMax ? (
         <p role="status" className="text-base leading-relaxed break-keep text-muted">

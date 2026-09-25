@@ -12,6 +12,7 @@ import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { Button } from '@/components/ui/Button'
 import { Toast } from '@/components/ui/Toast'
 import { type HandwritingDoc } from '@/lib/handwriting'
+import { formatDuration } from '@/lib/format'
 import { CAPTION_MAX_LENGTH, PHOTO_MAX_COUNT } from '@/lib/limits'
 import { resizePhoto } from '@/lib/image'
 import { DEMO_PEOPLE, emptyDemoDraft, validateMemory, type DemoActor, type DemoMemory } from '@/lib/demo/model'
@@ -215,7 +216,7 @@ function Room() {
     {data.memories.length ? <ul className="demo-feed">{data.memories.map((memory) => <li key={memory.id}>
       <Link href={`${ROOM}/memories/${memory.id}`} className="demo-memory-preview">
         <div className="demo-author"><span className={`demo-avatar ${memory.author === 'parent' ? 'demo-avatar-parent' : ''}`}>{DEMO_PEOPLE[memory.author].name.slice(0, 1)}</span><div><strong>{DEMO_PEOPLE[memory.author].name}</strong><p>{memory.example ? '체험용 예시' : new Date(memory.createdAt).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}</p></div><span className="demo-preview-arrow"><Icon name="next" /></span></div>
-        {memory.handwriting ? <div className="demo-handwriting-preview"><HandwritingView doc={memory.handwriting} label={`${DEMO_PEOPLE[memory.author].name}님의 손글씨`} /></div> : memory.photos[0] ? <Photo blob={memory.photos[0]} alt="남긴 추억의 첫 사진" /> : <div className="demo-voice-preview"><Icon name="voice" /><span>목소리 {memory.voice?.durationSec}초</span><span>들어보기</span></div>}
+        {memory.handwriting ? <div className="demo-handwriting-preview"><HandwritingView doc={memory.handwriting} label={`${DEMO_PEOPLE[memory.author].name}님의 손글씨`} /></div> : memory.photos[0] ? <Photo blob={memory.photos[0]} alt="남긴 추억의 첫 사진" /> : <div className="demo-voice-preview"><Icon name="voice" /><span>목소리 {formatDuration(memory.voice?.durationSec)}</span><span>들어보기</span></div>}
         {memory.caption ? <p className="demo-caption-preview">{memory.caption}</p> : null}
         <div className="demo-memory-meta"><span>{memory.handwriting ? '손글씨 재생' : '마음 열어보기'}</span>{memory.likedBy.length > 0 ? <span><Icon name="heart" filled />{memory.likedBy.length}</span> : null}</div>
       </Link>
@@ -328,12 +329,12 @@ function Compose({ onSaved }: { onSaved: (message: string) => void }) {
     {method ? <p className="demo-switch-hint">다른 탭을 눌러 함께 담아도, 먼저 쓴 내용은 남아 있어요.</p> : null}
     {/* 숨겨도 마운트는 유지한다. 다른 수단을 고르는 동안 녹음·손글씨가 사라지지 않는다. */}
     <section hidden={method !== 'handwriting'} className="demo-input-section" aria-label="손글씨 담기"><div className="demo-input-heading"><h3>손글씨로 남겨요</h3><span>쓰는 모습도 함께 담겨요</span></div><HandwritingPad value={handwriting} onChange={setHandwriting} disabled={busy} /></section>
-    <section hidden={method !== 'voice'} className="demo-input-section" aria-label="목소리 담기"><div className="demo-input-heading"><h3>목소리로 남겨요</h3><span>3초부터 1분까지</span></div><VoiceRecorder value={recording} onChange={setRecording} onActivityChange={setRecordingActive} disabled={busy || method !== 'voice'} />{recordingActive ? <p className="demo-media-hint">녹음을 마친 뒤 다른 방법을 함께 담을 수 있어요.</p> : null}</section>
+    <section hidden={method !== 'voice'} className="demo-input-section" aria-label="목소리 담기"><div className="demo-input-heading"><h3>목소리로 남겨요</h3><span>최대 1분</span></div><VoiceRecorder value={recording} onChange={setRecording} onActivityChange={setRecordingActive} disabled={busy || method !== 'voice'} />{recordingActive ? <p className="demo-media-hint">녹음을 마친 뒤 다른 방법을 함께 담을 수 있어요.</p> : null}</section>
     <section hidden={method !== 'photo'} className="demo-input-section" aria-label="사진 담기"><div className="demo-input-heading"><h3>오늘의 사진을 담아요</h3><span>{photos.length}/{PHOTO_MAX_COUNT}</span></div><input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden onChange={(event) => void pickPhotos(event.target.files)} /><button className="demo-photo-picker" type="button" onClick={() => fileInput.current?.click()} disabled={busy || picking || photos.length >= PHOTO_MAX_COUNT}><Icon name="photo" />{picking ? '사진을 준비하는 중…' : '사진 고르기'}</button>
       {photos.length ? <ul className="demo-photo-grid">{photos.map((photo, index) => <li key={photo.id}><Photo blob={photo.blob} alt={`선택한 사진 ${index + 1}`} /><button type="button" aria-label={`${index + 1}번째 사진 빼기`} disabled={busy} onClick={() => updateDraft(actor, (draft) => ({ ...draft, photos: draft.photos.filter((item) => item.id !== photo.id) }))}>×</button></li>)}</ul> : null}
     </section>
 
-    {dirty ? <div className="demo-attached" aria-label="지금 담은 내용">{handwriting ? <span><Icon name="check" />손글씨</span> : null}{recording ? <span><Icon name="check" />목소리 {recording.durationSec}초</span> : null}{photos.length ? <span><Icon name="check" />사진 {photos.length}장</span> : null}</div> : null}
+    {dirty ? <div className="demo-attached" aria-label="지금 담은 내용">{handwriting ? <span><Icon name="check" />손글씨</span> : null}{recording ? <span><Icon name="check" />목소리 {formatDuration(recording.durationSec)}</span> : null}{photos.length ? <span><Icon name="check" />사진 {photos.length}장</span> : null}</div> : null}
 
     {method ? <div className="demo-caption-field"><label htmlFor="demo-caption">함께 남길 한마디 <span>선택</span></label><textarea id="demo-caption" value={caption} onChange={(event) => updateDraft(actor, (draft) => ({ ...draft, caption: event.target.value }))} maxLength={CAPTION_MAX_LENGTH} rows={3} placeholder={actor === 'child' ? '엄마, 오늘 문득 이 말을 하고 싶었어.' : '지우야, 오늘 문득 이 말을 해주고 싶었어.'} disabled={busy} /><span className="demo-character-count">{caption.length}/{CAPTION_MAX_LENGTH}</span></div> : null}
     {error ? <p className="demo-error" role="alert">{error}</p> : null}

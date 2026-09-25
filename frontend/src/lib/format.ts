@@ -233,6 +233,7 @@ export function formatDuration(seconds: number | null | undefined): string {
   const minutes = Math.floor(total / 60)
   const rest = total % 60
 
+  if (total === 0) return '1초 미만'
   if (minutes === 0) return `${rest}초`
   if (rest === 0) return `${minutes}분`
   return `${minutes}분 ${rest}초`

@@ -8,7 +8,7 @@
  *    각자 따로 적어두면 한쪽만 고쳐져 조용히 어긋난다.
  *
  * 아래 값은 DB의 CHECK 제약과 반드시 같아야 한다.
- * - heart_messages: text_length_limit(300), duration_matches_type(voice 3~60초)
+ * - heart_messages: text_length_limit(300), duration_matches_type(voice 0~60초)
  * 값을 바꾸려면 DB 제약도 함께 봐야 한다. 스키마 변경은 임의로 하지 않는다.
  */
 
@@ -25,8 +25,8 @@ export const ROOM_NICKNAME_MAX_LENGTH = 20
 /** 글 한마디 최대 글자수. DB CHECK text_length_limit과 같은 값이다. */
 export const TEXT_MAX_LENGTH = 300
 
-/** 음성 한마디 최소 길이(초). DB CHECK duration_matches_type과 같은 값이다. */
-export const VOICE_MIN_SEC = 3
+/** 음성 길이 메타데이터의 하한. 실제 녹음에는 최소 시간 조건이 없다. */
+export const VOICE_MIN_SEC = 0
 
 /** 음성 한마디 최대 길이(초). DB CHECK duration_matches_type과 같은 값이다. */
 export const VOICE_MAX_SEC = 60

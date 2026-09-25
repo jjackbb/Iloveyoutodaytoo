@@ -102,7 +102,8 @@ type VoiceCheck =
 
 /**
  * 음성 검사. 없으면(null) 그대로 통과 — 음성은 2026-09-06 부터 선택이다.
- * 있으면 규칙은 예전과 글자 그대로 같다(경로는 이 방 것, 3~60초).
+ * 있으면 경로가 이 방 것인지와 길이 메타데이터가 0~60초인지 검사한다.
+ * 0초 표시는 1초 미만 녹음을 반올림한 값일 수 있다.
  */
 function validateVoice(
   rawPath: string | null | undefined,
@@ -118,10 +119,10 @@ function validateVoice(
   if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration)) {
     return { ok: false, error: '녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.' }
   }
-  const durationSec = Math.round(rawDuration)
-  if (durationSec < VOICE_MIN_SEC) {
-    return { ok: false, error: `${VOICE_MIN_SEC}초 이상 녹음해주세요.` }
+  if (rawDuration < VOICE_MIN_SEC) {
+    return { ok: false, error: '녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.' }
   }
+  const durationSec = Math.round(rawDuration)
   if (durationSec > VOICE_MAX_SEC) {
     return { ok: false, error: `녹음은 ${VOICE_MAX_SEC}초까지 담을 수 있어요.` }
   }

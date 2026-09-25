@@ -161,10 +161,10 @@ export async function sendHeartMessage(
       return fail('녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.')
     }
 
-    durationSec = Math.round(raw)
-    if (durationSec < VOICE_MIN_SEC) {
-      return fail(`${VOICE_MIN_SEC}초 이상 녹음해주세요.`)
+    if (raw < VOICE_MIN_SEC) {
+      return fail('녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해주세요.')
     }
+    durationSec = Math.round(raw)
     if (durationSec > VOICE_MAX_SEC) {
       return fail(`녹음은 ${VOICE_MAX_SEC}초까지 보낼 수 있어요.`)
     }

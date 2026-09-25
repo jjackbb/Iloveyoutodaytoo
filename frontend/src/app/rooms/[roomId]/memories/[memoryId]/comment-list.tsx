@@ -98,7 +98,7 @@ function CommentRow({ comment }: { comment: MemoryCommentView }) {
           </>
         )}
 
-        {comment.body ? null : comment.voiceUrl && comment.voiceDurationSec ? (
+        {comment.body ? null : comment.voiceUrl && comment.voiceDurationSec !== null ? (
           <div className="mt-1">
             <VoicePlayer
               src={comment.voiceUrl}

@@ -188,7 +188,7 @@ export function MemoryCard({
         </p>
       ) : null}
 
-      {voiceUrl && voiceDurationSec ? (
+      {voiceUrl && voiceDurationSec !== null ? (
         <div className="px-4 pt-3.5">
           <VoicePlayer
             src={voiceUrl}
@@ -197,7 +197,7 @@ export function MemoryCard({
             label={`${authorName}님의 목소리`}
           />
         </div>
-      ) : voiceDurationSec ? (
+      ) : voiceDurationSec !== null ? (
         // 경로는 있는데 주소를 만들지 못한 경우. 조용히 빈 자리로 두지 않는다.
         <p className="px-4 pt-3.5 text-sm text-muted">
           목소리를 불러오지 못했어요. 잠시 후 다시 열어주세요.

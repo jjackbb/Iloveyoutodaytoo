@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>오늘도 사랑해 · 사전 인터뷰 전체 흐름</title>
+  <style>
+    :root {
+      --bg: #f6f4ee;
+      --surface: #fffefa;
+      --ink: #29352f;
+      --muted: #66736c;
+      --line: #dde2d9;
+      --green: #245d4a;
+      --green-pale: #e6f0e9;
+      --coral: #b7654f;
+      --coral-pale: #f8eee8;
+      --gold: #9a6b25;
+      --gold-pale: #f9f1df;
+      --shadow: 0 16px 50px rgba(31, 58, 44, .055);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; line-height: 1.7; }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .page { max-width: 1480px; margin: auto; display: grid; grid-template-columns: 276px minmax(0, 1fr); gap: 28px; padding: 24px 32px 100px; }
+    .sidebar { position: sticky; top: 24px; align-self: start; height: calc(100vh - 48px); display: flex; flex-direction: column; gap: 22px; padding: 22px 18px; background: #ebeee7; border: 1px solid #dde4d9; border-radius: 24px; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 4px 10px 16px; border-bottom: 1px solid #d7ded3; text-decoration: none; font-size: 15px; font-weight: 800; letter-spacing: -.035em; }
+    .brand-mark { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px; background: var(--green); color: white; font-size: 18px; }
+    .side-label { margin: 0 10px 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+    .step-nav { display: grid; gap: 3px; overflow: auto; }
+    .step-nav a { display: flex; align-items: center; gap: 11px; min-height: 45px; padding: 9px 10px; border-radius: 11px; text-decoration: none; color: #4e6256; font-size: 13px; font-weight: 650; transition: background .15s, color .15s; }
+    .step-nav a:hover, .step-nav a.active { background: white; color: var(--green); }
+    .step-nav .nav-num { display: inline-grid; place-items: center; flex: 0 0 23px; height: 23px; border: 1px solid #c5d1c7; border-radius: 50%; font-size: 11px; }
+    .step-nav a.active .nav-num { background: var(--green); border-color: var(--green); color: white; }
+    .side-bottom { margin-top: auto; padding: 15px 12px 4px; border-top: 1px solid #d7ded3; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .side-bottom strong { color: var(--ink); }
+    main { min-width: 0; }
+    .hero { position: relative; overflow: hidden; padding: 45px 50px 39px; border-radius: 28px; background: #204f40; color: #fffdf5; box-shadow: var(--shadow); }
+    .hero:before, .hero:after { content: ""; position: absolute; border: 1px solid rgba(255, 255, 255, .12); border-radius: 50%; pointer-events: none; }
+    .hero:before { width: 440px; height: 440px; right: -170px; top: -220px; }
+    .hero:after { width: 280px; height: 280px; right: 30px; bottom: -195px; }
+    .eyebrow { margin: 0 0 12px; color: #bcd9c7; font-size: 11px; font-weight: 800; letter-spacing: .14em; }
+    h1 { position: relative; max-width: 720px; margin: 0; font-size: clamp(32px, 4.1vw, 57px); line-height: 1.18; letter-spacing: -.065em; }
+    .hero-desc { position: relative; max-width: 680px; margin: 18px 0 0; color: #e3eee5; font-size: 15px; line-height: 1.8; }
+    .hero-meta { position: relative; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+    .hero-meta span { padding: 6px 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 100px; background: rgba(255,255,255,.08); color: #eef5ee; font-size: 12px; font-weight: 650; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 20px 4px 7px; }
+    .save-state { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .save-dot { width: 7px; height: 7px; border-radius: 50%; background: #6ca48a; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .action { min-height: 37px; padding: 7px 13px; border: 1px solid #ced8cd; border-radius: 9px; background: var(--surface); color: var(--green); font-size: 12px; font-weight: 750; }
+    .action:hover { border-color: var(--green); }
+    .action.primary { background: var(--green); color: white; border-color: var(--green); }
+    .overview { margin: 22px 0 36px; padding: 27px 29px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); }
+    .section-kicker { margin: 0 0 4px; color: var(--coral); font-size: 11px; font-weight: 850; letter-spacing: .1em; }
+    h2 { margin: 0; font-size: 24px; line-height: 1.4; letter-spacing: -.045em; }
+    .overview .lead { margin: 7px 0 0; color: var(--muted); font-size: 14px; }
+    .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 23px; }
+    .flow a { min-height: 90px; display: flex; flex-direction: column; justify-content: space-between; padding: 13px 14px; border: 1px solid var(--line); border-radius: 12px; background: #f8faf5; text-decoration: none; font-size: 13px; font-weight: 750; line-height: 1.4; transition: transform .15s, border-color .15s; }
+    .flow a:hover { transform: translateY(-2px); border-color: var(--green); }
+    .flow .flow-num { color: var(--green); font-size: 11px; font-weight: 850; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 19px; color: var(--muted); font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend b { width: 8px; height: 8px; border-radius: 50%; }
+    .legend .confirmed { background: var(--green); }
+    .legend .review { background: var(--gold); }
+    .legend .write { background: var(--coral); }
+    .block { margin-top: 22px; padding: 31px 34px 33px; border: 1px solid var(--line); border-radius: 21px; background: var(--surface); scroll-margin-top: 20px; }
+    .block-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .block-title { display: flex; align-items: flex-start; gap: 15px; }
+    .number { display: grid; place-items: center; flex: 0 0 39px; height: 39px; border-radius: 12px; background: var(--green-pale); color: var(--green); font-size: 15px; font-weight: 850; }
+    .block h2 { margin-top: -4px; }
+    .status { flex-shrink: 0; padding: 5px 9px; border-radius: 100px; font-size: 11px; font-weight: 750; white-space: nowrap; }
+    .status.selected { background: var(--green-pale); color: var(--green); }
+    .status.review { background: var(--gold-pale); color: var(--gold); }
+    .status.write { background: var(--coral-pale); color: var(--coral); }
+    .intent { margin: 19px 0 0 54px; color: #47594e; font-size: 14px; }
+    .intent b { color: var(--green); }
+    .question { margin: 21px 0 0 54px; padding: 19px 22px; border-left: 3px solid var(--green); border-radius: 0 12px 12px 0; background: #f1f7f1; }
+    .question .micro { margin: 0 0 7px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .035em; }
+    .question p { margin: 0; font-size: 17px; font-weight: 750; letter-spacing: -.025em; line-height: 1.6; }
+    .question + .question { margin-top: 10px; }
+    .question.candidate { border-color: #c69a54; background: #fbf7ed; }
+    .question.candidate .micro { color: var(--gold); }
+    .question.note { border-color: #ddaa92; background: #fcf5f0; }
+    .question.note .micro { color: var(--coral); }
+    .note-line { margin: 15px 0 0 54px; color: var(--muted); font-size: 13px; }
+    .branch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 20px 0 0 54px; }
+    .branch .question { margin: 0; }
+    .work { margin: 25px 0 0 54px; padding-top: 19px; border-top: 1px dashed #d8ded4; }
+    .work-label { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: var(--ink); font-size: 13px; font-weight: 800; }
+    .work-letter { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--coral-pale); color: var(--coral); font-size: 12px; }
+    .work-hint { margin: 0 0 10px; color: var(--muted); font-size: 12px; }
+    textarea { display: block; width: 100%; min-height: 85px; padding: 13px 15px; border: 1px solid #cfd9cc; border-radius: 11px; outline: none; resize: vertical; background: #fff; color: var(--ink); font-size: 14px; line-height: 1.65; }
+    textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(36, 93, 74, .12); }
+    textarea::placeholder { color: #9aa79d; }
+    .work + .work { margin-top: 18px; padding-top: 0; border: 0; }
+    .finish { margin-top: 29px; padding: 26px 30px; border-radius: 18px; background: #e6ece2; }
+    .finish h2 { font-size: 20px; }
+    .finish p, .finish li { color: #4c5d52; font-size: 13px; }
+    .finish ul { margin-bottom: 0; padding-left: 20px; }
+    .foot { display: flex; flex-wrap: wrap; gap: 12px; margin: 27px 5px 0; color: var(--muted); font-size: 12px; }
+    .foot a { text-decoration: underline; text-underline-offset: 3px; }
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 20; max-width: 360px; padding: 11px 15px; border-radius: 10px; background: #213c30; color: white; box-shadow: var(--shadow); font-size: 13px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 980px) {
+      .page { grid-template-columns: 1fr; padding: 16px 20px 80px; }
+      .sidebar { position: static; height: auto; padding: 14px; gap: 8px; }
+      .brand { padding: 0 5px 10px; }
+      .side-label, .side-bottom { display: none; }
+      .step-nav { display: flex; overflow-x: auto; padding-bottom: 2px; }
+      .step-nav a { min-width: max-content; }
+      .hero { padding: 40px 34px; }
+    }
+    @media (max-width: 650px) {
+      .page { padding: 10px 12px 80px; gap: 12px; }
+      .hero { padding: 35px 25px; border-radius: 19px; }
+      .hero-desc { font-size: 13px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .overview { padding: 22px 18px; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .block { padding: 24px 18px; }
+      .block-head { align-items: flex-start; }
+      .block-title { gap: 11px; }
+      .number { flex-basis: 32px; height: 32px; }
+      .block h2 { font-size: 20px; }
+      .status { font-size: 10px; }
+      .intent, .question, .note-line, .branch, .work { margin-left: 0; }
+      .branch { grid-template-columns: 1fr; }
+      .question p { font-size: 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *:before, *:after { transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">♡</span><span>오늘도 사랑해</span></a>
+      <div>
+        <p class="side-label">INTERVIEW FLOW</p>
+        <nav class="step-nav" aria-label="인터뷰 단계">
+          <a href="#step-0"><span class="nav-num">0</span>참여 안내</a>
+          <a href="#step-1"><span class="nav-num">1</span>평소 표현 방식</a>
+          <a href="#step-2"><span class="nav-num">2</span>최근 실제 장면</a>
+          <a href="#step-3"><span class="nav-num">3</span>그 뒤 행동·상황</a>
+          <a href="#step-4"><span class="nav-num">4</span>기존 방법의 충분함</a>
+          <a href="#step-5"><span class="nav-num">5</span>편했던 반대 사례</a>
+          <a href="#step-6"><span class="nav-num">6</span>출발점 소개</a>
+          <a href="#step-7"><span class="nav-num">7</span>마무리</a>
+        </nav>
+      </div>
+      <div class="side-bottom"><strong>작성 중인 질문안</strong><br>참여자 섭외·실제 인터뷰는 아직 진행하지 않았습니다. 화면은 최근 경험을 들은 뒤에 보여줍니다.</div>
+    </aside>
+
+    <main id="top">
+      <header class="hero">
+        <p class="eyebrow">STEP 01 · PROBLEM INTERVIEW</p>
+        <h1>사전 인터뷰,<br>전체 흐름부터 함께 봐요.</h1>
+        <p class="hero-desc">각 단계에서 무엇을 알고 싶은지, 지금 정한 질문은 무엇인지, 아직 무엇을 써야 하는지 한 화면에 모았습니다. 모든 문장을 순서대로 읽는 대본이 아니라, 참여자의 답에 따라 움직이는 지도입니다.</p>
+        <div class="hero-meta"><span>성인 참여자 대상</span><span>화면 보기 전 대화</span><span>질문안 공동 작성 중</span><span>실제 인터뷰 미실시</span></div>
+      </header>
+
+      <div class="toolbar">
+        <div class="save-state"><span class="save-dot" aria-hidden="true"></span><span id="save-label">작성 칸 0/8 · 이 브라우저에 임시 보관</span></div>
+        <div class="toolbar-actions"><button class="action" id="copy-button" type="button">작성 내용 복사</button><button class="action primary" id="download-button" type="button">Markdown 내려받기</button></div>
+      </div>
+
+      <section class="overview" aria-labelledby="overview-title">
+        <p class="section-kicker">AT A GLANCE</p>
+        <h2 id="overview-title">질문이 이어지는 순서</h2>
+        <p class="lead">먼저 실제 경험을 듣습니다. 설명과 해석은 뒤로 미루고, 없는 경험도 그대로 기록합니다.</p>
+        <div class="flow">
+          <a href="#step-0"><span class="flow-num">00</span><span>안내와 선택권</span></a>
+          <a href="#step-1"><span class="flow-num">01</span><span>평소 표현</span></a>
+          <a href="#step-2"><span class="flow-num">02</span><span>최근 한 장면</span></a>
+          <a href="#step-3"><span class="flow-num">03</span><span>행동과 맥락</span></a>
+          <a href="#step-4"><span class="flow-num">04</span><span>쓰던 방법</span></a>
+          <a href="#step-5"><span class="flow-num">05</span><span>편했던 순간</span></a>
+          <a href="#step-6"><span class="flow-num">06</span><span>내 이야기</span></a>
+          <a href="#step-7"><span class="flow-num">07</span><span>빠진 경험</span></a>
+        </div>
+        <div class="legend" aria-label="상태 표시"><span><b class="confirmed"></b>사용자가 고른 작업안</span><span><b class="review"></b>AI 예시·검토 중</span><span><b class="write"></b>직접 작성할 칸</span></div>
+      </section>
+
+      <section id="step-0" class="block" aria-labelledby="title-0">
+        <div class="block-head"><div class="block-title"><span class="number">0</span><h2 id="title-0">참여 안내</h2></div><span class="status write">함께 작성</span></div>
+        <p class="intent"><b>의도</b> · 왜 묻는지와 답을 건너뛸 권리를 알리고, 익명 메모 범위를 먼저 확인합니다.</p>
+        <p class="note-line">정답이나 서비스 평가를 요구하지 않습니다. 녹음·녹화는 별도 동의 없이 진행하지 않습니다.</p>
+        <div class="work"><label class="work-label" for="answer-a"><span class="work-letter">A</span>내 말투의 시작 안내</label><p class="work-hint">짧은 목적, 화면을 보기 전 대화, 건너뛸 권리와 메모 범위를 담아 보세요.</p><textarea id="answer-a" data-field="A. 시작 안내" placeholder="예: 오늘은 가족에게 마음을 전했던 실제 경험을 듣고 싶어요…"></textarea></div>
+      </section>
+
+      <section id="step-1" class="block" aria-labelledby="title-1">
+        <div class="block-head"><div class="block-title"><span class="number">1</span><h2 id="title-1">평소 표현 방식</h2></div><span class="status selected">사용자 제안</span></div>
+        <p class="intent"><b>의도</b> · 참여자가 평소 어떤 방식으로 마음을 전한다고 생각하는지 듣습니다. ‘잘한다/못한다’ 평가에서 멈추지 않습니다.</p>
+        <div class="question"><p class="micro">첫 질문 · 작업안</p><p>“평소 가족에게 마음을 어떻게 표현하세요?”</p></div>
+        <p class="note-line">답이 나오면 가장 최근 실제 장면으로 이어갑니다.</p>
+      </section>
+
+      <section id="step-2" class="block" aria-labelledby="title-2">
+        <div class="block-head"><div class="block-title"><span class="number">2</span><h2 id="title-2">최근 실제 장면</h2></div><span class="status review">조건부 분기</span></div>
+        <p class="intent"><b>의도</b> · 추상적인 생각보다 최근 한 번의 상황과 행동을 듣습니다.</p>
+        <div class="branch">
+          <div class="question candidate"><p class="micro">표현했다면 · AI 예시, 사용자 긍정 반응</p><p>“가장 최근에는 언제 표현하셨나요? 그때 어떻게 하셨어요?”</p></div>
+          <div class="question candidate"><p class="micro">표현하지 않는다면 · AI 예시, 사용자 긍정 반응</p><p>“최근 전하고 싶었지만 전하지 않은 순간이 있었나요?”</p></div>
+        </div>
+        <p class="note-line">최근 사례가 없다면 없는 그대로 기록합니다. 가상의 경험을 만들어 말하도록 요구하지 않습니다.</p>
+      </section>
+
+      <section id="step-3" class="block" aria-labelledby="title-3">
+        <div class="block-head"><div class="block-title"><span class="number">3</span><h2 id="title-3">그 뒤 행동과 당시 상황</h2></div><span class="status selected">사용자 선택</span></div>
+        <p class="intent"><b>의도</b> · 결국 무엇을 했는지 확인하고, 표현을 멈춘 장면이 있다면 그때의 상황을 참여자 말로 듣습니다.</p>
+        <div class="branch">
+          <div class="question"><p class="micro">결과가 불분명할 때</p><p>“그 뒤에는 어떻게 하셨어요?”</p></div>
+          <div class="question"><p class="micro">실제로 말하려다 멈췄을 때</p><p>“말하려다 멈춘 그때, 무슨 일이 있었나요?”</p></div>
+        </div>
+        <p class="note-line">이미 행동을 충분히 들었다면 반복하지 않습니다. 쑥스러움·관계·시간 문제는 먼저 제시하지 않습니다.</p>
+      </section>
+
+      <section id="step-4" class="block" aria-labelledby="title-4">
+        <div class="block-head"><div class="block-title"><span class="number">4</span><h2 id="title-4">기존 방법은 충분했나</h2></div><span class="status write">다른 방법 작성</span></div>
+        <p class="intent"><b>의도</b> · 전화·메시지 등 이미 쓰는 방법이 전하고 싶은 마음을 충분히 담았는지 듣습니다. ‘나중의 후회’를 지금 확인한 사실로 취급하지 않습니다.</p>
+        <div class="question"><p class="micro">메시지를 실제로 보낸 경우에만 · 사용자 선택</p><p>“지금 그때 보낸 메시지를 돌아보면, 전하고 싶었던 마음을 어느 정도 담았다고 느끼세요?”</p></div>
+        <div class="work"><label class="work-label" for="answer-b1"><span class="work-letter">B</span>전화·대면 등 다른 방법을 썼다면</label><p class="work-hint">참여자가 실제로 쓴 방법을 넣어 충분했던 점과 아쉬움을 들을 질문을 적어 보세요.</p><textarea id="answer-b1" data-field="B1. 메시지 외 방법 질문" placeholder="내 질문"></textarea></div>
+        <div class="work"><label class="work-label" for="answer-b2"><span class="work-letter">B</span>결국 표현하지 않았다면</label><p class="work-hint">쓴 방법이 없는데 ‘충분했나요?’라고 묻지 않도록, 이어 물을 질문 또는 건너뛸 이유를 적어 보세요.</p><textarea id="answer-b2" data-field="B2. 표현하지 않은 경우" placeholder="내 질문 또는 건너뛸 이유"></textarea></div>
+      </section>
+
+      <section id="step-5" class="block" aria-labelledby="title-5">
+        <div class="block-head"><div class="block-title"><span class="number">5</span><h2 id="title-5">표현하기 편했던 반대 사례</h2></div><span class="status selected">질문 선택</span></div>
+        <p class="intent"><b>의도</b> · 어려웠던 경험만 모으지 않고, 별도 서비스가 필요 없거나 이미 편하게 표현할 수 있었던 경우를 찾습니다.</p>
+        <div class="question"><p class="micro">열린 질문 · AI 작성, 사용자 선택</p><p>“최근 가족에게 마음을 표현하기 편했던 순간이 있다면, 어떤 때였나요?”</p></div>
+        <p class="note-line">없다는 답도 받습니다. 생일은 답이 잘 떠오르지 않을 때만 후속 예시로 검토합니다.</p>
+        <div class="work"><label class="work-label" for="answer-c"><span class="work-letter">C</span>그 순간이 왜 편했는지</label><p class="work-hint">‘생일이라서’, ‘관계가 좋아서’처럼 원인을 먼저 말하지 않고 무엇이 달랐는지 묻습니다.</p><textarea id="answer-c" data-field="C. 편했던 이유 후속 질문" placeholder="내 후속 질문"></textarea></div>
+      </section>
+
+      <section id="step-6" class="block" aria-labelledby="title-6">
+        <div class="block-head"><div class="block-title"><span class="number">6</span><h2 id="title-6">내 이야기로 출발점 소개</h2></div><span class="status write">정확한 위치 검토</span></div>
+        <p class="intent"><b>의도</b> · 먼저 참여자 자신의 경험을 들은 뒤, 인터뷰어가 왜 이 질문을 하는지 설명합니다. 큰 순서는 사용자 선택이며 정확한 소개 위치는 아직 정하지 않았습니다.</p>
+        <div class="question candidate"><p class="micro">AI 소개 작업안 · 사용자 긍정 반응, 실제 사용 전</p><p>“저는 어머니를 가장 좋아하는데도 집에서는 표현을 잘 하지 않아, 어머니께서 제가 어머니를 좋아하지 않는다고 생각하셨다는 걸 알게 됐어요. 그래서 요즘은 함께 사는 어머니께 자기 전마다 ‘사랑합니다’라고 말하고 있어요. 이 경험을 겪으며, 떨어져 사는 가족은 마음을 전하고 싶을 때 어떻게 표현을 시작하는지 궁금해졌고, 그 고민에서 이 아이디어가 시작됐습니다.”</p></div>
+        <p class="note-line">Codex는 기존 방법과 편했던 경험까지 듣고 소개하기를 추천합니다. 소개가 앞의 답에 영향을 주는 것을 줄이기 위해서입니다. 후회·추억의 넓은 동기는 핵심 경험을 다 들은 뒤 설명합니다.</p>
+        <div class="work"><label class="work-label" for="answer-d1"><span class="work-letter">D</span>어디서 소개할지와 이유</label><p class="work-hint">최근 한 장면 직후 / 기존 방법·반대 사례까지 들은 뒤 / 다른 위치 중 선택해 이유를 적어 보세요.</p><textarea id="answer-d1" data-field="D1. 소개 위치와 이유" placeholder="내가 선택하는 위치와 이유"></textarea></div>
+        <div class="work"><label class="work-label" for="answer-d2"><span class="work-letter">D</span>소개 문안에서 고칠 말</label><p class="work-hint">고칠 부분이 없으면 ‘현재 AI 작업안 사용’이라고 적어도 됩니다.</p><textarea id="answer-d2" data-field="D2. 소개 문안 수정" placeholder="수정 문장 또는 현재 AI 작업안 사용"></textarea></div>
+      </section>
+
+      <section id="step-7" class="block" aria-labelledby="title-7">
+        <div class="block-head"><div class="block-title"><span class="number">7</span><h2 id="title-7">빠진 경험을 듣고 마무리</h2></div><span class="status write">함께 작성</span></div>
+        <p class="intent"><b>의도</b> · 질문이 놓친 경험을 열어 두고, 포트폴리오에 직접 인용할 내용은 익명 메모와 구분해 허용 범위를 확인합니다.</p>
+        <div class="work"><label class="work-label" for="answer-e1"><span class="work-letter">E</span>빠진 경험을 확인할 질문</label><p class="work-hint">지금 이야기와 다른 경험이나, 내가 묻지 않아 빠진 것이 있는지 들어 봅니다.</p><textarea id="answer-e1" data-field="E1. 빠진 경험 질문" placeholder="내 질문"></textarea></div>
+        <div class="work"><label class="work-label" for="answer-e2"><span class="work-letter">E</span>기록·직접 인용 범위 안내</label><p class="work-hint">익명 메모와 포트폴리오 직접 인용은 구분합니다. 인용을 원하지 않아도 괜찮습니다.</p><textarea id="answer-e2" data-field="E2. 기록과 인용 안내" placeholder="내 안내 문장"></textarea></div>
+      </section>
+
+      <section class="finish" aria-labelledby="finish-title">
+        <h2 id="finish-title">작성한 뒤 함께 볼 것</h2>
+        <p>A~E를 한 번에 채운 뒤 흐름 전체를 검토합니다. 어려운 칸은 비워 두어도 됩니다.</p>
+        <ul><li>답을 유도하는 말이나 중복 질문이 있는가?</li><li>참여자가 쓰지 않은 방법을 질문이 가정하는가?</li><li>최근 실제 행동과 진행자의 해석을 구분할 수 있는가?</li><li>소개 시점이 참여자의 앞선 답에 영향을 주지 않는가?</li></ul>
+      </section>
+      <footer class="foot"><a href="09_사전인터뷰_전체흐름_공동작성.md">Markdown 원본</a><a href="02_사전인터뷰_진행안.md">질문 선택 이력</a><a href="../PLAN.md">현재 계획</a><span>이 화면은 질문안 작성용이며 실제 인터뷰 기록이 아닙니다.</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    (() => {
+      const storageKey = 'oneuldo-interview-workbook-v1';
+      const fields = [...document.querySelectorAll('textarea[data-field]')];
+      const saveLabel = document.getElementById('save-label');
+      const toast = document.getElementById('toast');
+      let noticeTimer;
+      let canSave = true;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(noticeTimer);
+        noticeTimer = setTimeout(() => toast.classList.remove('show'), 3300);
+      }
+
+      function values() {
+        return Object.fromEntries(fields.map(field => [field.dataset.field, field.value.trim()]));
+      }
+
+      function updateCount() {
+        const complete = fields.filter(field => field.value.trim()).length;
+        saveLabel.textContent = `작성 칸 ${complete}/${fields.length} · ${canSave ? '이 브라우저에 임시 보관' : '브라우저 저장 불가 · 내려받기 권장'}`;
+      }
+
+      function save() {
+        try { localStorage.setItem(storageKey, JSON.stringify(values())); }
+        catch (_) { canSave = false; }
+        updateCount();
+      }
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        fields.forEach(field => { field.value = typeof saved[field.dataset.field] === 'string' ? saved[field.dataset.field] : ''; });
+      } catch (_) { canSave = false; }
+      fields.forEach(field => field.addEventListener('input', save));
+      updateCount();
+
+      function markdown() {
+        const data = values();
+        return '# 사전 인터뷰 질문안 — 작성한 칸\n\n' +
+          '작성 상태: 사용자 검토 중. 실제 인터뷰 결과 아님.\n\n' +
+          fields.map(field => `## ${field.dataset.field}\n\n${data[field.dataset.field] || '[미작성]'}\n`).join('\n');
+      }
+
+      document.getElementById('copy-button').addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(markdown()); showToast('복사했어요. 대화창에 붙여넣어 주세요.'); }
+        catch (_) { showToast('복사할 수 없어요. Markdown 내려받기를 이용해 주세요.'); }
+      });
+
+      document.getElementById('download-button').addEventListener('click', () => {
+        const blob = new Blob([markdown()], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '오늘도사랑해_사전인터뷰_내초안.md';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('작성한 답변을 Markdown 파일로 내려받았어요.');
+      });
+
+      if ('IntersectionObserver' in window) {
+        const nav = [...document.querySelectorAll('.step-nav a')];
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          nav.forEach(link => link.classList.toggle('active', link.hash === `#${visible.target.id}`));
+        }, { rootMargin: '-10% 0px -65% 0px', threshold: [0, .1, .5] });
+        document.querySelectorAll('section[id^="step-"]').forEach(section => observer.observe(section));
+      }
+    })();
+  </script>
+</body>
+</html>

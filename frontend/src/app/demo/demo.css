@@ -44,7 +44,7 @@
 .demo-album-link { display: block; aspect-ratio: 4 / 3; position: relative; background: #e8ded0; color: var(--color-ink); }
 .demo-cover-art { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(140deg, #dcd3c9, #f1ede7); color: #807166; }
 .demo-cover-art > svg { width: 72%; height: 72%; opacity: .9; transform: rotate(-7deg); }
-.demo-album-name { position: absolute; left: 0; bottom: 0; border-top-right-radius: 10px; background: white; height: 32px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; font-weight: 600; }
+.demo-album-name { position: absolute; left: 0; bottom: 0; border-top-right-radius: 10px; background: white; height: 29px; padding: 0 9px; display: flex; align-items: center; font-size: 15px; font-weight: 600; }
 .demo-unread { position: absolute; right: -9px; top: -9px; min-width: 22px; height: 22px; padding: 0 4px; border: 2px solid white; border-radius: 99px; background: var(--color-primary); color: white; font-size: 11px; font-weight: 700; display: flex; justify-content: center; align-items: center; }
 .demo-album-favorite { position: absolute; top: 8px; right: 8px; min-width: 44px; min-height: 44px; background: none; border: 0; display: grid; place-items: center; color: white; filter: drop-shadow(0 1px 2px rgb(0 0 0 / .3)); }
 .demo-album-favorite.is-favorite { color: #ff5a7a; }

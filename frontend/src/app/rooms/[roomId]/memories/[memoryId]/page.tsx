@@ -157,7 +157,7 @@ export default async function MemoryDetailPage({
             </p>
           ) : null}
 
-          {detail.voiceUrl && detail.voiceDurationSec ? (
+          {detail.voiceUrl && detail.voiceDurationSec !== null ? (
             <div className="pt-4">
               <VoicePlayer
                 src={detail.voiceUrl}
@@ -166,7 +166,7 @@ export default async function MemoryDetailPage({
                 label={`${detail.authorName}님의 목소리`}
               />
             </div>
-          ) : detail.voiceDurationSec ? (
+          ) : detail.voiceDurationSec !== null ? (
             <p className="pt-4 text-sm text-muted">
               목소리를 불러오지 못했어요. 잠시 후 다시 열어주세요.
             </p>

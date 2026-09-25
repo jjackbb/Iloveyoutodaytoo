@@ -175,12 +175,12 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * 정적 파일과 이미지 최적화 경로는 건너뛴다.
+     * 정적 파일, 이미지 최적화, 개발용 HMR 경로는 건너뛴다.
      *
      * .txt / .xml 을 빼먹으면 robots.txt·llms.txt 요청까지 로그인으로 리디렉트되어
      * 크롤러가 차단 규칙 자체를 못 읽는다. 규칙 파일을 만들어두고도 무력해지므로
      * 확장자 목록에서 지우지 마라.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)',
+    '/((?!_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)',
   ],
 }

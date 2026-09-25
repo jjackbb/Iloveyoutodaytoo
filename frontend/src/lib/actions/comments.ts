@@ -110,8 +110,9 @@ export type CreateVoiceCommentInput = {
 /**
  * 음성 댓글 남기기 (캡처 26~33).
  *
- * 길이 규칙은 게시물의 목소리와 같다(3~60초). 화면에서도 3초 미만이면 등록 버튼이
- * 켜지지 않지만, 서버가 마지막으로 한 번 더 본다. DB CHECK도 같은 값을 지킨다.
+ * 길이 메타데이터는 게시물의 목소리와 같은 0~60초 범위다.
+ * 최소 녹음 시간은 없고, 실제 파일이 없는 경우는 녹음기가 막는다.
+ * 서버가 경로와 길이를 다시 확인하고 DB CHECK도 같은 범위를 지킨다.
  */
 export async function createVoiceComment(
   input: CreateVoiceCommentInput,
@@ -147,10 +148,10 @@ export async function createVoiceComment(
       error: '녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해 주세요.',
     }
   }
-  const voiceDurationSec = Math.round(rawDuration)
-  if (voiceDurationSec < VOICE_MIN_SEC) {
-    return { ok: false, error: `음성 녹음은 ${VOICE_MIN_SEC}초 이상이어야 해요.` }
+  if (rawDuration < VOICE_MIN_SEC) {
+    return { ok: false, error: '녹음 길이를 확인하지 못했어요. 다시 한 번 녹음해 주세요.' }
   }
+  const voiceDurationSec = Math.round(rawDuration)
   if (voiceDurationSec > VOICE_MAX_SEC) {
     return { ok: false, error: `녹음은 ${VOICE_MAX_SEC}초까지 담을 수 있어요.` }
   }

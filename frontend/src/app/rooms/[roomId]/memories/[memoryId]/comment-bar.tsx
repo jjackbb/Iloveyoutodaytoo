@@ -13,7 +13,7 @@ import {
   createVoiceComment,
   type CommentActionResult,
 } from '@/lib/actions/comments'
-import { TEXT_MAX_LENGTH, VOICE_MIN_SEC } from '@/lib/limits'
+import { TEXT_MAX_LENGTH, VOICE_MAX_SEC } from '@/lib/limits'
 import { createClient } from '@/lib/supabase/client'
 
 /**
@@ -321,7 +321,7 @@ export function CommentBar({
  * 음성 댓글 시트 (캡처 26~33).
  *
  * 녹음기는 마음 표현하기와 **같은 부품**(VoiceRecorder)이다. 마이크 하나로 시작·정지,
- * 흘러가는 시간, 3초 미만이면 저장하지 않고 처음으로 되돌리기, 다 되면 미리듣기까지
+ * 흘러가는 시간, 파일이 비면 오류 안내, 다 되면 미리듣기까지
  * 이미 그 안에 있다. 여기서 다시 짜면 두 화면의 녹음 규칙이 서서히 어긋난다.
  *
  * 이 시트가 맡는 것은 그 뒤다: 파일 올리기 → 서버에 경로 넘기기 → 실패하면 뒷정리.
@@ -434,7 +434,7 @@ function VoiceCommentSheet({
         음성 댓글 남기기
       </h2>
       <p className="mt-1 mb-4 text-base leading-relaxed break-keep text-muted">
-        마이크를 눌러 녹음하고, {VOICE_MIN_SEC}초를 넘기면 등록할 수 있어요.
+        마이크를 눌러 녹음해 주세요. 최대 {VOICE_MAX_SEC}초까지 담을 수 있어요.
       </p>
 
       <VoiceRecorder
@@ -459,7 +459,7 @@ function VoiceCommentSheet({
         >
           취소
         </Button>
-        {/* 3초를 못 넘겼으면 녹음이 아예 남지 않으므로 이 버튼은 잠긴 채다(캡처 27). */}
+        {/* 녹음 파일이 아직 없으면 등록 버튼은 잠긴다. */}
         <Button
           type="button"
           fullWidth

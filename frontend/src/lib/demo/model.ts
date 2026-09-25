@@ -82,7 +82,7 @@ export function validateMemory(memory: DemoMemory): void {
   if (!Number.isFinite(Date.parse(memory.createdAt))) throw new Error('기록의 날짜를 확인해주세요.')
   if (memory.caption.length > CAPTION_MAX_LENGTH) throw new Error(`한마디는 ${CAPTION_MAX_LENGTH}자까지 남길 수 있어요.`)
   if (memory.handwriting && !isHandwritingDoc(memory.handwriting)) throw new Error('손글씨를 다시 확인해주세요.')
-  if (memory.voice && (!(memory.voice.blob instanceof Blob) || !memory.voice.blob.size || !Number.isFinite(memory.voice.durationSec) || memory.voice.durationSec < VOICE_MIN_SEC || memory.voice.durationSec > VOICE_MAX_SEC)) throw new Error(`목소리는 ${VOICE_MIN_SEC}~${VOICE_MAX_SEC}초로 담아주세요.`)
+  if (memory.voice && (!(memory.voice.blob instanceof Blob) || !memory.voice.blob.size || !Number.isFinite(memory.voice.durationSec) || memory.voice.durationSec < VOICE_MIN_SEC || memory.voice.durationSec > VOICE_MAX_SEC)) throw new Error('녹음 파일을 확인해 주세요. 목소리는 1분까지 담을 수 있어요.')
   if (memory.photos.length > PHOTO_MAX_COUNT || memory.photos.some((photo) => !(photo instanceof Blob) || !photo.type.startsWith('image/') || !photo.size)) throw new Error('사진을 다시 확인해주세요.')
   if (!memory.handwriting && !memory.voice && !memory.photos.length) throw new Error('손글씨, 목소리, 사진 중 하나를 담아주세요.')
 }
