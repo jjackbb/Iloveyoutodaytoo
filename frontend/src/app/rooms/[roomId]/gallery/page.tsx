@@ -38,8 +38,8 @@ const PHOTO_LIMIT = 240
  * 고정(pinned_at)은 보지 않는다 — 고정은 피드에서 "맨 위 한 자리"를 정하는 표시이고,
  * 여기서까지 순서를 흔들면 "언제 찍은 사진인지"로 훑는 흐름이 끊긴다.
  *
- * 빼는 것 두 가지:
- * - 지운 글(`deleted_at`)의 사진. 화면 어디에서도 다시 나오면 안 된다.
+ * 빼는 것:
+ * - 지운 글의 사진은 따로 거를 필요가 없다. 2026-09-26부터 삭제는 행을 완전히 지운다.
  * - **내가 숨긴 글**의 사진. 피드에서 안 보이기로 한 것이 갤러리에 그대로 있으면
  *   숨김이 반쪽짜리가 된다. 숨긴 것을 다시 보는 자리는 따로 있다(`/hidden`).
  */
@@ -66,7 +66,6 @@ export default async function RoomGalleryPage({
       'id, created_at, author_id, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)',
     )
     .eq('room_id', roomId)
-    .is('deleted_at', null)
     .order('created_at', { ascending: false })
     .limit(MEMORY_SCAN_LIMIT)
 

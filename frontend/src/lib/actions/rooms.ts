@@ -18,8 +18,8 @@ import { createClient } from '@/lib/supabase/server'
  * 코드로 또 넣으면 중복 등록이 되므로 절대 하지 않는다. (02_DATA_MODEL.md)
  *
  * 관계유형("어떤 사이인가요?")은 캡처 기준 개정으로 더 이상 묻지 않는다
- * (_workspace/03_capture_flow.md). rooms.relationship_type은 nullable이 됐고
- * 새 방은 값을 넣지 않는다 — 컬럼은 기존 방의 값 때문에 남겨 둔다.
+ * (_workspace/03_capture_flow.md). 2026-09-26 새 DB에서는 rooms.relationship_type
+ * 컬럼과 enum 자체를 만들지 않았다(supabase/migrations/20260926000000_initial_schema.sql).
  */
 
 /*
@@ -89,8 +89,6 @@ export async function createRoom(
       // 없는 키를 보내면 DB 제약(rooms_cover_preset_check)이 막고 방 만들기가 통째로 실패하므로
       // 여기서 한 번 걸러 낸다 — 폼에서 온 값을 그대로 믿지 않는다.
       cover_preset: isCoverPreset(cover) ? cover : COVER_PRESET_LIST[0].key,
-      // 관계유형은 더 이상 넣지 않는다. DB에서 nullable로 바꿔 뒀다.
-      relationship_type: null,
       // RLS가 owner_id = auth.uid()를 요구한다. 반드시 직접 넣어줘야 한다.
       owner_id: user.id,
     })

@@ -27,7 +27,7 @@ export const GRID_SLOTS = 3
  * 결과가 unknown이 된다. `as const`라 리터럴 타입이 그대로 전달된다.
  */
 export const MEMORY_CARD_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 위 select가 돌려주는 한 줄. 조회는 화면마다 다르지만 이 모양은 같다. */
 export type MemoryRow = {
@@ -41,6 +41,9 @@ export type MemoryRow = {
   /** 손글씨 획 좌표 파일(handwriting 버킷). 없으면 null. */
   handwriting_path: string | null
   handwriting_duration_ms: number | null
+  /** 추억 영상(video 버킷). 한 추억에 최대 한 개. 없으면 null. */
+  video_path: string | null
+  video_duration_ms: number | null
   author_id: string | null
   pinned_at: string | null
   author: { id: string; name: string } | null
@@ -71,7 +74,7 @@ export function isRoomPath(path: string | null, roomId: string): path is string 
  */
 export async function signPaths(
   supabase: Supabase,
-  bucket: 'media' | 'voice' | 'handwriting',
+  bucket: 'media' | 'voice' | 'handwriting' | 'video',
   paths: string[],
 ): Promise<Map<string, string>> {
   const urlByPath = new Map<string, string>()
@@ -226,12 +229,21 @@ export async function buildMemoryCards(options: {
     ),
   )
 
+  const videoPaths = Array.from(
+    new Set(
+      sorted
+        .map(({ memory }) => memory.video_path)
+        .filter((path): path is string => isRoomPath(path, roomId)),
+    ),
+  )
+
   const memoryIds = sorted.map(({ memory }) => memory.id)
 
   const [
     photoUrlByPath,
     voiceUrlByPath,
     handwritingUrlByPath,
+    videoUrlByPath,
     likesResult,
     savesResult,
     nicknameByUser,
@@ -240,6 +252,7 @@ export async function buildMemoryCards(options: {
     signPaths(supabase, 'media', photoPaths),
     signPaths(supabase, 'voice', voicePaths),
     signPaths(supabase, 'handwriting', handwritingPaths),
+    signPaths(supabase, 'video', videoPaths),
     supabase
       .from('memory_likes')
       // 누가 눌렀는지까지 가져와야 **내 하트가 채워졌는지**를 알 수 있다.
@@ -317,6 +330,10 @@ export async function buildMemoryCards(options: {
         ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
         : null,
       handwritingDurationMs: memory.handwriting_duration_ms,
+      videoUrl: isRoomPath(memory.video_path, roomId)
+        ? (videoUrlByPath.get(memory.video_path) ?? null)
+        : null,
+      hasVideo: memory.video_path !== null,
       likeCount: likeCountByMemory.get(memory.id) ?? 0,
       likedByMe: likedByMe.has(memory.id),
       commentCount: commentCountByMemory.get(memory.id) ?? 0,
@@ -374,6 +391,10 @@ export type MemoryDetailView = {
   /** 서명된 handwriting 버킷 주소. 못 만들었으면 null. */
   handwritingUrl: string | null
   handwritingDurationMs: number | null
+  /** 서명된 video 버킷 주소. 못 만들었으면 null. */
+  videoUrl: string | null
+  /** 영상이 있는지(DB 기준). url 이 없는데 참이면 "불러오지 못했어요"로 흐른다. */
+  hasVideo: boolean
   likeCount: number
   likedByMe: boolean
   isPinned: boolean
@@ -383,7 +404,7 @@ export type MemoryDetailView = {
 
 /** 상세에서 읽는 컬럼들. 카드와 달리 사진 수를 자르지 않는다(한 줄로 둔다 — 타입 추론). */
 const MEMORY_DETAIL_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 댓글 한 줄을 읽을 때 쓰는 컬럼들. */
 const COMMENT_SELECT =
@@ -392,7 +413,7 @@ const COMMENT_SELECT =
 /**
  * 게시물 하나와 그 댓글들을 상세 화면 모양으로 읽는다.
  *
- * 못 읽으면 null이다 — 지워졌거나(soft delete), 남의 방이거나(RLS), 주소가 잘못됐거나.
+ * 못 읽으면 null이다 — 지워졌거나, 남의 방이거나 작성자만 읽는 추억이거나(RLS), 주소가 잘못됐거나.
  * 셋을 구분해 알려줄 방법도 이유도 없어서 화면은 그냥 404로 흐른다.
  *
  * 요청 수: 게시물 1 + 댓글 1 + (서명 media 1 · voice 1) + 좋아요 1 + 저장 1 + 별명 1.
@@ -412,7 +433,6 @@ export async function loadMemoryDetail(options: {
     .eq('id', memoryId)
     // 다른 방 글의 주소를 들고 와도 이 방 화면에서는 열리지 않는다.
     .eq('room_id', roomId)
-    .is('deleted_at', null)
     .maybeSingle()
 
   if (error) {
@@ -458,11 +478,13 @@ export async function loadMemoryDetail(options: {
   const handwritingPaths = isRoomPath(memory.handwriting_path, roomId)
     ? [memory.handwriting_path]
     : []
+  const videoPaths = isRoomPath(memory.video_path, roomId) ? [memory.video_path] : []
 
   const [
     photoUrlByPath,
     voiceUrlByPath,
     handwritingUrlByPath,
+    videoUrlByPath,
     likesResult,
     saveResult,
     nicknameByUser,
@@ -470,6 +492,7 @@ export async function loadMemoryDetail(options: {
       signPaths(supabase, 'media', photoPaths),
       signPaths(supabase, 'voice', voicePaths),
       signPaths(supabase, 'handwriting', handwritingPaths),
+      signPaths(supabase, 'video', videoPaths),
       supabase.from('memory_likes').select('user_id').eq('memory_id', memoryId),
       supabase
         .from('memory_saves')
@@ -517,6 +540,10 @@ export async function loadMemoryDetail(options: {
       ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
       : null,
     handwritingDurationMs: memory.handwriting_duration_ms,
+    videoUrl: isRoomPath(memory.video_path, roomId)
+      ? (videoUrlByPath.get(memory.video_path) ?? null)
+      : null,
+    hasVideo: memory.video_path !== null,
     likeCount: likes.length,
     likedByMe: likes.some((like) => like.user_id === viewerId),
     isPinned: memory.pinned_at !== null,

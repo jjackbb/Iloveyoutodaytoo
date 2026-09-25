@@ -9,6 +9,7 @@
  *
  * 아래 값은 DB의 CHECK 제약과 반드시 같아야 한다.
  * - heart_messages: text_length_limit(300), duration_matches_type(voice 0~60초)
+ * - memories: memories_voice_pair(0~60초), memories_video_pair(0~30000ms)
  * 값을 바꾸려면 DB 제약도 함께 봐야 한다. 스키마 변경은 임의로 하지 않는다.
  */
 
@@ -30,6 +31,21 @@ export const VOICE_MIN_SEC = 0
 
 /** 음성 한마디 최대 길이(초). DB CHECK duration_matches_type과 같은 값이다. */
 export const VOICE_MAX_SEC = 60
+
+/**
+ * 추억 영상 최대 길이(밀리초). 최소 길이는 없다.
+ * DB CHECK memories_video_pair(0~30000ms)와 같은 값이다.
+ */
+export const VIDEO_MAX_MS = 30_000
+
+/**
+ * 추억 영상 한 개의 최대 파일 크기(바이트). 50MB = 50 × 1024 × 1024.
+ * video 버킷의 file_size_limit(52428800)과 같은 값이다. 자동 압축은 하지 않는다.
+ */
+export const VIDEO_MAX_BYTES = 50 * 1024 * 1024
+
+/** 추억 영상으로 받는 파일 형식. video 버킷의 allowed_mime_types와 같은 목록이다. */
+export const VIDEO_MIME_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'] as const
 
 /**
  * 추억 게시물 한 개에 담을 수 있는 사진 수 (캡처 12 "0/10").
@@ -69,14 +85,3 @@ export const REPORT_DETAIL_MAX_LENGTH = 500
  * 화면에서 통과한 값이 서버에서 거절된다.
  */
 export const PASSWORD_MIN_LENGTH = 8
-
-/**
- * 답장 미션이 걸리는 기준 (PRD [MISSION-01] 수정안 1).
- *
- * "한 사람이 보낸 마음 중, 내가 **듣고도 답장하지 않은 것**"이 이 수에 이르면
- * 그 사람의 다음 마음이 잠긴다. 즉 6번째부터 잠긴다.
- *
- * DB의 locked_senders() 안에도 같은 숫자가 박혀 있다. 바꾸려면 둘 다 고쳐야 한다 —
- * 진짜 관문은 DB 쪽이고, 이 값은 화면에 "N개 남았어요"를 적기 위한 것이다.
- */
-export const MISSION_UNREPLIED_LIMIT = 5

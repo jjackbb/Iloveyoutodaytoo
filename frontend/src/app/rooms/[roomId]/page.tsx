@@ -126,7 +126,6 @@ export default async function RoomPage({
     .select(MEMORY_CARD_SELECT)
     .eq('room_id', roomId)
     // 지운 글은 행이 남아 있을 뿐 없는 것이다(소프트 삭제). 모든 조회가 이 조건을 건다.
-    .is('deleted_at', null)
     /*
       고정된 글이 맨 위, 그 아래는 최신순.
       nullsFirst를 끄지 않으면 내림차순의 기본값이 NULLS FIRST라 **고정 안 된 글이 위로 온다**
@@ -316,7 +315,6 @@ async function findMatchingMemoryIds(options: {
     .from('memories')
     .select('id')
     .eq('room_id', roomId)
-    .is('deleted_at', null)
     .in('id', within)
 
   if (who) query = query.eq('author_id', who)

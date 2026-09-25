@@ -22,8 +22,7 @@ const MEMORY_PAGE_SIZE = 30
  * 숨김은 **누른 사람에게만** 걸린 표시다(`memory_hides`는 select도 본인 것만 열린다).
  * 그래서 남이 무엇을 숨겼는지는 여기서도 알 수 없고, 알 이유도 없다.
  *
- * 지운 글(`deleted_at`)은 숨겨 뒀더라도 보여주지 않는다 —
- * 풀어봐야 어디에도 안 나오는 글이라, 보여주면 "되돌렸는데 왜 없지"가 된다.
+ * 지운 글은 행째 사라지므로(2026-09-26 완전 삭제) 숨김 목록에도 남지 않는다.
  */
 export default async function RoomHiddenPage({
   params,
@@ -57,7 +56,6 @@ export default async function RoomHiddenPage({
           .from('memories')
           .select(MEMORY_CARD_SELECT)
           .eq('room_id', roomId)
-          .is('deleted_at', null)
           .in('id', hiddenIds)
           .order('created_at', { ascending: false })
           .limit(MEMORY_PAGE_SIZE)

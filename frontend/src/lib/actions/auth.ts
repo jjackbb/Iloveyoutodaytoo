@@ -200,7 +200,7 @@ async function syncLargeTextCookie(
   if (!user) return
 
   const { data } = await supabase
-    .from('users')
+    .from('user_private')
     .select('large_text')
     .eq('id', user.id)
     .maybeSingle()
@@ -262,14 +262,17 @@ export async function signUp(
     return fail('이용약관과 개인정보 처리방침에 동의해주세요.', 'terms')
   }
 
-  // 만 14세 미만은 법정대리인 동의가 있어야 가입할 수 있다 (개인정보보호법)
+  /*
+    만 14세 미만은 법정대리인 동의가 있어야 가입할 수 있다 (개인정보보호법).
+    2026-09-26 사용자 결정: 실제 보호자 확인 기능이 완성되기 전에는 미성년 가입을 막는다.
+    체크박스나 확인하지 않은 전화번호를 "동의 완료"로 치지 않는다.
+    DB(enforce_guardian_consent)도 같은 규칙으로 한 번 더 막는다 — 여기는 이유를 알려주는 자리다.
+  */
   const minor = needsGuardianConsent(birthDate)
-  const guardianConsented = formData.get('guardian_consented') === 'on'
-
-  if (minor && (!guardianName || !guardianPhone || !guardianConsented)) {
+  if (minor) {
     return fail(
-      '만 14세 미만은 법정대리인의 성함·연락처와 동의가 필요해요. 보호자와 함께 입력해주세요.',
-      'guardian',
+      '만 14세 미만은 보호자 확인 기능을 준비하고 있어 아직 가입할 수 없어요.',
+      'birth_date',
     )
   }
 
@@ -284,13 +287,6 @@ export async function signUp(
         username,
         birth_date: birthDate,
         auth_provider: 'email',
-        ...(minor
-          ? {
-              guardian_name: guardianName,
-              guardian_phone: guardianPhone,
-              guardian_consented: true,
-            }
-          : {}),
       },
     },
   })

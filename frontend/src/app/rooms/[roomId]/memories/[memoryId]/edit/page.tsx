@@ -36,7 +36,6 @@ export default async function EditMemoryPage({
     )
     .eq('id', memoryId)
     .eq('room_id', roomId)
-    .is('deleted_at', null)
     .maybeSingle()
 
   const backHref = `/rooms/${roomId}/memories/${memoryId}`

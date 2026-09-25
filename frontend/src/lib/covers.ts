@@ -1,5 +1,3 @@
-import type { Enums } from '@/types/database'
-
 /**
  * 방 커버.
  *
@@ -53,21 +51,6 @@ export const COVER_PRESET_LIST = Object.entries(COVER_PRESETS).map(
 
 export function isCoverPreset(value: unknown): value is CoverPreset {
   return typeof value === 'string' && value in COVER_PRESETS
-}
-
-/**
- * 관계 유형별 기본 커버.
- * 방을 만들 때 커버를 고르지 않아도 관계에 어울리는 색이 잡혀 있게 한다 —
- * 시니어 사용자에게 "골라야만 넘어갈 수 있는 단계"를 하나 더 만들지 않기 위해서다.
- */
-export const DEFAULT_COVER_BY_TYPE: Record<
-  Enums<'relationship_type'>,
-  CoverPreset
-> = {
-  family: 'warm',
-  lover: 'blush',
-  friend: 'sky',
-  self: 'sand',
 }
 
 /**

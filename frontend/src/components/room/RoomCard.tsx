@@ -15,7 +15,7 @@ import { formatRelativeTime } from '@/lib/format'
  * 관계유형 라벨과 생성일은 더 이상 보여주지 않는다 — 캡처에 없다.
  * 라벨을 만들던 relationshipTypeLabel()·RELATIONSHIP_TYPE_LABEL도 함께 지웠다
  * (2026-08-19). 쓰는 곳이 한 군데도 없는데 남겨두면 "아직 쓰나?" 하고
- * 되살리는 사람이 생긴다. rooms.relationship_type 컬럼 자체는 예전 방의 값이라 그대로 둔다.
+ * 되살리는 사람이 생긴다. 2026-09-26 새 DB에서는 rooms.relationship_type 컬럼도 없앴다.
  * 연속일수 배지도 뺐다. 그 자리는 캡처대로 ♡ 즐겨찾기가 쓴다.
  *
  * 이 컴포넌트는 DB를 직접 보지 않는다. 필요한 값은 전부 props로 받는다.

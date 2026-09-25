@@ -392,8 +392,8 @@ function EditCaptionDialog({
 /**
  * 삭제 확인 창.
  *
- * 실제로는 소프트 삭제(`deleted_at`)라 DB에는 남지만, 사용자에게 "사실은 안 지워져요"라고
- * 말하지 않는다 — **화면에서 영영 사라지고 되돌릴 길이 없는 것은 사실**이기 때문이다.
+ * 2026-09-26부터 **완전 삭제**다. 추억과 연결 파일(사진·영상·목소리·손글씨)·댓글이 모두 지워지고
+ * 되돌릴 길이 없다. 파일 정리가 남으면 성공이라고 하지 않고 다시 누르게 한다(deleteMemory).
  */
 function ConfirmDeleteDialog({
   authorName,
@@ -416,8 +416,8 @@ function ConfirmDeleteDialog({
         이 추억을 삭제할까요?
       </h2>
       <p className="mt-2 text-base leading-relaxed break-keep text-muted">
-        {authorName}님이 남긴 사진·목소리·문구가 앨범방에서 사라져요. 되돌릴 수
-        없어요.
+        {authorName}님이 남긴 사진·영상·목소리·문구와 댓글이 모두 지워져요.
+        되돌릴 수 없어요.
       </p>
 
       {error ? (

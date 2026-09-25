@@ -260,7 +260,7 @@ async function loadTarget(
   const { data } = await supabase
     .from('memories')
     .select(
-      'id, room_id, media_type, description, created_at, author_id, author:users!memories_author_id_fkey(id, name)',
+      'id, room_id, video_path, description, created_at, author_id, author:users!memories_author_id_fkey(id, name)',
     )
     .eq('id', targetId)
     .maybeSingle()
@@ -270,7 +270,8 @@ async function loadTarget(
   const authorName = data.author_id
     ? (data.author?.name ?? '이름 없음')
     : WITHDRAWN_NAME
-  const mediaNoun = data.media_type === 'video' ? '영상' : '사진'
+  // 추억 하나에 여러 수단이 담기므로 "추억"이라 부른다. 영상이 있으면 그것을 알린다.
+  const mediaNoun = data.video_path ? '영상이 담긴 추억' : '추억'
 
   return {
     summary: `${authorName}님이 ${formatKstDate(data.created_at)}에 올린 ${mediaNoun}`,

@@ -28,6 +28,7 @@ import { getCurrentUser, requireUser } from '@/lib/auth'
 import {
   CAPTION_MAX_LENGTH,
   PHOTO_MAX_COUNT,
+  VIDEO_MAX_MS,
   VOICE_MAX_SEC,
   VOICE_MIN_SEC,
 } from '@/lib/limits'
@@ -51,6 +52,10 @@ export type CreateMemoryInput = {
   handwritingPath?: string | null
   /** 첫 획부터 마지막 점까지(ms). handwritingPath 가 없으면 null. */
   handwritingDurationMs?: number | null
+  /** video 버킷에 올라간 영상 경로. 선택. 한 추억에 최대 한 개다. */
+  videoPath?: string | null
+  /** 영상 길이(ms). 브라우저가 실제 파일에서 읽은 값. videoPath 가 없으면 null. */
+  videoDurationMs?: number | null
   /**
    * 녹음하면서 잰 파형 막대 높이(0~1). 없으면 재생바가 재생할 때 파일을 해석한다.
    * 저장해 두면 화면에 뜨자마자 파형을 그릴 수 있어 파일을 미리 받지 않아도 된다.
@@ -158,6 +163,52 @@ function validateHandwriting(
   return { ok: true, path, durationMs }
 }
 
+type VideoCheck =
+  | { ok: true; path: string | null; durationMs: number | null }
+  | { ok: false; error: string }
+
+/**
+ * 영상 검사 (2026-09-26 추억 영상). 최소 길이는 없고 최대 30초다.
+ * 용량(50MB)은 브라우저가 올리기 전에 거르고, 버킷 상한이 한 번 더 막는다.
+ */
+function validateVideo(
+  rawPath: string | null | undefined,
+  rawDuration: number | null | undefined,
+  roomId: string,
+): VideoCheck {
+  const path = rawPath?.trim() ?? ''
+  if (!path) return { ok: true, path: null, durationMs: null }
+
+  if (!isOwnRoomPath(path, roomId)) {
+    return { ok: false, error: '영상을 저장하지 못했어요. 다시 한 번 담아주세요.' }
+  }
+  if (typeof rawDuration !== 'number' || !Number.isFinite(rawDuration) || rawDuration < 0) {
+    return { ok: false, error: '영상 길이를 확인하지 못했어요. 다시 한 번 담아주세요.' }
+  }
+  const durationMs = Math.round(rawDuration)
+  if (durationMs > VIDEO_MAX_MS) {
+    return { ok: false, error: `영상은 ${VIDEO_MAX_MS / 1000}초까지 담을 수 있어요.` }
+  }
+  return { ok: true, path, durationMs }
+}
+
+/** 저장 RPC가 돌려준 오류를 사용자 문구로 바꾼다. */
+function failFromDb(
+  error: { code?: string; message: string },
+  where: string,
+): CreateMemoryResult {
+  // 23514 = CHECK 제약 위반(길이·경로·올린 사람). 값이 잘못된 것이라 다시 보내도 똑같이 막힌다.
+  if (error.code === '23514') {
+    console.error(`[${where}] 제약 위반:`, error.message)
+    return fail('담으신 내용을 다시 한 번 확인해주세요.')
+  }
+  if (error.code === '42501') {
+    return fail('이 앨범방에 추억을 남길 수 없어요. 홈에서 방을 다시 열어주세요.')
+  }
+  console.error(`[${where}] 실패:`, error.code, error.message)
+  return fail('연결이 잠시 불안정했어요. 잠시 후 다시 시도할게요.', true)
+}
+
 export async function createMemory(
   input: CreateMemoryInput,
 ): Promise<CreateMemoryResult> {
@@ -196,12 +247,17 @@ export async function createMemory(
   )
   if (!handwriting.ok) return fail(handwriting.error)
 
+  // --- 영상 (선택, 최대 1개) ---
+  const video = validateVideo(input.videoPath, input.videoDurationMs, roomId)
+  if (!video.ok) return fail(video.error)
+
   /*
     하나 이상. 문제 정의가 "쑥스러워서 표현을 못 하는 사람"인데 가장 쑥스러운 일
-    (목소리 녹음)을 강제하고 있었다(PRD §6⑯). 셋 중 무엇이든 하나면 마음이다.
+    (목소리 녹음)을 강제하고 있었다(PRD §6⑯). 무엇이든 하나면 마음이다.
+    영상 하나만으로도 남길 수 있다(2026-09-26 사용자 결정).
   */
-  if (!voice.path && !handwriting.path && photoPaths.length === 0) {
-    return fail('목소리 · 손글씨 · 사진 중 하나는 담아주세요.')
+  if (!voice.path && !handwriting.path && !video.path && photoPaths.length === 0) {
+    return fail('목소리 · 손글씨 · 사진 · 영상 중 하나는 담아주세요.')
   }
 
   // --- 문구 (선택) ---
@@ -231,51 +287,26 @@ export async function createMemory(
     )
   }
 
-  const { data: memory, error: insertError } = await supabase
-    .from('memories')
-    .insert({
-      room_id: roomId,
-      author_id: user.id, // RLS가 auth.uid()와 같은지 확인한다. 반드시 명시.
-      description: caption || null,
-      voice_path: voice.path,
-      voice_duration_sec: voice.durationSec,
-      voice_levels: voice.path ? sanitizeLevels(input.voiceLevels) : null,
-      handwriting_path: handwriting.path,
-      handwriting_duration_ms: handwriting.durationMs,
-      // media_url은 넣지 않는다 — 사진은 아래 memory_photos가 맡는다(컬럼 주석 참고).
-    })
-    .select('id')
-    .single()
+  /*
+    추억 한 줄과 사진 줄을 DB 함수 하나로 한 번에 넣는다(create_memory).
+    중간에 실패하면 둘 다 없던 일이 된다 — 예전처럼 "사진 없는 반쪽 카드"를 지우러 가다
+    그것마저 실패하는 일이 없다. 공개 범위(작성자만 / 방 공유)는 DB 트리거가 저장 순간의
+    활성 참여자 수로 정하고, 여기서는 보내지 않는다.
+  */
+  const { error: insertError } = await supabase.rpc('create_memory', {
+    p_room_id: roomId,
+    p_caption: caption,
+    p_photo_paths: photoPaths,
+    p_voice_path: voice.path ?? undefined,
+    p_voice_duration_sec: voice.durationSec ?? undefined,
+    p_voice_levels: (voice.path ? sanitizeLevels(input.voiceLevels) : null) ?? undefined,
+    p_handwriting_path: handwriting.path ?? undefined,
+    p_handwriting_duration_ms: handwriting.durationMs ?? undefined,
+    p_video_path: video.path ?? undefined,
+    p_video_duration_ms: video.durationMs ?? undefined,
+  })
 
-  if (insertError || !memory) {
-    // 23514 = CHECK 제약 위반. 값이 잘못된 것이라 다시 보내도 똑같이 막힌다.
-    if (insertError?.code === '23514') {
-      return fail('담으신 내용을 다시 한 번 확인해주세요.')
-    }
-    return fail('연결이 잠시 불안정했어요. 잠시 후 다시 시도할게요.', true)
-  }
-
-  const { error: photoError } = await supabase.from('memory_photos').insert(
-    photoPaths.map((path, index) => ({
-      memory_id: memory.id,
-      storage_path: path,
-      sort_order: index,
-    })),
-  )
-
-  if (photoError) {
-    /*
-      사진을 못 붙였으면 게시물만 덩그러니 남는다 — 피드에 사진 없는 카드가 뜬다.
-      그래서 방금 만든 게시물을 되돌린다. 이건 "사용자 데이터 삭제"가 아니라
-      **완성되지 못한 내 요청을 취소하는 것**이라 물리 삭제 금지 원칙에 걸리지 않는다.
-      (memory_photos는 ON DELETE CASCADE라 일부만 들어갔어도 함께 정리된다)
-
-      residue-scan-allow: physical-delete — 남의 기록이 아니라 방금 내가 만들다 만
-      반쪽짜리 게시물을 되돌리는 것이다. 남겨두면 사진 없는 카드가 피드에 영영 남는다.
-    */
-    await supabase.from('memories').delete().eq('id', memory.id)
-    return fail('사진을 저장하지 못했어요. 잠시 후 다시 시도할게요.', true)
-  }
+  if (insertError) return failFromDb(insertError, '추억 저장')
 
   // 방 피드와 홈의 "게시물 N개"를 서버가 다시 세도록 캐시를 비운다.
   revalidatePath(`/rooms/${roomId}`)
@@ -338,7 +369,6 @@ async function loadMemoryForAction(
     .from('memories')
     .select('id, room_id, author_id')
     .eq('id', memoryId)
-    .is('deleted_at', null)
     .maybeSingle()
 
   if (!data) return null
@@ -505,6 +535,8 @@ export type UpdateMemoryInput = {
   voiceLevels?: number[] | null
   handwritingPath?: string | null
   handwritingDurationMs?: number | null
+  videoPath?: string | null
+  videoDurationMs?: number | null
   caption?: string | null
 }
 
@@ -562,12 +594,12 @@ export async function updateMemory(
   )
   if (!handwriting.ok) return fail(handwriting.error)
 
-  /*
-    하나 이상. 문제 정의가 "쑥스러워서 표현을 못 하는 사람"인데 가장 쑥스러운 일
-    (목소리 녹음)을 강제하고 있었다(PRD §6⑯). 셋 중 무엇이든 하나면 마음이다.
-  */
-  if (!voice.path && !handwriting.path && photoPaths.length === 0) {
-    return fail('목소리 · 손글씨 · 사진 중 하나는 담아주세요.')
+  // --- 영상 (선택, 최대 1개) ---
+  const video = validateVideo(input.videoPath, input.videoDurationMs, roomId)
+  if (!video.ok) return fail(video.error)
+
+  if (!voice.path && !handwriting.path && !video.path && photoPaths.length === 0) {
+    return fail('목소리 · 손글씨 · 사진 · 영상 중 하나는 담아주세요.')
   }
 
   // --- 문구 (선택) ---
@@ -576,94 +608,32 @@ export async function updateMemory(
     return fail(`문구는 ${CAPTION_MAX_LENGTH}자 안으로 줄여주세요.`)
   }
 
-  // 지금 붙어 있는 사진과 목소리. 나중에 "쓰지 않게 된 파일"을 가려내는 데 쓴다.
-  const { data: beforeRows } = await supabase
-    .from('memory_photos')
-    .select('storage_path')
-    .eq('memory_id', memory.id)
-  const { data: beforeMemory } = await supabase
-    .from('memories')
-    .select('voice_path, handwriting_path')
-    .eq('id', memory.id)
-    .maybeSingle()
+  /*
+    고치기도 DB 함수 하나로 한 번에 한다(update_memory). 사진 줄을 비우고 다시 쓰는 동안
+    실패하면 원래 사진이 그대로 남는다. 더 이상 가리키지 않는 옛 파일은 DB가 정리 목록
+    (storage_deletion_jobs)에 올리고, 아래 settleStorageDeletions가 실제로 지운다.
+  */
+  const { error: updateError } = await supabase.rpc('update_memory', {
+    p_memory_id: memory.id,
+    p_caption: caption,
+    p_photo_paths: photoPaths,
+    p_voice_path: voice.path ?? undefined,
+    p_voice_duration_sec: voice.durationSec ?? undefined,
+    p_voice_levels: (voice.path ? sanitizeLevels(input.voiceLevels) : null) ?? undefined,
+    p_handwriting_path: handwriting.path ?? undefined,
+    p_handwriting_duration_ms: handwriting.durationMs ?? undefined,
+    p_video_path: video.path ?? undefined,
+    p_video_duration_ms: video.durationMs ?? undefined,
+  })
 
-  const { error: updateError } = await supabase
-    .from('memories')
-    .update({
-      description: caption || null,
-      voice_path: voice.path,
-      voice_duration_sec: voice.durationSec,
-      voice_levels: voice.path ? sanitizeLevels(input.voiceLevels) : null,
-      handwriting_path: handwriting.path,
-      handwriting_duration_ms: handwriting.durationMs,
-    })
-    .eq('id', memory.id)
-
-  if (updateError) {
-    if (updateError.code === '23514') {
-      return fail('담으신 내용을 다시 한 번 확인해주세요.')
-    }
-    console.error('[추억 고치기] 실패:', updateError.message)
-    return fail('연결이 잠시 불안정했어요. 잠시 후 다시 시도할게요.', true)
-  }
+  if (updateError) return failFromDb(updateError, '추억 고치기')
 
   /*
-    사진 줄은 통째로 새로 놓는다. 어느 줄이 남고 어느 줄이 빠졌는지 맞춰 고치는 것보다
-    **화면에 놓인 순서 그대로 다시 쓰는 편**이 어긋날 여지가 없다(순서가 곧 sort_order다).
-
-    residue-scan-allow: physical-delete — 사용자의 기록이 아니라 게시물과 사진을 잇는
-    연결 줄이다. 사진 파일 자체는 아래에서 따로 판단해 지운다.
+    옛 파일 정리. 실패해도 고치기는 이미 끝났다 — 옛 파일은 이제 어떤 기록에도 연결되지 않아
+    올린 본인 외에는 읽을 수 없고, 정리 목록에 남아 다음 삭제·고치기 때 다시 지운다.
   */
-  const { error: clearError } = await supabase
-    .from('memory_photos')
-    .delete()
-    .eq('memory_id', memory.id)
-
-  if (clearError) {
-    console.error('[추억 고치기] 사진 줄 비우기 실패:', clearError.message)
-    return fail('사진을 저장하지 못했어요. 잠시 후 다시 시도할게요.', true)
-  }
-
-  const { error: photoError } = await supabase.from('memory_photos').insert(
-    photoPaths.map((path, index) => ({
-      memory_id: memory.id,
-      storage_path: path,
-      sort_order: index,
-    })),
-  )
-
-  if (photoError) {
-    console.error('[추억 고치기] 사진 붙이기 실패:', photoError.message)
-    return fail('사진을 저장하지 못했어요. 잠시 후 다시 시도할게요.', true)
-  }
-
-  /*
-    이제 아무도 가리키지 않는 파일을 지운다.
-    실패해도 사용자에게는 알리지 않는다 — 고치기는 이미 끝났고, 남은 파일에 대해
-    사용자가 할 수 있는 일이 없다. 원인은 로그에 남긴다.
-  */
-  const stalePhotos = (beforeRows ?? [])
-    .map((row) => row.storage_path)
-    .filter((path) => path && !photoPaths.includes(path))
-
-  if (stalePhotos.length > 0) {
-    const { error } = await supabase.storage.from('media').remove(stalePhotos)
-    if (error) console.error('[추억 고치기] 옛 사진 삭제 실패:', error.message)
-  }
-
-  const staleVoice = beforeMemory?.voice_path
-  if (staleVoice && staleVoice !== voice.path) {
-    const { error } = await supabase.storage.from('voice').remove([staleVoice])
-    if (error) console.error('[추억 고치기] 옛 녹음 삭제 실패:', error.message)
-  }
-
-  const staleHandwriting = beforeMemory?.handwriting_path
-  if (staleHandwriting && staleHandwriting !== handwriting.path) {
-    const { error } = await supabase.storage
-      .from('handwriting')
-      .remove([staleHandwriting])
-    if (error) console.error('[추억 고치기] 옛 손글씨 삭제 실패:', error.message)
-  }
+  const left = await settleStorageDeletions(supabase)
+  if (left > 0) console.error('[추억 고치기] 옛 파일 정리가 남음:', left)
 
   revalidateRoom(roomId)
   return { ok: true }
@@ -796,16 +766,71 @@ export async function toggleMemorySave(
 }
 
 /**
- * 게시물 삭제 (⋯ 메뉴의 "삭제") — **소프트 삭제**.
+ * 정리 목록(storage_deletion_jobs)에 남은 내 파일을 Storage에서 지우고,
+ * 실제로 사라졌는지 DB가 확인하게 한다. 돌려주는 값 = 아직 남은 파일 수.
  *
- * 행을 지우지 않는다. `deleted_at`에 시각을 적고 모든 조회에서 뺀다.
- * 물리 삭제 금지 원칙(PRD/05_REDESIGN_PLAN.md §5) — 지워진 것은 되돌릴 수 없고,
- * 함께 담긴 사진·음성은 다른 사람의 추억이기도 하다.
+ * DB와 Storage는 한 트랜잭션으로 묶을 수 없다. 그래서 순서를 정했다:
+ *   1) DB 행을 먼저 지운다 → 그 순간 모두의 읽기·서명이 막힌다(Storage 읽기 정책이 연결 기록을 본다).
+ *   2) 지울 파일은 DB 안의 목록에 남긴다 → Storage 삭제가 실패해도 목록이 남아 다시 시도할 수 있다.
+ *   3) finish_storage_deletions가 storage.objects에서 정말 사라진 것만 목록에서 뺀다.
+ */
+async function settleStorageDeletions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+): Promise<number> {
+  const { data: pending, error: listError } = await supabase.rpc(
+    'pending_storage_deletions',
+  )
+  if (listError) {
+    console.error('[파일 정리] 목록을 못 읽었다:', listError.message)
+    return Number.POSITIVE_INFINITY
+  }
+
+  const byBucket = new Map<string, string[]>()
+  for (const row of pending ?? []) {
+    const paths = byBucket.get(row.bucket_id) ?? []
+    paths.push(row.object_name)
+    byBucket.set(row.bucket_id, paths)
+  }
+
+  const failures: string[] = []
+  for (const [bucket, paths] of byBucket) {
+    try {
+      const { error } = await supabase.storage.from(bucket).remove(paths)
+      if (error) failures.push(`${bucket}: ${error.message}`)
+    } catch (cause) {
+      failures.push(
+        `${bucket}: ${cause instanceof Error ? cause.message : String(cause)}`,
+      )
+    }
+  }
+
+  const { data: left, error: finishError } = await supabase.rpc(
+    'finish_storage_deletions',
+    { p_error: failures.length > 0 ? failures.join(' / ') : undefined },
+  )
+  if (finishError) {
+    console.error('[파일 정리] 확인 실패:', finishError.message)
+    return Number.POSITIVE_INFINITY
+  }
+  if (failures.length > 0) {
+    console.error('[파일 정리] Storage 삭제 실패:', failures.join(' / '))
+  }
+  return left ?? 0
+}
+
+/** 파일 정리가 남았을 때 보여줄 문구. 성공이라고 말하지 않는다. */
+const DELETE_FILES_PENDING =
+  '추억은 지웠지만 사진·영상 같은 파일 정리를 마치지 못했어요. [삭제하기]를 한 번 더 눌러 주세요.'
+
+/**
+ * 게시물 삭제 (⋯ 메뉴의 "삭제") — **완전 삭제** (2026-09-26 사용자 결정).
  *
- * 사용자에게는 "삭제할까요?"로 묻는다. 화면에서 영영 사라지는 것은 사실이므로
- * "숨겨질 뿐"이라고 안심시키면 오히려 거짓말이 된다.
+ * 추억 행과 거기 달린 사진 줄·댓글·반응·알림을 DB에서 지우고(delete_memory),
+ * 연결된 사진·영상·목소리·손글씨·댓글 음성 파일을 Storage에서 지운다. 되돌릴 수 없다.
+ * 작성자만 지울 수 있다 — DB 함수가 작성자인지 다시 본다.
  *
- * 남의 글은 못 지운다 — RLS(`memories_update`)가 작성자만 통과시킨다.
+ * 파일 정리가 하나라도 남으면 성공이라고 알리지 않는다. 같은 버튼을 다시 누르면
+ * 이미 지운 추억이라도 남은 파일부터 다시 지운다(정리 목록은 DB에 남아 있다).
  */
 export async function deleteMemory(
   memoryId: string,
@@ -814,25 +839,36 @@ export async function deleteMemory(
   const supabase = await createClient()
 
   const memory = await loadMemoryForAction(supabase, memoryId)
-  if (!memory) {
-    return { ok: false, error: '게시물을 찾지 못했어요. 화면을 새로고침해 주세요.' }
-  }
-  if (memory.authorId !== user.id) {
-    return { ok: false, error: '내가 남긴 글만 지울 수 있어요.' }
+
+  if (memory) {
+    if (memory.authorId !== user.id) {
+      return { ok: false, error: '내가 남긴 글만 지울 수 있어요.' }
+    }
+
+    const { error } = await supabase.rpc('delete_memory', {
+      p_memory_id: memoryId,
+    })
+    if (error) {
+      console.error('[삭제] 실패:', error.code, error.message)
+      return { ok: false, error: '잠시 후 다시 시도해 주세요.' }
+    }
+  } else {
+    // 이미 지운 추억에서 다시 누른 경우 — 남은 파일 정리만 다시 시도한다.
+    const { data: pending } = await supabase.rpc('pending_storage_deletions')
+    if (!pending || pending.length === 0) {
+      return {
+        ok: false,
+        error: '게시물을 찾지 못했어요. 화면을 새로고침해 주세요.',
+      }
+    }
   }
 
-  const { error } = await supabase
-    .from('memories')
-    // 고정돼 있던 글이면 고정도 함께 푼다. 지워진 글이 "이 방의 고정"으로 남아 있으면
-    // 나중에 되살릴 때 아무도 시키지 않은 자리에 가 있게 된다.
-    .update({ deleted_at: new Date().toISOString(), pinned_at: null })
-    .eq('id', memoryId)
-
-  if (error) {
-    console.error('[삭제] 실패:', error.message)
-    return { ok: false, error: '잠시 후 다시 시도해 주세요.' }
+  const left = await settleStorageDeletions(supabase)
+  if (left > 0) {
+    return { ok: false, error: DELETE_FILES_PENDING }
   }
 
-  revalidateRoom(memory.roomId)
+  if (memory) revalidateRoom(memory.roomId)
+  else revalidatePath('/', 'layout')
   return { ok: true }
 }

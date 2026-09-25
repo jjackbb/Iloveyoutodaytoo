@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { VideoPlayer } from '@/components/media/VideoPlayer'
 import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
 import { LikeButton } from '@/components/memory/LikeButton'
@@ -59,6 +60,10 @@ export interface MemoryCardProps {
   handwritingUrl?: string | null
   /** 손글씨가 있는지(DB 기준). url 이 없는데 이 값이 있으면 "불러오지 못했어요"로 흐른다. */
   handwritingDurationMs?: number | null
+  /** 서명된 video 버킷 주소. 못 만들었으면 null. */
+  videoUrl?: string | null
+  /** 영상이 있는지(DB 기준). url 이 없는데 참이면 "불러오지 못했어요"로 흐른다. */
+  hasVideo?: boolean
   likeCount: number
   /** 이 화면을 보는 사람이 좋아요를 눌렀는지. 사람마다 다르다. */
   likedByMe: boolean
@@ -86,6 +91,8 @@ export function MemoryCard({
   voiceLevels = null,
   handwritingUrl = null,
   handwritingDurationMs = null,
+  videoUrl = null,
+  hasVideo = false,
   likeCount,
   likedByMe,
   commentCount,
@@ -166,6 +173,16 @@ export function MemoryCard({
             authorName={authorName}
           />
         </Link>
+      ) : null}
+
+      {/*
+        영상 (2026-09-26). 사진 아래·문구 위. 카드 안에서 바로 재생한다 —
+        상세로 가야만 볼 수 있으면 목소리·손글씨와 규칙이 달라진다.
+      */}
+      {hasVideo ? (
+        <div className="px-4 pt-3.5">
+          <VideoPlayer src={videoUrl} label={`${authorName}님이 남긴 영상`} />
+        </div>
       ) : null}
 
       {caption ? (

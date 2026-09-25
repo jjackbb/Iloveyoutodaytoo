@@ -66,7 +66,6 @@ export default async function RoomLikedPage({
           .select(MEMORY_CARD_SELECT)
           .eq('room_id', roomId)
           // 지운 글은 어떤 목록에도 나오지 않는다(소프트 삭제).
-          .is('deleted_at', null)
           .in('id', likedIds)
           // 좋아요를 누른 순서가 아니라 **글이 올라온 순서**로 본다. 피드와 같은 흐름이다.
           .order('created_at', { ascending: false })

@@ -69,7 +69,6 @@ export async function loadDailySlot(
       .from('memories')
       .select('id', { count: 'exact', head: true })
       .eq('author_id', userId)
-      .is('deleted_at', null)
       .gte('created_at', monthStart)
       .lt('created_at', monthEnd),
     supabase
@@ -84,7 +83,6 @@ export async function loadDailySlot(
       .select(
         'id, room_id, author:users!memories_author_id_fkey(name), room:rooms!memories_room_id_fkey(name)',
       )
-      .is('deleted_at', null)
       .gte('created_at', lastYearStart)
       .lt('created_at', lastYearEnd)
       .order('created_at', { ascending: false })

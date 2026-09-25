@@ -42,7 +42,6 @@ const SIGNED_URL_TTL_SEC = 60 * 60
 type RoomRoster = {
   roomId: string
   roomName: string
-  relationshipType: Enums<'relationship_type'> | null
   coverPreset: string | null
   coverPath: string | null
   /** 나를 뺀 활성 멤버들. 방 안에서 부르는 이름(별명 우선)까지 정해 둔다. */
@@ -66,7 +65,7 @@ async function loadRosters(
   const { data: memberships, error: membershipError } = await supabase
     .from('room_members')
     .select(
-      'room_id, joined_at, custom_name, custom_cover_preset, custom_cover_path, rooms(id, name, relationship_type, cover_preset, cover_path)',
+      'room_id, joined_at, custom_name, custom_cover_preset, custom_cover_path, rooms(id, name, cover_preset, cover_path)',
     )
     .eq('user_id', myUserId)
     .eq('status', 'active')
@@ -109,7 +108,6 @@ async function loadRosters(
     byRoom.set(row.room_id, {
       roomId: room.id,
       roomName: roomDisplayName({ name: room.name, customName: row.custom_name }),
-      relationshipType: room.relationship_type,
       coverPreset: cover.preset,
       coverPath: cover.path,
       others: [],
@@ -460,12 +458,11 @@ export async function resolveHeartTargets(
  * "나에게" 보낼 마음을 어느 방에 남길지.
  *
  * heart_messages는 반드시 방 하나에 매여 있다(room_id가 NOT NULL이고 RLS도 방을 본다).
- * 그런데 우리에게는 "나만의 방"이라는 개념이 화면에 없다 — 관계유형 질문이 2026-08-09에
- * 제거되면서 새 방은 relationship_type이 비어 있다. 그래서 세 단계로 고른다.
+ * 그런데 우리에게는 "나만의 방"이라는 개념이 화면에 없다 — 관계유형은 2026-08-09 화면에서,
+ * 2026-09-26 새 DB에서 완전히 없앴다. 그래서 두 단계로 고른다.
  *
- *   1) 예전에 '나 자신' 유형으로 만든 방이 있으면 그 방
- *   2) 없으면 **나 혼자 있는 방** 중 가장 오래된 방 — 남이 볼 수 없는 자리라 가장 가깝다
- *   3) 그것도 없으면 가장 오래된 방
+ *   1) **나 혼자 있는 방** 중 가장 오래된 방 — 남이 볼 수 없는 자리라 가장 가깝다
+ *   2) 그것도 없으면 가장 오래된 방
  *
  * 어느 경우든 받는 사람이 나 자신이라 그 방의 다른 멤버에게는 보이지 않는다
  * (heart_messages의 RLS는 보낸 사람·받는 사람에게만 열려 있다).
@@ -476,7 +473,6 @@ function pickSelfRoom(rosters: RoomRoster[]): RoomRoster {
   )
 
   return (
-    byJoinedAt.find((roster) => roster.relationshipType === 'self') ??
     byJoinedAt.find((roster) => roster.activeCount === 1) ??
     byJoinedAt[0]
   )

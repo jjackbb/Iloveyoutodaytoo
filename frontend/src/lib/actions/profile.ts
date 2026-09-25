@@ -335,7 +335,7 @@ export async function setLargeText(on: boolean): Promise<void> {
 
   const supabase = await createClient()
   const { error } = await supabase
-    .from('users')
+    .from('user_private')
     .update({ large_text: on })
     .eq('id', user.id)
 

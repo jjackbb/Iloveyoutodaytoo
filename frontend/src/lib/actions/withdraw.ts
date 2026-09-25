@@ -48,7 +48,7 @@ const REASON_MAX_LENGTH = 200
  * ⚠️ avatars는 여기 넣으면 안 된다. 경로 규약이 `{user_id}/파일명`이라
  * 방 id로 뒤지면 아무것도 못 찾는다. collectFilesToRemove 가 이 통만 따로 훑는다.
  */
-const FILE_BUCKETS = ['voice', 'media', 'covers', 'handwriting'] as const
+const FILE_BUCKETS = ['voice', 'media', 'covers', 'handwriting', 'video'] as const
 
 /** 프로필 사진 통. 경로 규약이 `{user_id}/파일명`이라 위 셋과 지우는 방법이 다르다. */
 const AVATAR_BUCKET = 'avatars'
@@ -102,6 +102,43 @@ async function collectFilesToRemove(
     }
   } catch (cause) {
     console.error('[회원 탈퇴] 프로필 사진 목록 수집 중 예외:', cause)
+  }
+
+  /*
+   * 나만 읽던 추억(작성 당시 혼자였던 추억)의 파일.
+   *
+   * withdraw_account 는 이런 추억을 함께 지운다 — 탈퇴하면 아무도 읽을 수 없는 기록이라
+   * 남겨 둘 이유가 없다(2026-09-26 새 DB). 방은 남아도 이 파일들은 모두 내가 올린 것이라
+   * owner 정책으로 지울 수 있다. 목록은 계정이 살아 있는 지금 모은다.
+   */
+  try {
+    const { data: privateMemories, error } = await supabase
+      .from('memories')
+      .select(
+        'voice_path, handwriting_path, video_path, photos:memory_photos(storage_path), comments:memory_comments(voice_path)',
+      )
+      .eq('author_id', userId)
+      .eq('visibility', 'private')
+
+    if (error) {
+      console.error('[회원 탈퇴] 나만 읽는 추억 조회 실패:', error.message)
+    } else {
+      const add = (bucket: string, path: string | null | undefined) => {
+        if (!path) return
+        const group = pending.find((item) => item.bucket === bucket)
+        if (group) group.paths.push(path)
+        else pending.push({ bucket, paths: [path] })
+      }
+      for (const memory of privateMemories ?? []) {
+        add('voice', memory.voice_path)
+        add('handwriting', memory.handwriting_path)
+        add('video', memory.video_path)
+        for (const photo of memory.photos ?? []) add('media', photo.storage_path)
+        for (const comment of memory.comments ?? []) add('voice', comment.voice_path)
+      }
+    }
+  } catch (cause) {
+    console.error('[회원 탈퇴] 나만 읽는 추억 파일 수집 중 예외:', cause)
   }
 
   /*

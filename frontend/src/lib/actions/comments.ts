@@ -39,7 +39,6 @@ async function loadMemoryForComment(
     .from('memories')
     .select('id, room_id')
     .eq('id', memoryId)
-    .is('deleted_at', null)
     .maybeSingle()
 
   if (!data) return null

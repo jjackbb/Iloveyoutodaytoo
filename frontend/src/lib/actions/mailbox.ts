@@ -434,8 +434,6 @@ export async function fetchMailboxPage(
         : null,
       type: row.type,
       sendMode: row.send_mode,
-      // 잠긴 마음은 내용을 실어 보내지 않는다. 화면에서 가리기만 하면
-      // 개발자 도구에 그대로 보여서 락이 무의미해진다.
       text: row.type === 'text' ? row.content : null,
       mediaUrl,
       durationSec: row.duration_sec,

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { CommentBar } from './comment-bar'
 import { CommentList } from './comment-list'
 import { PhotoPager } from './photo-pager'
+import { VideoPlayer } from '@/components/media/VideoPlayer'
 import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
 import { LikeButton } from '@/components/memory/LikeButton'
@@ -135,6 +136,16 @@ export default async function MemoryDetailPage({
             hasPhotos={detail.hasPhotos}
             authorName={detail.authorName}
           />
+
+          {/* 영상 (2026-09-26). 사진 아래·문구 위 — 카드와 같은 순서. */}
+          {detail.hasVideo ? (
+            <div className="pt-4">
+              <VideoPlayer
+                src={detail.videoUrl}
+                label={`${detail.authorName}님이 남긴 영상`}
+              />
+            </div>
+          ) : null}
 
           {detail.caption ? (
             <p className="pt-4 text-base leading-relaxed break-keep whitespace-pre-wrap text-ink">

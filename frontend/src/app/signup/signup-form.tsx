@@ -191,44 +191,17 @@ export function SignupForm({ next }: { next: string }) {
       <BirthDateField name="birth_date" onValueChange={setBirthDate} />
 
       {minor ? (
-        <fieldset className="flex flex-col gap-4 rounded-inner bg-primary-soft p-4">
-          <legend className="px-1 text-base font-medium text-primary">
-            보호자 동의가 필요해요
-          </legend>
-          <p className="text-base leading-relaxed text-ink">
-            만 14세 미만은 법에 따라 법정대리인의 동의가 있어야 가입할 수 있어요.
-            보호자와 함께 입력해주세요.
-          </p>
-
-          <Field
-            id="guardian_name"
-            name="guardian_name"
-            label="보호자 성함"
-            required
-            defaultValue={state?.values?.guardianName}
-          />
-
-          <Field
-            id="guardian_phone"
-            name="guardian_phone"
-            label="보호자 연락처"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            required
-            defaultValue={state?.values?.guardianPhone}
-          />
-
-          <label className="flex min-h-[44px] items-center gap-3 text-base text-ink">
-            <input
-              type="checkbox"
-              name="guardian_consented"
-              required
-              className="size-6 shrink-0 accent-primary"
-            />
-            <span>보호자가 이 가입에 동의합니다.</span>
-          </label>
-        </fieldset>
+        /*
+          보호자 확인 기능이 완성되기 전까지 만 14세 미만 가입은 받지 않는다(2026-09-26 사용자 결정).
+          예전처럼 보호자 이름·연락처·동의 체크를 받으면 "확인된 것처럼" 보이므로 입력칸을 두지 않는다.
+        */
+        <p
+          role="status"
+          className="rounded-inner bg-primary-soft p-4 text-base leading-relaxed break-keep text-ink"
+        >
+          만 14세 미만은 보호자 확인이 필요해요. 이 기능을 준비하고 있어 아직 가입할 수
+          없어요.
+        </p>
       ) : null}
 
       {/*

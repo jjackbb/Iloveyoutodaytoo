@@ -93,7 +93,6 @@ export default async function HomePage() {
           .in('room_id', roomIds)
           // 지운 글은 행이 남아 있을 뿐 없는 것이다(소프트 삭제).
           // 이 조건이 빠지면 홈의 "게시물 N개"가 방 안에서 실제로 보이는 수보다 많아진다.
-          .is('deleted_at', null)
       : Promise.resolve({ data: [], error: null }),
   ])
 
