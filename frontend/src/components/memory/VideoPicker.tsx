@@ -42,6 +42,9 @@ export type PickedVideo = {
 
 type PickerPhase = 'idle' | 'checking' | 'preparing' | 'live' | 'recording'
 
+/** 앱 안 촬영이 저절로 멈추는 시점. 30초 상한보다 조금 앞이다(아래 startRecording 주석). */
+const AUTO_STOP_MS = VIDEO_MAX_MS - 700
+
 /** 브라우저가 녹화할 수 있는 형식 중 버킷이 받는 것을 고른다. 없으면 null. */
 function pickRecorderMime(): string | null {
   if (typeof MediaRecorder === 'undefined') return null
@@ -254,8 +257,12 @@ export function VideoPicker({
     tickRef.current = setInterval(() => {
       setElapsedMs(Date.now() - startedAtRef.current)
     }, 250)
-    // 30초가 되면 저절로 멈춘다 — 넘겨 찍고 나서 거절당하지 않게.
-    stopTimerRef.current = setTimeout(() => stopRecording(), VIDEO_MAX_MS)
+    /*
+      30초 직전에 저절로 멈춘다 — 넘겨 찍고 나서 거절당하지 않게.
+      정확히 30초에 멈추면 멈춤 처리가 늦게 끝나 파일이 30.x초가 되고, 방금 찍은 영상이
+      "30초 초과"로 거절됐다(2026-09-26 브라우저 검사에서 실제로 31초로 잡혔다). 그래서 여유를 둔다.
+    */
+    stopTimerRef.current = setTimeout(() => stopRecording(), AUTO_STOP_MS)
   }
 
   function stopRecording() {
