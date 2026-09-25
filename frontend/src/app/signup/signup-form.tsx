@@ -5,7 +5,7 @@ import { useActionState, useEffect, useState } from 'react'
 
 import { BirthDateField } from '@/components/ui/BirthDateField'
 import { Button } from '@/components/ui/Button'
-import { controlClassName, Field, FieldShell } from '@/components/ui/Field'
+import { controlClassName, FieldShell } from '@/components/ui/Field'
 import { RuleList } from '@/components/ui/RuleList'
 import { signUp, type AuthState } from '@/lib/actions/auth'
 import { checkUsername, type UsernameCheck } from '@/lib/actions/username'

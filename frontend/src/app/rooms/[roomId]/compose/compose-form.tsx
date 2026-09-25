@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/Button'
 import { controlClassName } from '@/components/ui/Field'
 import { createMemory, updateMemory } from '@/lib/actions/memories'
 import { HandwritingPad } from '@/components/handwriting/HandwritingPad'
+import { VideoPicker, type PickedVideo } from '@/components/memory/VideoPicker'
 import {
   HANDWRITING_BUCKET,
   isHandwritingDoc,
@@ -27,12 +28,14 @@ import { track } from '@/lib/analytics'
 import { resizePhoto } from '@/lib/image'
 import { CAPTION_MAX_LENGTH, PHOTO_MAX_COUNT } from '@/lib/limits'
 import { createClient } from '@/lib/supabase/client'
+import { extensionForVideoMime, VIDEO_BUCKET } from '@/lib/video'
 
 /**
  * 마음 표현하기 — 작성 화면 (캡처 12~21).
  *
- * 사진 타일 줄 / "함께 담을 목소리" 카드 / "문구 선택" / 아래 고정 [♥ 표현하기].
- * 손글씨·목소리·사진 중 하나 이상 담으면 버튼이 켜진다.
+ * 사진 타일 줄 / 영상 / "함께 담을 목소리" 카드 / 손글씨 / "문구 선택" / 아래 고정 [♥ 표현하기].
+ * 손글씨·목소리·사진·영상 중 하나 이상 담으면 버튼이 켜진다.
+ * 영상은 2026-09-26에 더했다 — 한 개, 30초·50MB까지, 파일 선택과 앱 안 촬영 모두.
  * 목소리에는 최소 녹음 시간이 없고, 빈 파일은 녹음기에서 다시 시도하게 한다.
  * 사진도 선택이다(2026-08-25 사용자 결정).
  *
@@ -457,6 +460,16 @@ async function discardHandwriting(path: string) {
   }
 }
 
+/** 물린 영상 파일을 버킷에서 지운다. 손글씨와 같은 역할. */
+async function discardVideo(path: string) {
+  try {
+    const { error } = await createClient().storage.from(VIDEO_BUCKET).remove([path])
+    if (error) console.error('[마음 표현하기] 영상 정리 실패:', error.message)
+  } catch (cause) {
+    console.error('[마음 표현하기] 영상 정리 중 예외:', cause)
+  }
+}
+
 export type ComposeInitial = {
   memoryId: string
   /** 지금 붙어 있는 사진들. 순서 그대로다. */
@@ -465,6 +478,8 @@ export type ComposeInitial = {
   voice: { path: string; url: string; durationSec: number; levels: number[] | null } | null
   /** 지금 붙어 있는 손글씨(획 좌표 JSON). 없으면 null. */
   handwriting: { path: string; url: string; durationMs: number } | null
+  /** 지금 붙어 있는 영상. 없으면 null. */
+  video: { path: string; url: string; durationMs: number } | null
   caption: string
 }
 
@@ -488,6 +503,21 @@ export function ComposeForm({
   )
   const [recording, setRecording] = useState<VoiceRecording | null>(null)
   const [handwriting, setHandwriting] = useState<HandwritingDoc | null>(null)
+  /*
+    영상. 고치기로 들어왔으면 원래 영상을 그대로 보여준다(파일을 받아오지 않는다 — 30초 영상은
+    목소리보다 훨씬 크고, 다시 올릴 일도 없다). path 가 있으면 "원래 것"이다.
+  */
+  const [video, setVideo] = useState<PickedVideo | null>(() =>
+    initial?.video
+      ? {
+          blob: null,
+          previewUrl: initial.video.url,
+          durationMs: initial.video.durationMs,
+          mime: null,
+          path: initial.video.path,
+        }
+      : null,
+  )
   const [caption, setCaption] = useState(initial?.caption ?? '')
   const [phase, setPhase] = useState<Phase>('editing')
   const [notice, setNotice] = useState<string | null>(null)
@@ -501,6 +531,7 @@ export function ComposeForm({
   const uploadedPhotoPathsRef = useRef(new Map<string, string>())
   const uploadedVoicePathRef = useRef<string | null>(null)
   const uploadedHandwritingPathRef = useRef<string | null>(null)
+  const uploadedVideoPathRef = useRef<string | null>(null)
 
   /**
    * 고치기로 들어왔을 때, 지금 화면의 목소리가 **원래 그 게시물의 것**인가.
@@ -569,15 +600,18 @@ export function ComposeForm({
     const photoPaths = uploadedPhotoPathsRef.current
     const voicePath = uploadedVoicePathRef
     const handwritingPath = uploadedHandwritingPathRef
+    const videoPath = uploadedVideoPathRef
     const committed = committedRef
 
     return () => {
       if (committed.current) return
       void discardUploads([...photoPaths.values()], voicePath.current)
       if (handwritingPath.current) void discardHandwriting(handwritingPath.current)
+      if (videoPath.current) void discardVideo(videoPath.current)
       photoPaths.clear()
       voicePath.current = null
       handwritingPath.current = null
+      videoPath.current = null
     }
   }, [])
 
@@ -613,6 +647,21 @@ export function ComposeForm({
     setHandwritingIsOriginal(false)
     setHandwriting(next)
     if (next && stageRef.current === 'open') stageRef.current = 'capturing'
+  }, [])
+
+  /**
+   * 영상을 바꾸거나 뺐으면 앞서 올려 둔 파일은 물린다(목소리·손글씨와 같은 이유).
+   * 고치기의 원래 영상은 여기서 지우지 않는다 — 저장이 끝난 뒤 서버가 정리 목록에 올린다.
+   */
+  const handleVideoChange = useCallback((next: PickedVideo | null) => {
+    const stale = uploadedVideoPathRef.current
+    uploadedVideoPathRef.current = null
+    if (stale) void discardVideo(stale)
+    setVideo(next)
+    if (next) {
+      if (stageRef.current === 'open') stageRef.current = 'capturing'
+      track('capture_start', { kind: 'video' })
+    }
   }, [])
 
   /*
@@ -688,7 +737,10 @@ export function ComposeForm({
     전에는 "음성 3초"가 유일한 조건이었다. 가장 쑥스러운 일을 가장 먼저 시키고 있었다.
   */
   const canSubmit =
-    (recording !== null || handwriting !== null || photos.length > 0) &&
+    (recording !== null ||
+      handwriting !== null ||
+      video !== null ||
+      photos.length > 0) &&
     caption.trim().length <= CAPTION_MAX_LENGTH
 
   /*
@@ -848,6 +900,15 @@ export function ComposeForm({
         uploadedHandwritingPathRef.current = handwritingPath
       }
 
+      // 영상 (선택, 한 개). 원래 영상이면 경로만 다시 쓴다.
+      let videoPath: string | null = video?.path ?? uploadedVideoPathRef.current
+      if (!videoPath && video?.blob) {
+        const mime = video.mime ?? 'video/mp4'
+        videoPath = `${roomId}/${randomFileId()}.${extensionForVideoMime(mime)}`
+        await upload(VIDEO_BUCKET, videoPath, video.blob, mime)
+        uploadedVideoPathRef.current = videoPath
+      }
+
       // 저장. 서버가 마지막으로 값들을 확인한다.
       for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
         const payload = {
@@ -858,6 +919,8 @@ export function ComposeForm({
           voiceLevels: recording?.levels ?? null,
           handwritingPath,
           handwritingDurationMs: handwriting?.durationMs ?? null,
+          videoPath,
+          videoDurationMs: videoPath ? (video?.durationMs ?? null) : null,
           caption: caption.trim() || null,
         }
 
@@ -927,6 +990,7 @@ export function ComposeForm({
     roomId,
     router,
     upload,
+    video,
     voiceIsOriginal,
   ])
 
@@ -1063,6 +1127,14 @@ export function ComposeForm({
               </p>
             ) : null}
 
+          </section>
+
+          {/* 영상 (2026-09-26). 한 개 · 30초 · 50MB. 파일 선택과 바로 찍기 모두. */}
+          <section aria-labelledby="video-label" className="flex flex-col gap-2">
+            <h2 id="video-label" className="text-base font-bold text-ink">
+              영상 <span className="font-medium text-muted">(선택)</span>
+            </h2>
+            <VideoPicker value={video} onChange={handleVideoChange} disabled={busy} />
           </section>
 
           {/* 함께 담을 목소리 (캡처 12·16·18) */}

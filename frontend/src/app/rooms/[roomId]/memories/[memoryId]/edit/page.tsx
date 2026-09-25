@@ -32,7 +32,7 @@ export default async function EditMemoryPage({
   const { data: memory } = await supabase
     .from('memories')
     .select(
-      'id, author_id, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, photos:memory_photos(storage_path, sort_order)',
+      'id, author_id, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, photos:memory_photos(storage_path, sort_order)',
     )
     .eq('id', memoryId)
     .eq('room_id', roomId)
@@ -51,21 +51,26 @@ export default async function EditMemoryPage({
     .map((row) => row.storage_path)
     .filter((path): path is string => Boolean(path))
 
-  const [photoUrlByPath, voiceUrlByPath, handwritingUrlByPath] = await Promise.all([
-    signPaths(supabase, 'media', photoPaths),
-    signPaths(supabase, 'voice', memory.voice_path ? [memory.voice_path] : []),
-    signPaths(
-      supabase,
-      'handwriting',
-      memory.handwriting_path ? [memory.handwriting_path] : [],
-    ),
-  ])
+  const [photoUrlByPath, voiceUrlByPath, handwritingUrlByPath, videoUrlByPath] =
+    await Promise.all([
+      signPaths(supabase, 'media', photoPaths),
+      signPaths(supabase, 'voice', memory.voice_path ? [memory.voice_path] : []),
+      signPaths(
+        supabase,
+        'handwriting',
+        memory.handwriting_path ? [memory.handwriting_path] : [],
+      ),
+      signPaths(supabase, 'video', memory.video_path ? [memory.video_path] : []),
+    ])
 
   const voiceUrl = memory.voice_path
     ? (voiceUrlByPath.get(memory.voice_path) ?? null)
     : null
   const handwritingUrl = memory.handwriting_path
     ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
+    : null
+  const videoUrl = memory.video_path
+    ? (videoUrlByPath.get(memory.video_path) ?? null)
     : null
 
   /*
@@ -83,9 +88,16 @@ export default async function EditMemoryPage({
   */
   const voiceBroken = Boolean(memory.voice_path) && !voiceUrl
   const handwritingBroken = Boolean(memory.handwriting_path) && !handwritingUrl
+  const videoBroken = Boolean(memory.video_path) && !videoUrl
   const photosBroken = photoPaths.length > 0 && photos.length === 0
-  const nothing = photos.length === 0 && !memory.voice_path && !memory.handwriting_path
-  if (voiceBroken || handwritingBroken || photosBroken || nothing) redirect(backHref)
+  const nothing =
+    photos.length === 0 &&
+    !memory.voice_path &&
+    !memory.handwriting_path &&
+    !memory.video_path
+  if (voiceBroken || handwritingBroken || videoBroken || photosBroken || nothing) {
+    redirect(backHref)
+  }
 
   return (
     <div className="flex h-[100dvh] flex-col">
@@ -115,6 +127,14 @@ export default async function EditMemoryPage({
                   path: memory.handwriting_path,
                   url: handwritingUrl,
                   durationMs: memory.handwriting_duration_ms ?? 0,
+                }
+              : null,
+          video:
+            memory.video_path && videoUrl
+              ? {
+                  path: memory.video_path,
+                  url: videoUrl,
+                  durationMs: memory.video_duration_ms ?? 0,
                 }
               : null,
           caption: memory.description ?? '',
