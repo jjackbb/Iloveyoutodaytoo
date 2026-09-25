@@ -453,13 +453,13 @@ isOneToOne: false
                   ]
                 },"storage_deletion_jobs": {
                   Row: {
-                    "attempts": number,"bucket_id": string,"created_at": string,"id": string,"last_error": string | null,"object_name": string,"reason": string,"requested_by": string
+                    "attempts": number,"bucket_id": string,"claimed_at": string | null,"created_at": string,"id": string,"last_error": string | null,"object_name": string,"reason": string,"requested_by": string
                   }
                   Insert: {
-                    "attempts"?: number,"bucket_id": string,"created_at"?: string,"id"?: string,"last_error"?: string | null,"object_name": string,"reason"?: string,"requested_by": string
+                    "attempts"?: number,"bucket_id": string,"claimed_at"?: string | null,"created_at"?: string,"id"?: string,"last_error"?: string | null,"object_name": string,"reason"?: string,"requested_by": string
                   }
                   Update: {
-                    "attempts"?: number,"bucket_id"?: string,"created_at"?: string,"id"?: string,"last_error"?: string | null,"object_name"?: string,"reason"?: string,"requested_by"?: string
+                    "attempts"?: number,"bucket_id"?: string,"claimed_at"?: string | null,"created_at"?: string,"id"?: string,"last_error"?: string | null,"object_name"?: string,"reason"?: string,"requested_by"?: string
                   }
                   Relationships: [
                     
@@ -616,6 +616,9 @@ isOneToOne: false
                            },
 "shares_room_with":
 { Args: { "p_user_id": string }; Returns: boolean
+                           },
+"storage_object_pending_deletion":
+{ Args: { "p_bucket": string,"p_name": string }; Returns: boolean
                            },
 "update_memory":
 { Args: { "p_caption": string,"p_handwriting_duration_ms"?: number,"p_handwriting_path"?: string,"p_memory_id": string,"p_photo_paths": (string)[],"p_video_duration_ms"?: number,"p_video_path"?: string,"p_voice_duration_sec"?: number,"p_voice_levels"?: (number)[],"p_voice_path"?: string }; Returns: undefined

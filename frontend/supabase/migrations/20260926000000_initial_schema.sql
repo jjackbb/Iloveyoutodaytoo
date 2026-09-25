@@ -406,6 +406,9 @@ create table public.storage_deletion_jobs (
   created_at   timestamptz not null default now(),
   attempts     integer not null default 0,
   last_error   text,
+  -- 지금 지우는 중이라고 표시한 시각. Storage 삭제는 내부적으로 읽기 권한이 필요해서
+  -- 이 시각부터 30초 동안만 요청한 사람에게 그 파일 읽기를 연다(아래 app_objects_select).
+  claimed_at   timestamptz,
   constraint storage_deletion_jobs_object_key unique (bucket_id, object_name)
 );
 
@@ -602,6 +605,17 @@ as $$
          and (u.id = auth.uid() or public.shares_room_with(u.id)))
     else false
   end;
+$$;
+
+-- 이 파일이 삭제 정리 목록에 올라 있는가. 정책 안에서 목록을 직접 읽으면 목록의 RLS
+-- (요청한 본인만 보기)에 걸려 다른 사람 눈에는 "목록에 없음"으로 보인다 — 그래서 함수로 본다.
+create or replace function public.storage_object_pending_deletion(p_bucket text, p_name text)
+ returns boolean language sql stable security definer set search_path to 'public'
+as $$
+  select exists (
+    select 1 from public.storage_deletion_jobs j
+     where j.bucket_id = p_bucket and j.object_name = p_name
+  );
 $$;
 
 -- ─────────────────────────────────────────────────────────────
@@ -1182,7 +1196,7 @@ begin
      );
 
   update public.storage_deletion_jobs
-     set attempts = attempts + 1, last_error = left(p_error, 500)
+     set attempts = attempts + 1, last_error = left(p_error, 500), claimed_at = null
    where requested_by = v_uid;
   get diagnostics v_left = row_count;
   return v_left;
@@ -1584,15 +1598,16 @@ begin
 end;
 $$;
 
--- 내가 아직 지우지 못한 파일 목록(앞서 실패한 것 포함).
+-- 내가 아직 지우지 못한 파일 목록(앞서 실패한 것 포함). 부르는 순간 "지우는 중"으로 표시한다.
+-- 앱은 이 목록을 받은 즉시 Storage 삭제를 부르고, 끝나면 finish_storage_deletions() 를 부른다.
 create or replace function public.pending_storage_deletions()
  returns table(bucket_id text, object_name text)
- language sql stable security definer set search_path to 'public'
+ language sql volatile security definer set search_path to 'public'
 as $$
-  select j.bucket_id, j.object_name
-    from public.storage_deletion_jobs j
+  update public.storage_deletion_jobs j
+     set claimed_at = now()
    where j.requested_by = auth.uid()
-   order by j.created_at;
+  returning j.bucket_id, j.object_name;
 $$;
 
 -- 내부 전용 함수는 앱 역할이 직접 부르지 못하게 한다.
@@ -1856,11 +1871,24 @@ create policy app_objects_update on storage.objects for update to authenticated
   )
   with check (owner_id = (select auth.uid())::text);
 
+-- 삭제 정리 목록에 오른 파일(지운 추억의 파일)은 올린 본인도 더 이상 읽거나 서명할 수 없다.
+-- 예외: 삭제를 요청한 사람이 "지우는 중"으로 표시한 뒤 30초 — Storage 삭제가 읽기 권한을 요구한다.
 create policy app_objects_select on storage.objects for select to authenticated
   using (
     bucket_id in ('media', 'voice', 'handwriting', 'video', 'covers', 'avatars')
-    and (owner_id = (select auth.uid())::text
+    and (
+      (
+        (owner_id = (select auth.uid())::text
          or public.can_read_storage_object(bucket_id, name))
+        and not public.storage_object_pending_deletion(bucket_id, name)
+      )
+      or exists (
+        select 1 from public.storage_deletion_jobs j
+         where j.bucket_id = storage.objects.bucket_id
+           and j.object_name = storage.objects.name
+           and j.requested_by = (select auth.uid())
+           and j.claimed_at > now() - interval '30 seconds')
+    )
   );
 
 create policy app_objects_delete on storage.objects for delete to authenticated
