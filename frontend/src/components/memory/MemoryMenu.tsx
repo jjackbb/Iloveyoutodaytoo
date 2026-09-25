@@ -210,7 +210,7 @@ export function MemoryMenu({
           */}
           {isMine ? (
             <MenuLink href={`/rooms/${roomId}/memories/${memoryId}/edit`}>
-              사진·목소리 고치기
+              사진·영상·목소리 고치기
             </MenuLink>
           ) : null}
 
