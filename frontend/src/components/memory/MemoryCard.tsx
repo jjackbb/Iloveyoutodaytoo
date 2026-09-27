@@ -5,6 +5,7 @@ import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
 import { LikeButton } from '@/components/memory/LikeButton'
 import { MemoryMenu } from '@/components/memory/MemoryMenu'
+import { PrivateBadge } from '@/components/memory/PrivateBadge'
 import { formatRelativeTime } from '@/lib/format'
 import { PHOTO_MAX_COUNT } from '@/lib/limits'
 
@@ -72,6 +73,8 @@ export interface MemoryCardProps {
   isPinned: boolean
   /** 이 화면을 보는 사람이 저장(북마크)했는지. */
   isSaved: boolean
+  /** 작성자만 보는 추억인가(저장 순간 혼자였다). 작성자가 공개로 바꿀 수 있다(2026-09-28). */
+  isPrivate?: boolean
   as?: 'li' | 'div'
 }
 
@@ -98,6 +101,7 @@ export function MemoryCard({
   commentCount,
   isPinned,
   isSaved,
+  isPrivate = false,
   as: Element = 'li',
 }: MemoryCardProps) {
   /*
@@ -141,6 +145,7 @@ export function MemoryCard({
                 고정됨
               </span>
             ) : null}
+            {isPrivate ? <PrivateBadge /> : null}
           </p>
         </div>
 
@@ -148,10 +153,10 @@ export function MemoryCard({
           roomId={roomId}
           memoryId={memoryId}
           authorName={authorName}
-          caption={caption}
           isMine={isMine}
           isPinned={isPinned}
           isSaved={isSaved}
+          isPrivate={isPrivate}
         />
       </div>
 

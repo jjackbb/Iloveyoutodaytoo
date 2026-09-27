@@ -1,4 +1,4 @@
-// Supabase 스키마에서 자동 생성된 타입 (supabase gen types typescript --local, 2026-09-26).
+// Supabase 스키마에서 자동 생성된 타입 (supabase gen types typescript --local, 2026-09-28).
 // 원본: supabase/migrations/. 스키마를 바꾼 뒤에는 다시 생성해서 이 파일을 교체하세요.
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
@@ -602,6 +602,9 @@ isOneToOne: false
                            },
 "prune_push_subscription":
 { Args: { "p_endpoint": string }; Returns: undefined
+                           },
+"publish_memories":
+{ Args: { "p_memory_ids": (string)[] }; Returns: number
                            },
 "purge_guardian_verifications":
 { Args: Record<PropertyKey, never>; Returns: number

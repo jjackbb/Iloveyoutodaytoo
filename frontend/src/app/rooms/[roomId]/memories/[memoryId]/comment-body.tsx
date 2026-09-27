@@ -136,7 +136,7 @@ export function CommentBody({
       <p className="mt-1 inline-block rounded-inner rounded-tl-[4px] bg-surface-soft px-3.5 py-2.5 text-base leading-relaxed break-keep whitespace-pre-wrap text-ink">
         {body}
         {edited ? (
-          // 고친 적이 있다는 표시. 가족이 주고받는 말이 아무 흔적 없이
+          // 고친 적이 있다는 표시. 소중한 존재가 주고받는 말이 아무 흔적 없이
           // 다른 말로 바뀌면 안 된다.
           <span className="ml-2 align-middle text-sm text-muted">수정됨</span>
         ) : null}

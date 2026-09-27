@@ -113,7 +113,7 @@ export type FieldProps =
  * 한 줄 입력(기본) 또는 여러 줄 입력(as="textarea").
  *
  * 예)
- *   <Field id="roomName" name="name" label="방 이름" hint="엄마, 우리 가족처럼 부르기 쉬운 이름" error={state?.error} required />
+ *   <Field id="roomName" name="name" label="방 이름" hint="우리 앨범방처럼 부르기 쉬운 이름" error={state?.error} required />
  *   <Field id="message" name="content" label="오늘의 한마디" as="textarea" rows={4} />
  */
 export function Field({

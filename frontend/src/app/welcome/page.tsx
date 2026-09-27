@@ -7,12 +7,12 @@ import { ButtonLink } from '@/components/ui/Button'
 /**
  * 브라우저 방문자를 포트폴리오 데모로 안내한다(2026-09-22 사용자 결정).
  * 기존 소개 레이아웃은 유지하고 설치 대신 체험 진입을 연결했다.
- * 소개 문구와 화면 전체의 최종 디자인은 별도 사용자 검토 대상이다.
+ * 소개 문구는 2026-09-28 사용자가 직접 정했다(앞선 AI 초안을 바꿈).
  */
 export const metadata: Metadata = {
   title: '오늘도 사랑해',
   description:
-    '쑥스러운 마음을 목소리로 남기는 곳, 우리끼리의 비밀 감정 사서함',
+    '소중한 존재에게 마음껏 표현해요',
 }
 
 export default function WelcomePage() {
@@ -24,13 +24,11 @@ export default function WelcomePage() {
           오늘도 사랑해
         </h1>
         <p className="text-lg leading-relaxed text-muted">
-          쑥스러운 마음을 목소리로 남기는 곳,
-          <br />
-          우리끼리의 비밀 감정 사서함
+          소중한 존재에게 마음껏 표현해요
         </p>
       </div>
 
-      {/* 실제 가입과 분리된 가상 가족방 체험. */}
+      {/* 실제 가입과 분리된 가상 앨범방 체험. */}
       <ButtonLink
         href="/demo"
         fullWidth
@@ -39,7 +37,7 @@ export default function WelcomePage() {
       </ButtonLink>
 
       <p className="text-sm leading-relaxed text-muted">
-        가입 없이 가상의 가족방을 둘러보세요.
+        가입 없이 가상의 앨범방을 둘러보세요.
         <br />
         체험한 내용은 이 브라우저에만 저장돼요.
       </p>

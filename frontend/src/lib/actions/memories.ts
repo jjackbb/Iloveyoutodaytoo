@@ -545,7 +545,7 @@ export type UpdateMemoryInput = {
  *
  * 그전에는 문구만 고칠 수 있었다. 사진을 잘못 골랐거나 목소리를 다시 담고 싶으면
  * 지우고 처음부터 다시 올리는 수밖에 없었는데, 그러면 **거기 달린 댓글과 좋아요가
- * 함께 사라진다.** 가족이 남긴 말을 사진 한 장 바꾸자고 버리게 할 수는 없다.
+ * 함께 사라진다.** 소중한 존재가 남긴 말을 사진 한 장 바꾸자고 버리게 할 수는 없다.
  *
  * 검사 규칙은 새로 남길 때(createMemory)와 **글자 그대로 같다.** 여기만 느슨하면
  * 만들 땐 막힌 것이 고치기로 들어온다.
@@ -871,4 +871,67 @@ export async function deleteMemory(
   if (memory) revalidateRoom(memory.roomId)
   else revalidatePath('/', 'layout')
   return { ok: true }
+}
+
+/**
+ * '나만 보기' 추억을 공개로 바꾼다 (2026-09-28 사용자 결정).
+ *
+ * 한 장(⋯ 메뉴)이든 여러 장(앨범방 편집)이든 같은 길이다. 되돌리는 길은 없다 —
+ * 한 번 보여준 것을 다시 감추면 받은 사람에게는 "사라진 글"로 보인다.
+ * 내 글인지·지금 그 방 참여자인지는 DB(publish_memories)가 다시 본다. 하나라도 어긋나면
+ * 아무것도 바꾸지 않는다. `roomId`는 화면을 다시 그리는 데에만 쓴다.
+ */
+export async function publishMemories(
+  roomId: string,
+  memoryIds: string[],
+): Promise<MemoryActionResult> {
+  await requireUser()
+  const ids = [...new Set(memoryIds)].filter(Boolean)
+  if (ids.length === 0) return { ok: false, error: '공개할 추억을 골라 주세요.' }
+
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('publish_memories', { p_memory_ids: ids })
+  if (error) {
+    console.error('[공개로 바꾸기] 실패:', error.code, error.message)
+    return {
+      ok: false,
+      error:
+        error.code === '42501'
+          ? '내가 남긴 추억만 공개로 바꿀 수 있어요.'
+          : '잠시 후 다시 시도해 주세요.',
+    }
+  }
+
+  revalidateRoom(roomId)
+  return { ok: true }
+}
+
+/**
+ * 앨범방 편집에서 여러 장 지우기 (2026-09-28).
+ *
+ * 한 장씩 deleteMemory 와 같은 길로 지운다 — 파일 정리·재시도 규칙이 그대로 따라온다.
+ * 하나라도 실패하면 성공이라고 하지 않고 몇 개가 남았는지 알린다.
+ */
+export async function deleteMemories(memoryIds: string[]): Promise<MemoryActionResult> {
+  const ids = [...new Set(memoryIds)].filter(Boolean)
+  if (ids.length === 0) return { ok: false, error: '지울 추억을 골라 주세요.' }
+
+  let failed = 0
+  let lastError = ''
+  for (const id of ids) {
+    const result = await deleteMemory(id)
+    if (!result.ok) {
+      failed += 1
+      lastError = result.error
+    }
+  }
+
+  if (failed === 0) return { ok: true }
+  return {
+    ok: false,
+    error:
+      failed === ids.length
+        ? lastError
+        : `${ids.length}개 중 ${failed}개를 지우지 못했어요. ${lastError}`,
+  }
 }

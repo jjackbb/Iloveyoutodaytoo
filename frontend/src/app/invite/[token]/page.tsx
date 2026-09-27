@@ -116,7 +116,7 @@ export default async function InvitePreviewPage({
           부탁해보시면 ‘{invitation.room_name}’에 들어오실 수 있어요.
         </p>
         <ButtonLink href="/" variant="secondary" fullWidth>
-          내 관계방 보러 가기
+          내 앨범방 보러 가기
         </ButtonLink>
       </Shell>
     ) : (
@@ -145,7 +145,7 @@ export default async function InvitePreviewPage({
           지났어요. 새 링크를 부탁드리면 다시 들어오실 수 있어요.
         </p>
         <ButtonLink href="/" variant="secondary" fullWidth>
-          내 관계방 보러 가기
+          내 앨범방 보러 가기
         </ButtonLink>
       </Shell>
     ) : (

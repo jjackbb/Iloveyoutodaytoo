@@ -71,7 +71,7 @@ export default async function BlocksPage({
       ) : items.length === 0 ? (
         <EmptyState
           title="차단한 분이 없어요"
-          description="불편한 분이 생기면 관계방의 구성원 목록에서 차단할 수 있어요."
+          description="불편한 분이 생기면 앨범방의 구성원 목록에서 차단할 수 있어요."
         />
       ) : (
         <ul className="flex flex-col gap-3">

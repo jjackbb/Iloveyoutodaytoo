@@ -274,7 +274,7 @@ export default async function ContactPage() {
         </ul>
 
         <p className="text-base leading-relaxed text-muted">
-          마음 한마디는 사서함과 관계방에 있는 &lsquo;신고&rsquo; 버튼으로 바로
+          마음 한마디는 사서함과 앨범방에 있는 &lsquo;신고&rsquo; 버튼으로 바로
           접수하실 수 있어요.
         </p>
       </section>

@@ -27,7 +27,7 @@ export const GRID_SLOTS = 3
  * 결과가 unknown이 된다. `as const`라 리터럴 타입이 그대로 전달된다.
  */
 export const MEMORY_CARD_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, visibility, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 위 select가 돌려주는 한 줄. 조회는 화면마다 다르지만 이 모양은 같다. */
 export type MemoryRow = {
@@ -46,6 +46,8 @@ export type MemoryRow = {
   video_duration_ms: number | null
   author_id: string | null
   pinned_at: string | null
+  /** private = 작성자만 보는 추억(저장 순간 혼자였다), room = 방의 모두. 2026-09-28부터 작성자가 private → room 으로 열 수 있다. */
+  visibility: 'private' | 'room'
   author: { id: string; name: string } | null
   photos: { storage_path: string; sort_order: number }[] | null
 }
@@ -339,6 +341,7 @@ export async function buildMemoryCards(options: {
       commentCount: commentCountByMemory.get(memory.id) ?? 0,
       isPinned: memory.pinned_at !== null,
       isSaved: savedByMe.has(memory.id),
+      isPrivate: memory.visibility === 'private',
     }
   })
 }
@@ -399,12 +402,14 @@ export type MemoryDetailView = {
   likedByMe: boolean
   isPinned: boolean
   isSaved: boolean
+  /** 작성자만 보는 추억인가. 작성자 본인에게만 이런 글이 보인다. */
+  isPrivate: boolean
   comments: MemoryCommentView[]
 }
 
 /** 상세에서 읽는 컬럼들. 카드와 달리 사진 수를 자르지 않는다(한 줄로 둔다 — 타입 추론). */
 const MEMORY_DETAIL_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, visibility, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 댓글 한 줄을 읽을 때 쓰는 컬럼들. */
 const COMMENT_SELECT =
@@ -548,6 +553,7 @@ export async function loadMemoryDetail(options: {
     likedByMe: likes.some((like) => like.user_id === viewerId),
     isPinned: memory.pinned_at !== null,
     isSaved: saveResult.data !== null,
+    isPrivate: memory.visibility === 'private',
     comments: comments.map((comment) => ({
       commentId: comment.id,
       authorName: nameOf(comment.author_id, comment.author),

@@ -9,6 +9,7 @@ import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
 import { LikeButton } from '@/components/memory/LikeButton'
 import { MemoryMenu } from '@/components/memory/MemoryMenu'
+import { PrivateBadge } from '@/components/memory/PrivateBadge'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
 import { formatRelativeTime } from '@/lib/format'
@@ -99,10 +100,10 @@ export default async function MemoryDetailPage({
           roomId={roomId}
           memoryId={detail.memoryId}
           authorName={detail.authorName}
-          caption={detail.caption}
           isMine={isMine}
           isPinned={detail.isPinned}
           isSaved={detail.isSaved}
+          isPrivate={detail.isPrivate}
         />
       </RoomAppBar>
 
@@ -122,6 +123,7 @@ export default async function MemoryDetailPage({
               </p>
               <p className="text-sm text-muted">
                 {formatRelativeTime(detail.createdAt)}
+                {detail.isPrivate ? <PrivateBadge /> : null}
               </p>
             </div>
           </div>

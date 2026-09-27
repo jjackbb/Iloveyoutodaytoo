@@ -112,7 +112,7 @@ export function RoomForm({
             id="name"
             name="name"
             label="앨범방 이름"
-            placeholder="예: 우리 가족 행복방"
+            placeholder="예: 우리의 행복 앨범방"
             maxLength={ROOM_NAME_MAX_LENGTH}
             value={name}
             onChange={(event) => setName(event.target.value)}

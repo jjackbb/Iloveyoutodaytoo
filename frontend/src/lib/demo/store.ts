@@ -5,16 +5,23 @@ export const DEMO_DB_NAME = 'oneuldo-portfolio-demo-v1'
 const STORE = 'snapshot'
 const KEY = 'current'
 
+/** 초기화로 풀리는 문제(저장 기록 손상)와 풀리지 않는 문제(저장소 접근 불가)를 구분한다. */
+export class DemoStorageError extends Error {
+  constructor(message: string, readonly resettable: boolean) {
+    super(message)
+  }
+}
+
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof indexedDB === 'undefined') {
-      reject(new Error('이 브라우저에서는 체험 내용을 저장할 수 없어요. 다른 브라우저에서 열어주세요.'))
+      reject(new DemoStorageError('이 브라우저에서는 체험 내용을 저장할 수 없어요. 다른 브라우저에서 열어주세요.', false))
       return
     }
     const request = indexedDB.open(DEMO_DB_NAME, 1)
     request.onupgradeneeded = () => request.result.createObjectStore(STORE)
-    request.onerror = () => reject(new Error('브라우저 저장 공간을 열지 못했어요. 저장 권한을 확인해주세요.'))
-    request.onblocked = () => reject(new Error('다른 체험 창을 닫고 다시 시도해주세요.'))
+    request.onerror = () => reject(new DemoStorageError('브라우저 저장 공간을 열지 못했어요. 저장 권한을 확인해주세요.', false))
+    request.onblocked = () => reject(new DemoStorageError('다른 체험 창을 닫고 다시 시도해주세요.', false))
     request.onsuccess = () => resolve(request.result)
   })
 }
@@ -39,7 +46,7 @@ export async function updateDemo(
           const old = value as { favorite: boolean; actor?: string }
           value = { ...value, favorite: { child: old.actor !== 'parent' && old.favorite, parent: old.actor === 'parent' && old.favorite } }
         }
-        if (!reset && value !== undefined && !isDemoSnapshot(value)) throw new Error('저장된 체험 내용을 읽지 못했어요. 예시로 초기화하면 다시 시작할 수 있어요.')
+        if (!reset && value !== undefined && !isDemoSnapshot(value)) throw new DemoStorageError('저장된 체험 내용을 읽지 못했어요. 예시로 초기화하면 다시 시작할 수 있어요.', true)
         const current = reset || value === undefined ? createDemoSeed() : value as DemoSnapshot
         next = change(current)
         if (!isDemoSnapshot(next)) throw new Error('저장할 내용을 확인하지 못했어요. 입력은 그대로 두었어요.')

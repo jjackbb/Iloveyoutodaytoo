@@ -362,7 +362,7 @@ export async function acceptInvitation(
     .eq('id', roomMemberId)
     .maybeSingle()
 
-  // 홈의 관계방 목록이 새 방을 바로 보여주도록 캐시를 비운다.
+  // 홈의 앨범방 목록이 새 방을 바로 보여주도록 캐시를 비운다.
   revalidatePath('/', 'layout')
 
   redirect(member?.room_id ? `/rooms/${member.room_id}` : '/')

@@ -119,6 +119,28 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(welcomeUrl)
   }
 
+  /*
+    서버 키 없이 띄운 데모 전용 실행(scripts/dev-demo.mjs, 데모 배포)에는 로그인 세션이 없다.
+    키 없이 Supabase 클라이언트를 만들면 요청 전체가 500으로 죽어, 소개 화면이 거는
+    약관·manifest.json·sw.js까지 깨진다. 공개 파일은 그대로 내주고, DB가 있어야 하는
+    초대장·API와 나머지 화면은 소개 화면으로 보낸다. 키가 있는 운영 동작은 바뀌지 않는다.
+  */
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    const needsServer = ['/invite', '/api'].some(
+      (p) => pathname === p || pathname.startsWith(`${p}/`),
+    )
+    if (isBrowserAllowed(pathname) && !needsServer) {
+      return NextResponse.next({ request })
+    }
+    const welcomeUrl = request.nextUrl.clone()
+    welcomeUrl.pathname = '/welcome'
+    welcomeUrl.search = ''
+    return NextResponse.redirect(welcomeUrl)
+  }
+
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(

@@ -45,7 +45,7 @@ type TargetView = {
   /** 그 내용을 남긴 사람. 탈퇴했으면 null */
   ownerId: string | null
   /**
-   * 그 내용이 있던 관계방. 차단은 방 설정 화면에서만 걸 수 있어서 안내 링크에 쓴다.
+   * 그 내용이 있던 앨범방. 차단은 방 설정 화면에서만 걸 수 있어서 안내 링크에 쓴다.
    * 이용자 신고처럼 방을 특정할 수 없으면 null.
    */
   roomId: string | null
@@ -121,7 +121,7 @@ export default async function ReportPage({
 
   const alreadyReported = existing?.[0] ?? null
 
-  // 차단은 "함께 있는 관계방의 설정 > 함께하는 분" 목록에서만 걸 수 있다.
+  // 차단은 "함께 있는 앨범방의 설정 > 함께하는 분" 목록에서만 걸 수 있다.
   // 어느 방인지 알 때만 링크를 준다. 잘못된 곳으로 보내면 안내가 없느니만 못하다.
   const blockHref = target.roomId ? `/rooms/${target.roomId}/settings` : null
 
@@ -166,7 +166,7 @@ export default async function ReportPage({
                 </>
               ) : (
                 <>
-                  차단은 그분과 함께 있는 관계방을 열고 [설정] 화면의 함께하는 분
+                  차단은 그분과 함께 있는 앨범방을 열고 [설정] 화면의 함께하는 분
                   목록에서 할 수 있어요.
                 </>
               )}

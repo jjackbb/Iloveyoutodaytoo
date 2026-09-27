@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 import { MoreDrawer } from './more-drawer'
 import { MemoryCard } from '@/components/memory/MemoryCard'
@@ -15,6 +16,7 @@ import {
 } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
 import { FeedItem, FeedScroll } from '@/app/rooms/[roomId]/feed-scroll'
+import { FeedEditBar, FeedEditProvider, SelectableCard } from '@/app/rooms/[roomId]/feed-edit'
 import { FeedSearch, type FeedAuthor } from '@/app/rooms/[roomId]/feed-search'
 import { roomMemberName } from '@/lib/member-name'
 import { loadRoomName } from '@/lib/room-look'
@@ -93,6 +95,12 @@ export default async function RoomPage({
 
   const searchOpen =
     query.find === '1' || who !== null || on !== null || q !== null
+
+  /*
+    편집 (2026-09-28 사용자 결정). 내 추억을 여러 장 골라 공개로 바꾸기·수정·삭제.
+    찾기와 겹치면 무엇을 누르는지 헷갈리므로 찾는 중에는 열지 않는다. 주소에만 있다.
+  */
+  const editing = query.edit === '1' && !searchOpen
 
   // 멤버인지는 layout.tsx가 이미 확인했다. 여기서 사람을 다시 읽는 것은
   // **누구의 화면인지**를 알아야 하기 때문이다 — 좋아요·저장·숨김은 사람마다 다르고,
@@ -187,10 +195,33 @@ export default async function RoomPage({
     .map((card) => card.photos[0]?.url)
     .filter((url): url is string => Boolean(url))
 
+  const hasMine = cards.some((card) => card.authorId === viewer.id)
+
   return (
     // 100dvh: 모바일 브라우저 주소창이 접혔다 펴져도 높이가 흔들리지 않는다(홈과 같다).
+    <FeedEditProvider roomId={roomId} editing={editing}>
     <div className="flex h-[100dvh] flex-col">
+      {editing ? (
+        <RoomAppBar backHref={`/rooms/${roomId}`} backLabel="편집 끝내기" title="추억 고르기">
+          <Link
+            href={`/rooms/${roomId}`}
+            className="flex h-11 items-center rounded-button px-3 text-base font-bold text-primary"
+          >
+            완료
+          </Link>
+        </RoomAppBar>
+      ) : (
       <RoomAppBar backHref="/" backLabel="홈으로 돌아가기" title={roomName}>
+        {/* 편집 — 내가 남긴 추억이 있을 때만. 누르면 여러 장을 골라 공개·수정·삭제한다. */}
+        {hasMine && !searchOpen ? (
+          <Link
+            href={`/rooms/${roomId}?edit=1`}
+            className="flex h-11 shrink-0 items-center rounded-button px-2.5 text-base font-semibold text-ink active:bg-surface-soft"
+          >
+            편집
+          </Link>
+        ) : null}
+
         {/*
           찾아보기 (노션 IA 3.4). 링크인 이유 — 여는 것도 주소(?find=1)라
           뒤로가기로 그대로 닫힌다. 여는 데에 화면 상태를 쓰지 않는다.
@@ -223,12 +254,20 @@ export default async function RoomPage({
           memberNames={members.map((member) => member.name)}
         />
       </RoomAppBar>
+      )}
+
+      {editing ? (
+        <p className="mx-auto w-full max-w-md shrink-0 px-screen-x pb-2 text-sm text-muted">
+          내가 남긴 추억만 고를 수 있어요.
+        </p>
+      ) : null}
 
       {/*
         스크롤 칸과 떠 있는 [맨 아래로] 버튼을 함께 그린다 (노션 IA 3.4).
         카드 목록은 여기서(서버에서) 그린 그대로 꽂히므로 번들에 들어가지 않는다.
       */}
-      <FeedScroll showJump={cards.length > 0} matchIds={matchIds}>
+      {/* 편집 중에는 [맨 아래로]가 아래 편집 줄을 가리므로 띄우지 않는다. */}
+      <FeedScroll showJump={cards.length > 0 && !editing} matchIds={matchIds}>
         <div className="mx-auto w-full max-w-md px-screen-x pt-0.5 pb-screen-b">
           {/* 찾기 칸 (노션 IA 3.4·6.8). 고르는 일만 여기서 하고 거르는 일은 위 조회가 했다. */}
           <FeedSearch
@@ -261,7 +300,14 @@ export default async function RoomPage({
               {cards.map((card) => (
                 // 찾은 결과로 데려갈 때 이 자리를 표시한다. 카드 내용은 그대로 지나간다.
                 <FeedItem key={card.memoryId} memoryId={card.memoryId}>
-                  <MemoryCard {...card} as="div" />
+                  <SelectableCard
+                    memoryId={card.memoryId}
+                    authorName={card.authorName}
+                    selectable={card.authorId !== null && card.authorId === viewer.id}
+                    isPrivate={card.isPrivate ?? false}
+                  >
+                    <MemoryCard {...card} as="div" />
+                  </SelectableCard>
                 </FeedItem>
               ))}
             </ul>
@@ -269,22 +315,29 @@ export default async function RoomPage({
         </div>
       </FeedScroll>
 
-      {/* 아래 고정 줄 (캡처 10·22). 추억이 있든 없든 늘 같은 자리에 있다. */}
-      <div className="shrink-0 border-t border-hairline bg-card px-screen-x py-3">
-        <div className="mx-auto w-full max-w-md">
-          <ButtonLink href={`/rooms/${roomId}/compose`} fullWidth>
-            마음 표현하기
-          </ButtonLink>
-        </div>
-      </div>
+      {/* 아래 고정 줄 (캡처 10·22). 추억이 있든 없든 늘 같은 자리에 있다. 편집 중에는 편집 줄로 바뀐다. */}
+      {editing ? (
+        <FeedEditBar />
+      ) : (
+        <>
+          <div className="shrink-0 border-t border-hairline bg-card px-screen-x py-3">
+            <div className="mx-auto w-full max-w-md">
+              <ButtonLink href={`/rooms/${roomId}/compose`} fullWidth>
+                마음 표현하기
+              </ButtonLink>
+            </div>
+          </div>
 
-      <BottomNav />
+          <BottomNav />
+        </>
+      )}
 
       {/* 방을 막 만들고 들어왔을 때만 뜬다 (캡처 10). */}
       {justCreated ? (
         <Toast message="앨범방이 만들어졌어요 🎉" offsetClassName="bottom-32" />
       ) : null}
     </div>
+    </FeedEditProvider>
   )
 }
 

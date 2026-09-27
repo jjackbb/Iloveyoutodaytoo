@@ -74,7 +74,7 @@ comment on table public.user_private is
   '본인만 읽는 계정 정보(아이디·생년월일·보호자). 방 참여자에게 노출하지 않는다.';
 
 -- ─────────────────────────────────────────────────────────────
--- 2. 가족방·참여·초대
+-- 2. 앨범방·참여·초대
 -- ─────────────────────────────────────────────────────────────
 
 create table public.rooms (
@@ -1676,7 +1676,7 @@ grant update (name, profile_image) on public.users to authenticated;
 revoke insert, update, delete on public.user_private from anon, authenticated;
 grant update (large_text) on public.user_private to authenticated;
 
--- 가족방
+-- 앨범방
 create policy rooms_select on public.rooms for select to authenticated
   using (owner_id = (select auth.uid()) or public.is_room_member(id));
 create policy rooms_insert on public.rooms for insert to authenticated

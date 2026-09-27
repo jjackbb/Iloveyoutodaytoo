@@ -23,7 +23,7 @@ import { formatRelativeTime } from '@/lib/format'
 
 export interface RoomCardProps {
   roomId: string
-  /** 앨범방 이름. 예: "우리 가족 행복방" */
+  /** 앨범방 이름. 예: "우리 앨범방" */
   name: string
   /**
    * 커버 프리셋 키. 방에 정해진 것(rooms.cover_preset)일 수도, 내가 고른 것

@@ -231,7 +231,7 @@ export async function deleteComment(
  * 정직하다 — 남은 흔적(지움 → 새 댓글)이 실제로 일어난 일과 같기 때문이다.
  * 그래서 ⋯ 메뉴도 텍스트 댓글에만 [수정]을 보여준다.
  *
- * 고친 사실은 `edited_at`에 남긴다. 가족이 주고받는 말이 아무 흔적 없이 다른 말로
+ * 고친 사실은 `edited_at`에 남긴다. 소중한 존재가 주고받는 말이 아무 흔적 없이 다른 말로
  * 바뀌면 안 된다.
  */
 export async function updateTextComment(

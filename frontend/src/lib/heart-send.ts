@@ -23,7 +23,7 @@ export type SendCandidate = {
   /** `self` · `random` · `room:{roomId}` · `member:{roomId}:{userId}` */
   id: string
   kind: 'self' | 'random' | 'room' | 'member'
-  /** 굵게 나오는 이름. 방 후보는 "우리 가족 행복방 (전체)"처럼 접미가 붙어 있다. */
+  /** 굵게 나오는 이름. 방 후보는 "우리 앨범방 (전체)"처럼 접미가 붙어 있다. */
   name: string
   /** 이름 아래 회색 한 줄. "나에게 보내기", "전체 멤버 (3명)에게 보내기" 등. */
   description: string

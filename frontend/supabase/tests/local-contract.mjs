@@ -111,7 +111,7 @@ await expectOk('프로필: 이름 변경', a.from('users').update({ name: 'A엄�
 }
 
 // ── 2. 방 만들기와 초대 전 비공개 추억 ───────────────────────────
-const room = await expectOk('방: A가 가족방 생성', a.from('rooms').insert({ name: '우리집', owner_id: aid }).select('id').single())
+const room = await expectOk('방: A가 앨범방 생성', a.from('rooms').insert({ name: '우리집', owner_id: aid }).select('id').single())
 const R = room.id
 const f = (name) => `${R}/${name}-${stamp}`
 
@@ -152,7 +152,8 @@ await expectError('Storage: 영상 버킷에 허용하지 않은 형식 거절',
   const { data } = await a.from('memories').insert({ room_id: R, author_id: aid, visibility: 'room', description: '강제' }).select('id, visibility').single()
   expectEqual('공개 범위: 입력한 room 을 무시하고 private', data?.visibility, 'private')
   const { data: upd } = await a.from('memories').update({ visibility: 'room' }).eq('id', data.id).select('visibility').single()
-  expectEqual('공개 범위: 저장 뒤 room 으로 바꿔도 그대로 private', upd?.visibility, 'private')
+  // 2026-09-28 사용자 결정으로 바뀐 규칙: 작성자는 저장 뒤 나만 보기를 공개로 열 수 있다(되돌리기는 6-2에서 막힘을 확인).
+  expectEqual('공개 범위: 저장 뒤 작성자가 room 으로 여는 것은 허용(2026-09-28 결정)', upd?.visibility, 'room')
 }
 
 // ── 3. B 초대 → 공동 작성 ───────────────────────────────────────
@@ -298,6 +299,39 @@ await expectOk('재입장: B 다시 수락', b.rpc('accept_invitation', { p_toke
   // A의 글 중 B가 읽을 수 있는 최신 글은 공유 추억 m2 뿐이다(나머지 A의 글은 모두 private).
   record('위젯: B의 위젯에는 A의 비공개 추억이 아니라 공유 추억 m2가 뜸', got === m2, got ?? '없음')
   await expectError('위젯: 무효 토큰은 28000', anon.rpc('widget_latest', { p_token: 'nope' }), '28000')
+}
+
+// ── 6-2. 나만 보기 → 공개 (2026-09-28 사용자 결정) ───────────────
+// 지금 A의 비공개 추억: m1(첫 혼자)·mVideoOnly·m3(다시 혼자). B는 재입장한 활성 참여자.
+await expectError('공개로: B는 A의 비공개 추억을 공개로 못 바꿈(읽지도 못함)', b.rpc('publish_memories', { p_memory_ids: [m3] }), '42501')
+await expectError('공개로: 남의 글이 하나라도 섞이면 전부 거절', a.rpc('publish_memories', { p_memory_ids: [m3, mB] }), '42501')
+{
+  const { data } = await admin.from('memories').select('visibility').eq('id', m3).single()
+  expectEqual('공개로: 거절되면 아무것도 바뀌지 않음(m3 그대로 private)', data?.visibility, 'private')
+}
+{
+  const r = await b.from('memories').update({ visibility: 'room' }).eq('id', m3).select('id')
+  expectEqual('공개로: B가 직접 UPDATE 해도 0행(RLS)', (r.data ?? []).length, 0)
+}
+{
+  const n = await expectOk('공개로: A가 m3·mVideoOnly 두 개를 한꺼번에 공개', a.rpc('publish_memories', { p_memory_ids: [m3, mVideoOnly] }))
+  expectEqual('공개로: 바꾼 개수 2', n, 2)
+  const { data } = await b.from('memories').select('id').in('id', [m3, mVideoOnly])
+  expectEqual('공개로: 이제 B가 두 추억을 읽음', (data ?? []).length, 2)
+  expectEqual('공개로: B가 m3 영상 서명 가능', await canSign(b, 'video', f('v3.mp4')), true)
+  const again = await expectOk('공개로: 이미 공개인 글을 다시 보내면 0개(건너뜀)', a.rpc('publish_memories', { p_memory_ids: [m3] }))
+  expectEqual('공개로: 다시 보낸 결과 0', again, 0)
+}
+{
+  await a.from('memories').update({ visibility: 'private' }).eq('id', m3)
+  const { data } = await admin.from('memories').select('visibility').eq('id', m3).single()
+  expectEqual('공개로: 공개 → 나만 보기 되돌리기는 막힘(room 유지)', data?.visibility, 'room')
+  const { data: n } = await admin.from('notifications').select('id').eq('memory_id', m3)
+  expectEqual('공개로: 공개로 바꿔도 알림은 만들지 않음', n?.length ?? 0, 0)
+}
+{
+  const { data } = await admin.from('memories').select('visibility').eq('id', m1).single()
+  expectEqual('공개로: 고르지 않은 m1은 그대로 private', data?.visibility, 'private')
 }
 
 // ── 7. 삭제 ───────────────────────────────────────────────────

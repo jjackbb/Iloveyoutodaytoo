@@ -8,7 +8,7 @@ import { ROOM_NICKNAME_MAX_LENGTH } from '@/lib/limits'
 import { createClient } from '@/lib/supabase/server'
 
 /**
- * 관계방 구성원 — "이 방 나가기"와 "이 방에서 쓸 별명".
+ * 앨범방 구성원 — "이 방 나가기"와 "이 방에서 쓸 별명".
  *
  * 가장 중요한 규칙: **한 줄도 지우지 않는다.**
  * room_members.status를 'left'로 바꾸고 left_at에 지금 시각을 적는 게 전부다.
@@ -221,7 +221,7 @@ export async function leaveRoom(
     return { error: '나가지 못했어요. 잠시 후 다시 눌러주세요.' }
   }
 
-  // 홈의 관계방 목록에서 이 방이 바로 빠지도록 캐시를 비운다.
+  // 홈의 앨범방 목록에서 이 방이 바로 빠지도록 캐시를 비운다.
   revalidatePath('/', 'layout')
 
   redirect('/')

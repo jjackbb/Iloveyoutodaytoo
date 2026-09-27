@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 /**
- * 관계방 화면들의 "뒤로".
+ * 앨범방 화면들의 "뒤로".
  *
  * 왜 클라이언트 컴포넌트인가:
  * 목적지가 지금 보고 있는 화면에 따라 달라진다. 방 안쪽 화면(마음 쓰기, 초대하기)에서

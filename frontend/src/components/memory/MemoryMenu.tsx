@@ -16,17 +16,16 @@ import { Button } from '@/components/ui/Button'
 import {
   deleteMemory,
   hideMemory,
+  publishMemories,
   setMemoryPin,
   toggleMemorySave,
-  updateMemoryCaption,
   type MemoryActionResult,
 } from '@/lib/actions/memories'
-import { CAPTION_MAX_LENGTH } from '@/lib/limits'
 
 /**
  * 게시물 오른쪽 위 ⋯ 메뉴 (캡처 22·23).
  *
- * 항목: 고정 / 수정 / 숨기기 / 저장 / 삭제.
+ * 항목: 고정 / (나만 보기면) 모두에게 공개 / 수정 / 숨기기 / 저장 / 삭제.
  * **수정·삭제는 내가 남긴 글에만 보인다.** 남의 글에서는 아예 그리지 않는다 —
  * 회색으로 눌리지 않게 두면 "왜 안 되지" 하고 계속 누르게 된다.
  * 고정·숨기기·저장은 모두에게 보인다(각각 공용 큐레이션·개인 표시라서).
@@ -43,26 +42,26 @@ export function MemoryMenu({
   roomId,
   memoryId,
   authorName,
-  caption,
   isMine,
   isPinned,
   isSaved,
+  isPrivate = false,
 }: {
   /** 고치기 화면 주소를 만들려고 받는다. */
   roomId: string
   memoryId: string
   /** 낭독기에서 어느 게시물의 메뉴인지 알리기 위해. 피드에 ⋯가 여럿이다. */
   authorName: string
-  /** 수정 창의 첫 값. 서버가 준 지금 문구다. */
-  caption: string | null
   /** 내가 남긴 글인가 (author_id === 지금 로그인한 사람). */
   isMine: boolean
   isPinned: boolean
   isSaved: boolean
+  /** 작성자만 보는 추억인가. 내 글이면 '모두에게 공개'가 나온다(2026-09-28). */
+  isPrivate?: boolean
 }) {
   const [open, setOpen] = useState(false)
   /** 지금 떠 있는 창. 메뉴에서 고른 뒤에만 바뀐다. */
-  const [dialog, setDialog] = useState<'none' | 'edit' | 'delete'>('none')
+  const [dialog, setDialog] = useState<'none' | 'delete' | 'publish'>('none')
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
 
@@ -189,29 +188,29 @@ export function MemoryMenu({
             {isPinned ? '고정 해제' : '고정'}
           </MenuItem>
 
-          {isMine ? (
+          {/*
+            나만 보기 → 모두에게 공개 (2026-09-28 사용자 결정). 되돌릴 수 없어 확인 창을 거친다.
+            반대 방향(공개 → 나만 보기)은 없다.
+          */}
+          {isMine && isPrivate ? (
             <MenuItem
               disabled={pending}
               onClick={() => {
-                // 창을 띄우면서 목록은 접는다. 창 뒤에 목록이 남아 있을 이유가 없다.
                 setError(null)
                 setOpen(false)
-                setDialog('edit')
+                setDialog('publish')
               }}
             >
-              문구 고치기
+              모두에게 공개
             </MenuItem>
           ) : null}
 
           {/*
-            사진·목소리까지 고치기 (노션 IA 3.8) — 작성 화면을 그대로 다시 연다.
-            문구만 고치는 길을 남겨둔 이유: 오탈자 하나 고치자고 화면을 옮겨 갔다
-            돌아오게 하면 그게 더 번거롭다. 짧은 일은 그 자리에서 끝내야 한다.
+            수정 (2026-09-28 사용자 결정): 예전의 '문구 고치기'(그 자리 창)와 '사진·영상·목소리 고치기'(작성 화면)를
+            하나로 합쳤다. 작성 화면에 문구 칸도 있으므로 한 곳에서 모두 고친다.
           */}
           {isMine ? (
-            <MenuLink href={`/rooms/${roomId}/memories/${memoryId}/edit`}>
-              사진·영상·목소리 고치기
-            </MenuLink>
+            <MenuLink href={`/rooms/${roomId}/memories/${memoryId}/edit`}>수정</MenuLink>
           ) : null}
 
           <MenuItem disabled={pending} onClick={() => run(() => hideMemory(memoryId))}>
@@ -248,13 +247,13 @@ export function MemoryMenu({
         </div>
       ) : null}
 
-      {dialog === 'edit' ? (
-        <EditCaptionDialog
-          initialCaption={caption ?? ''}
+      {dialog === 'publish' ? (
+        <ConfirmPublishDialog
+          count={1}
           pending={pending}
           error={error}
           onCancel={closeAll}
-          onSubmit={(next) => run(() => updateMemoryCaption(memoryId, next))}
+          onConfirm={() => run(() => publishMemories(roomId, [memoryId]))}
         />
       ) : null}
 
@@ -315,81 +314,6 @@ function MenuItem({
 }
 
 /**
- * 문구 고치기 창.
- *
- * **문구만** 고친다. 사진·음성은 여기서 손대지 않는다 — 그건 "고치기"가 아니라
- * 처음부터 다시 담는 일이라 작성 화면의 몫이다.
- */
-function EditCaptionDialog({
-  initialCaption,
-  pending,
-  error,
-  onCancel,
-  onSubmit,
-}: {
-  initialCaption: string
-  pending: boolean
-  error: string | null
-  onCancel: () => void
-  onSubmit: (caption: string) => void
-}) {
-  const [value, setValue] = useState(initialCaption)
-  const labelId = useId()
-
-  return (
-    <Dialog labelledBy={labelId} onCancel={onCancel}>
-      <h2 id={labelId} className="text-lg font-bold text-ink">
-        문구 고치기
-      </h2>
-
-      <label htmlFor={`${labelId}-input`} className="sr-only">
-        추억에 남길 문구
-      </label>
-      <textarea
-        id={`${labelId}-input`}
-        value={value}
-        maxLength={CAPTION_MAX_LENGTH}
-        rows={4}
-        autoFocus
-        onChange={(event) => setValue(event.target.value)}
-        className="mt-3 w-full resize-none rounded-inner border border-hairline-strong bg-card px-3.5 py-3 text-base leading-relaxed text-ink placeholder:text-muted"
-        placeholder="이 순간에 남기고 싶은 말"
-      />
-      <p className="mt-1.5 text-right text-sm tabular-nums text-muted">
-        {value.length}/{CAPTION_MAX_LENGTH}
-      </p>
-
-      {error ? (
-        <p role="alert" className="mt-2 text-sm leading-relaxed text-primary">
-          {error}
-        </p>
-      ) : null}
-
-      <div className="mt-4 flex gap-2">
-        <Button
-          type="button"
-          variant="secondary"
-          fullWidth
-          disabled={pending}
-          onClick={onCancel}
-        >
-          그만두기
-        </Button>
-        <Button
-          type="button"
-          fullWidth
-          pending={pending}
-          pendingText="저장하는 중…"
-          onClick={() => onSubmit(value)}
-        >
-          저장하기
-        </Button>
-      </div>
-    </Dialog>
-  )
-}
-
-/**
  * 삭제 확인 창.
  *
  * 2026-09-26부터 **완전 삭제**다. 추억과 연결 파일(사진·영상·목소리·손글씨)·댓글이 모두 지워지고
@@ -444,6 +368,97 @@ function ConfirmDeleteDialog({
           pendingText="삭제하는 중…"
           onClick={onConfirm}
         >
+          삭제하기
+        </Button>
+      </div>
+    </Dialog>
+  )
+}
+
+/**
+ * 공개로 바꾸기 확인 창 (2026-09-28). 앨범방 편집에서 여러 장을 바꿀 때도 같은 창을 쓴다.
+ * 되돌릴 수 없다는 것을 먼저 말한다 — 누르고 나서 알면 늦다.
+ */
+export function ConfirmPublishDialog({
+  count,
+  pending,
+  error,
+  onCancel,
+  onConfirm,
+}: {
+  count: number
+  pending: boolean
+  error: string | null
+  onCancel: () => void
+  onConfirm: () => void
+}) {
+  const labelId = useId()
+
+  return (
+    <Dialog labelledBy={labelId} onCancel={onCancel}>
+      <h2 id={labelId} className="text-lg font-bold text-ink">
+        {count > 1 ? `추억 ${count}개를 공개할까요?` : '이 추억을 공개할까요?'}
+      </h2>
+      <p className="mt-2 text-base leading-relaxed break-keep text-muted">
+        앨범방의 모든 사람이 볼 수 있게 돼요. 공개한 뒤에는 다시 나만 보기로 되돌릴 수 없어요.
+      </p>
+
+      {error ? (
+        <p role="alert" className="mt-2 text-sm leading-relaxed text-primary">
+          {error}
+        </p>
+      ) : null}
+
+      <div className="mt-4 flex gap-2">
+        <Button type="button" variant="secondary" fullWidth disabled={pending} onClick={onCancel}>
+          그만두기
+        </Button>
+        <Button type="button" fullWidth pending={pending} pendingText="공개하는 중…" onClick={onConfirm}>
+          공개하기
+        </Button>
+      </div>
+    </Dialog>
+  )
+}
+
+/**
+ * 여러 장 삭제 확인 창 (2026-09-28 앨범방 편집). 한 장 삭제 창과 같은 말을 쓴다.
+ */
+export function ConfirmDeleteManyDialog({
+  count,
+  pending,
+  error,
+  onCancel,
+  onConfirm,
+}: {
+  count: number
+  pending: boolean
+  error: string | null
+  onCancel: () => void
+  onConfirm: () => void
+}) {
+  const labelId = useId()
+
+  return (
+    <Dialog labelledBy={labelId} onCancel={onCancel}>
+      <h2 id={labelId} className="text-lg font-bold text-ink">
+        추억 {count}개를 삭제할까요?
+      </h2>
+      <p className="mt-2 text-base leading-relaxed break-keep text-muted">
+        고른 추억의 사진·영상·목소리·문구와 댓글이 모두 지워져요. 되돌릴 수 없어요.
+      </p>
+
+      {error ? (
+        <p role="alert" className="mt-2 text-sm leading-relaxed text-primary">
+          {error}
+        </p>
+      ) : null}
+
+      <div className="mt-4 flex gap-2">
+        <Button type="button" variant="secondary" fullWidth disabled={pending} onClick={onCancel}>
+          그만두기
+        </Button>
+        <Button type="button" fullWidth pending={pending} pendingText="삭제하는 중…" onClick={onConfirm}>
           삭제하기
         </Button>
       </div>
