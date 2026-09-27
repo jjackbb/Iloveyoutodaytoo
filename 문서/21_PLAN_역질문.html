@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘도 사랑해 — PLAN 남은 선택 6개</title>
+  <style>
+    :root { color-scheme: light; font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f8f5f0; color: #302c2a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.55; }
+    main { max-width: 860px; margin: auto; padding: 32px 18px 80px; }
+    h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.3; margin: 0 0 12px; }
+    h2 { font-size: 1.18rem; margin: 0 0 6px; }
+    p { margin: 0 0 12px; }
+    .lead, .context { color: #615b57; }
+    .notice { padding: 16px 18px; background: #fff; border: 1px solid #e8dfd8; border-radius: 14px; margin: 22px 0; }
+    .question { background: #fff; border: 1px solid #e8dfd8; border-radius: 18px; margin: 18px 0; padding: 22px; }
+    .options { display: grid; gap: 9px; margin-top: 16px; }
+    label.option { display: block; padding: 11px 13px; border: 1px solid #d9d0ca; border-radius: 10px; cursor: pointer; }
+    label.option:has(input:checked) { border-color: #b94116; background: #fff7f2; }
+    input[type=radio] { accent-color: #b94116; margin-right: 8px; }
+    .badge { display: inline-block; font-size: .75rem; font-weight: 700; color: #9d3210; background: #ffe9dd; padding: 2px 7px; border-radius: 999px; }
+    .why { display: block; margin: 4px 0 0 24px; color: #625d59; font-size: .92rem; }
+    textarea { width: 100%; min-height: 72px; margin-top: 9px; padding: 10px; border: 1px solid #bfb6b0; border-radius: 8px; font: inherit; resize: vertical; }
+    textarea:focus, button:focus-visible, a:focus-visible { outline: 3px solid #c65b29; outline-offset: 2px; }
+    button { padding: 12px 18px; border: 0; border-radius: 10px; background: #b94116; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    button:hover { background: #913210; }
+    #result { white-space: pre-wrap; margin-top: 16px; padding: 16px; border: 1px solid #e8dfd8; border-radius: 10px; background: white; }
+    a { color: #9d3210; }
+    @media (max-width: 580px) { main { padding-top: 22px; } .question { padding: 17px; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>PLAN 남은 선택 6개</h1>
+  <p class="lead">확정된 결정을 다시 묻지 않았습니다. 아래는 실제 조사와 테스트를 진행하기 전에 남은 선택입니다. 추천안은 제안이며, 기타에 직접 작성할 수 있습니다.</p>
+  <div class="notice">
+    <p>현재 화면: <a href="인수인계/증거_2026-09-28_E6_홈과앨범방_정리/01_홈.png" target="_blank" rel="noopener">홈 캡처</a> · <a href="인수인계/증거_2026-09-28_E6_홈과앨범방_정리/02_앨범방.png" target="_blank" rel="noopener">앨범방 캡처</a> · <a href="https://oneuldo-demo.vercel.app/demo" target="_blank" rel="noopener">공개 데모</a></p>
+    <p>성인 3명의 문제 확인 설문과 어머니 인터뷰는 사용자 진행 단계입니다. 실제 응답이나 기록이 있으면 답변과 함께 알려주세요. 없는 동안 문제 가설의 참·거짓이나 기능 효과를 확정하지 않습니다.</p>
+  </div>
+  <form id="questions">
+    <section class="question" data-title="1. E6 최신 화면 검토">
+      <h2>1. 최신 홈·앨범방 화면을 테스트에 쓸까요?</h2>
+      <p class="context">대표 시안 A는 선택됐지만, 이후 E5·E6의 배치와 카드 변경은 별도 확인이 남았습니다.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="q1" value="현재 화면으로 기술·사용성 테스트를 진행한다"><span>현재 화면으로 테스트</span> <span class="badge">추천</span><span class="why">실제 막힘을 먼저 확인하고 수정 여부를 판단합니다.</span></label>
+        <label class="option"><input type="radio" name="q1" value="화면 수정 의견을 먼저 반영한다"><span>수정 후 테스트</span><span class="why">구체적인 수정 의견을 받은 뒤 그 버전으로 테스트합니다.</span></label>
+        <label class="option"><input type="radio" name="q1" value="기타"><span>기타 — 직접 작성</span></label>
+        <textarea name="q1_other" aria-label="1번 기타 의견" placeholder="화면에서 바꾸고 싶은 부분을 적어 주세요."></textarea>
+      </div>
+    </section>
+    <section class="question" data-title="2. 새 앨범방 아이콘">
+      <h2>2. 홈의 ‘새 앨범방’ 아이콘은 어떻게 둘까요?</h2>
+      <p class="context">데모는 현재 앨범방 한 개만 지원해 아이콘을 누르면 안내창이 뜹니다. 눌러서 새 방을 만들 수 있을 것처럼 보일 수 있습니다.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="q2" value="현재 아이콘과 안내창을 유지한다"><span>현재 안내 유지</span> <span class="badge">추천</span><span class="why">이미 요청한 아이콘을 보존하고, 테스트에서 기대와 충돌하는지 관찰합니다.</span></label>
+        <label class="option"><input type="radio" name="q2" value="새 방 만들기를 데모에 구현한다"><span>새 방 만들기 구현</span><span class="why">실제 동작과 일치하지만 데모 범위·저장 구조가 커집니다.</span></label>
+        <label class="option"><input type="radio" name="q2" value="아이콘을 일단 숨긴다"><span>아이콘 숨김</span><span class="why">한 방 테스트에 집중하지만 요청한 화면 요소를 바꿉니다.</span></label>
+        <label class="option"><input type="radio" name="q2" value="기타"><span>기타 — 직접 작성</span></label>
+        <textarea name="q2_other" aria-label="2번 기타 의견" placeholder="원하는 동작이나 문구를 적어 주세요."></textarea>
+      </div>
+    </section>
+    <section class="question" data-title="3. 실제 화면 사용 확인">
+      <h2>3. 5명의 화면 사용을 어떤 방식으로 확인할까요?</h2>
+      <p class="context">구글 설문 답만으로는 과업을 실제로 끝냈는지, 도움을 받았는지 관찰할 수 없습니다.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="q3" value="대면 또는 원격 화면 공유로 한 명씩 관찰한다"><span>대면·화면 공유 관찰</span> <span class="badge">추천</span><span class="why">과업 행동과 설문 자기 보고를 분리해 기록할 수 있습니다.</span></label>
+        <label class="option"><input type="radio" name="q3" value="설문만 받고 행동 확인은 미확인으로 표시한다"><span>설문만 진행</span><span class="why">진행은 쉽지만 무도움 완료율이나 막힌 행동은 주장할 수 없습니다.</span></label>
+        <label class="option"><input type="radio" name="q3" value="기타"><span>기타 — 직접 작성</span></label>
+        <textarea name="q3_other" aria-label="3번 기타 의견" placeholder="참여자별 다른 방식도 적을 수 있습니다."></textarea>
+      </div>
+    </section>
+    <section class="question" data-title="4. 사용성 설문 시점·문항">
+      <h2>4. 사용성 설문은 언제, 어떤 문항으로 받을까요?</h2>
+      <p class="context"><a href="20_사용성테스트_설문_초안.md" target="_blank" rel="noopener">별도 초안</a>은 과업·막힘·평소 방법과의 차이를 묻습니다. 1단계 문제 확인 설문과는 다른 설문입니다.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="q4" value="세 과업이 끝난 뒤 초안 7문항을 검토해 한 번 받는다"><span>과업 뒤 한 번</span> <span class="badge">추천</span><span class="why">과업 중 질문으로 행동을 방해하지 않고, 관찰 후 자기 보고를 받습니다.</span></label>
+        <label class="option"><input type="radio" name="q4" value="과업마다 짧게 묻고 마지막에 비교 질문을 받는다"><span>과업마다 짧게</span><span class="why">기억은 선명하지만 과업 흐름을 끊을 수 있습니다.</span></label>
+        <label class="option"><input type="radio" name="q4" value="기타"><span>기타 — 직접 작성</span></label>
+        <textarea name="q4_other" aria-label="4번 기타 의견" placeholder="빼거나 추가할 문항과 시점을 적어 주세요."></textarea>
+      </div>
+    </section>
+    <section class="question" data-title="5. 참여자 겹침">
+      <h2>5. 1단계 설문 참여자와 6단계 테스트 참여자가 겹쳐도 될까요?</h2>
+      <p class="context">5명 참여 가능하다는 계획은 있지만, 성인 설문 후보 3명과 얼마나 겹치는지는 확인되지 않았습니다.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="q5" value="겹침을 허용하고 기존 데모 노출·학습 효과를 기록한다"><span>겹침 허용·기록</span> <span class="badge">추천</span><span class="why">현재 모집 가능 인원을 활용하되 첫 사용과 재사용 결과를 구분합니다.</span></label>
+        <label class="option"><input type="radio" name="q5" value="테스트는 새 참여자를 우선 찾는다"><span>새 참여자 우선</span><span class="why">첫 사용 관찰에 유리하지만 모집 시간이 더 필요합니다.</span></label>
+        <label class="option"><input type="radio" name="q5" value="기타"><span>기타 — 직접 작성</span></label>
+        <textarea name="q5_other" aria-label="5번 기타 의견" placeholder="이미 정해진 참여자 구성도 적어 주세요."></textarea>
+      </div>
+    </section>
+    <section class="question" data-title="6. 포트폴리오 역할 근거">
+      <h2>6. 팀원별 역할을 포트폴리오에 어느 수준까지 적을까요?</h2>
+      <p class="context">아이디어·기획 의도가 사용자에게서 출발했고 팀과 논의했다는 진술은 기록돼 있습니다. 팀원별 세부 역할은 현재 자료만으로 확정할 수 없습니다.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="q6" value="확인된 본인·팀·AI 역할만 적고 세부 역할은 미확인으로 둔다"><span>확인된 역할만</span> <span class="badge">추천</span><span class="why">출처 없는 개인별 기여를 만들지 않고 지금 편집을 진행합니다.</span></label>
+        <label class="option"><input type="radio" name="q6" value="팀 역할 자료를 제공한 뒤 상세 기여표를 작성한다"><span>자료 제공 후 상세화</span><span class="why">역할표를 더 완성할 수 있지만 확인 자료가 필요합니다.</span></label>
+        <label class="option"><input type="radio" name="q6" value="기타"><span>기타 — 직접 작성</span></label>
+        <textarea name="q6_other" aria-label="6번 기타 의견" placeholder="팀원별 역할이나 확인 자료 위치를 적어 주세요."></textarea>
+      </div>
+    </section>
+    <button type="button" id="copy">선택한 답변 복사</button>
+    <p id="message" role="status" aria-live="polite"></p>
+    <div id="result" hidden></div>
+  </form>
+</main>
+<script>
+  const form = document.getElementById('questions')
+  document.getElementById('copy').addEventListener('click', async () => {
+    const lines = ['오늘도 사랑해 PLAN 남은 선택 답변']
+    for (const section of form.querySelectorAll('.question')) {
+      const name = section.querySelector('input[type=radio]').name
+      const selected = section.querySelector('input[type=radio]:checked')
+      const other = section.querySelector('textarea').value.trim()
+      lines.push(`${section.dataset.title}: ${selected ? selected.value === '기타' ? `기타 — ${other || '(내용 미입력)'}` : selected.value : '(미선택)'}`)
+    }
+    const response = lines.join('\n')
+    const result = document.getElementById('result')
+    result.hidden = false
+    result.textContent = response
+    try { await navigator.clipboard.writeText(response); document.getElementById('message').textContent = '복사했습니다. 채팅에 붙여넣어 주세요.' }
+    catch { document.getElementById('message').textContent = '아래 답변을 선택해 복사한 뒤 채팅에 붙여넣어 주세요.' }
+  })
+</script>
+</body>
+</html>
