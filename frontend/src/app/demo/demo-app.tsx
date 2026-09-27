@@ -368,8 +368,11 @@ export function DemoApp() {
             <button className="demo-reset" type="button" disabled={busy || writing} onClick={() => void startOver()} aria-label="데모 초기화"><Icon name="reset" /><span>초기화</span></button>
           </div>
         </div>
-        {/* 체험 안내는 앱 화면 밖(체험 도구 줄)에 둔다(2026-09-28 사용자 요청). */}
-        <p className="demo-toolbar-note">가상의 앨범방이에요. 내용은 이 브라우저에만 남아요. · 실제 전송 없이 체험하는 화면 · <Link href="/welcome">서비스 소개</Link></p>
+        {/* 체험 안내와 후기 설문 입구는 앱 화면 밖에 둔다. */}
+        <div className="demo-toolbar-bottom">
+          <p className="demo-toolbar-note">가상의 앨범방이에요. 내용은 이 브라우저에만 남아요. · 실제 전송 없이 체험하는 화면 · <Link href="/welcome">서비스 소개</Link></p>
+          <Link className="demo-feedback-entry" href="/demo/feedback" onClick={leaveWhileRecording('/demo/feedback')}>데모 후기 설문 제출하기</Link>
+        </div>
       </div>
 
       {/* 홈·작성은 아래 행동 버튼을 고정하고 내용만 스크롤한다(2026-09-28 대표 시안 A). */}

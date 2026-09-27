@@ -18,8 +18,40 @@
 .demo-root p { word-break: keep-all; overflow-wrap: anywhere; }
 .demo-root [hidden] { display: none !important; }
 .demo-toolbar { flex-shrink: 0; border-bottom: 1px solid var(--color-hairline); background: #fff; }
-.demo-toolbar-note { max-width: 900px; margin: 0 auto; padding: 0 24px 8px; font-size: 12px; line-height: 1.5; color: var(--color-muted); word-break: keep-all; }
+.demo-toolbar-bottom { max-width: 900px; margin: 0 auto; padding: 0 24px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
+.demo-toolbar-note { font-size: 12px; line-height: 1.5; color: var(--color-muted); word-break: keep-all; }
 .demo-toolbar-note a { color: inherit; text-underline-offset: 3px; }
+.demo-feedback-entry { min-height: 44px; padding: 8px 12px; border: 1px solid var(--color-hairline-strong); border-radius: 10px; color: var(--color-primary); background: var(--color-primary-soft); font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; }
+.demo-feedback-entry:hover { background: var(--color-surface-soft); }
+.demo-feedback-page { min-height: 100dvh; padding: 24px 20px 64px; color: var(--color-ink); background: var(--color-canvas); }
+.demo-feedback-page * { box-sizing: border-box; }
+.demo-feedback-container { max-width: 680px; margin: 0 auto; }
+.demo-feedback-back { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 12px; color: var(--color-primary); font-size: 14px; font-weight: 600; text-decoration: none; }
+.demo-feedback-header { padding: 24px; background: white; border: 1px solid var(--color-hairline); border-radius: 18px; }
+.demo-feedback-eyebrow { color: var(--color-primary); font-size: 12px; font-weight: 700; }
+.demo-feedback-header h1 { margin: 8px 0 16px; font-size: 28px; letter-spacing: -.04em; }
+.demo-feedback-header p:not(.demo-feedback-eyebrow) { margin: 10px 0 0; font-size: 15px; line-height: 1.6; }
+.demo-feedback-form { display: grid; gap: 16px; margin-top: 16px; }
+.demo-feedback-privacy { padding: 16px 20px; border-radius: 14px; background: var(--color-primary-soft); font-size: 14px; line-height: 1.6; }
+.demo-feedback-fieldset, .demo-feedback-question { min-width: 0; margin: 0; padding: 20px 24px; border: 1px solid var(--color-hairline); border-radius: 16px; background: white; }
+.demo-feedback-fieldset legend { float: left; width: 100%; margin-bottom: 14px; padding: 0; font-size: 16px; font-weight: 700; line-height: 1.5; }
+.demo-feedback-options { clear: both; display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-feedback-options label, .demo-feedback-consent-group label, .demo-feedback-portfolio { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--color-hairline-strong); border-radius: 10px; font-size: 14px; line-height: 1.45; }
+.demo-feedback-page input[type="checkbox"], .demo-feedback-page input[type="radio"] { width: 18px; height: 18px; accent-color: var(--color-primary); flex-shrink: 0; }
+.demo-feedback-detail { clear: both; display: block; margin-top: 14px; font-size: 13px; color: var(--color-muted); }
+.demo-feedback-detail input, .demo-feedback-question textarea, .demo-feedback-result textarea { display: block; width: 100%; min-height: 44px; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--color-hairline-strong); border-radius: 10px; color: var(--color-ink); background: white; font: inherit; font-size: 16px; }
+.demo-feedback-question { display: block; }
+.demo-feedback-question > span { display: block; font-size: 16px; font-weight: 700; line-height: 1.5; }
+.demo-feedback-question small, .demo-feedback-hint { display: block; margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--color-muted); }
+.demo-feedback-question textarea { min-height: 96px; resize: vertical; }
+.demo-feedback-consent-group { clear: both; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.demo-feedback-consent-group strong { width: 100%; font-size: 14px; }
+.demo-feedback-portfolio { margin-top: 12px; }
+.demo-feedback-copy { min-height: 52px; border: 0; border-radius: 14px; background: var(--color-primary); color: white; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.demo-feedback-copy:hover { background: var(--color-primary-active); }
+.demo-feedback-result { padding: 16px 20px; border-radius: 14px; background: #fff; border: 1px solid var(--color-hairline-strong); font-size: 14px; line-height: 1.6; }
+.demo-feedback-result textarea { min-height: 150px; resize: vertical; }
+.demo-feedback-page :is(a, button, input, textarea):focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 /* 스크롤 칸이 있는 화면은 앱처럼 한 화면 높이에 맞춘다. */
 .demo-root:has(.demo-phone--compose) { height: 100dvh; }
 .demo-toolbar-inner { max-width: 900px; margin: auto; min-height: 64px; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -165,7 +197,11 @@
   .demo-compose { padding: 0; }
   .demo-compose-fields { padding: 24px 20px; }
   .demo-compose-action { padding-right: 20px; padding-left: 20px; }
-  .demo-toolbar-note { padding: 0 16px 6px; font-size: 11px; }
+  .demo-toolbar-bottom { padding: 0 16px 8px; }
+  .demo-toolbar-note { font-size: 11px; }
+  .demo-feedback-page { padding: 12px 12px 40px; }
+  .demo-feedback-header, .demo-feedback-fieldset, .demo-feedback-question { padding: 18px; }
+  .demo-feedback-header h1 { font-size: 24px; }
   .demo-appbar { padding-right: 16px; padding-left: 16px; }
 }
 /* 카드·상세의 좋아요·댓글(2026-09-28, 인스타그램처럼) */
