@@ -4,5 +4,6 @@ export function isDemoPath(pathname: string): boolean {
 }
 
 export function isDemoPresentationPath(pathname: string): boolean {
-  return isDemoPath(pathname) || pathname === '/welcome'
+  // 포트폴리오 가입 시안은 데모 저장소·인증 없이 별도 경로로 공개한다.
+  return isDemoPath(pathname) || pathname === '/welcome' || pathname === '/portfolio/signup-preview'
 }
