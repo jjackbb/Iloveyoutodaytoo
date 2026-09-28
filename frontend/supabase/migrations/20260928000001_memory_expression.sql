@@ -18,7 +18,7 @@ alter table public.memories
           and video_trim_end_ms - video_trim_start_ms >= 1000
           and video_trim_end_ms <= video_duration_ms))
       and (video_poster_ms is null or (video_poster_ms >= coalesce(video_trim_start_ms, 0)
-        and video_poster_ms <= coalesce(video_trim_end_ms, video_duration_ms)))))
+        and video_poster_ms <= coalesce(video_trim_end_ms, video_duration_ms))))
   );
 
 create table public.memory_reactions (
