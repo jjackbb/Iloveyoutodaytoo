@@ -547,6 +547,7 @@ export function DemoApp() {
         {/* 체험 안내와 후기 설문 입구는 앱 화면 밖에 둔다. */}
         <div className="demo-toolbar-bottom">
           <p className="demo-toolbar-note">가상의 앨범방이에요. 내용은 이 브라우저에만 남아요. · 실제 전송 없이 체험하는 화면 · <Link href="/welcome">서비스 소개</Link></p>
+          <Link className="demo-feedback-entry" href="/demo/pre-survey" onClick={leaveWhileRecording('/demo/pre-survey')}>첫 설문 작성하기</Link>
           <Link className="demo-feedback-entry" href="/demo/feedback" onClick={leaveWhileRecording('/demo/feedback')}>데모 후기 설문 제출하기</Link>
         </div>
       </div>

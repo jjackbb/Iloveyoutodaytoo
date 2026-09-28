@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { formatPreSurvey, readPreSurvey, type PreSurvey } from '@/lib/demo/pre-survey'
 
 const ACTIONS = ['작성', '예시 열람·재생', '좋아요·댓글', '다시 보기', '아무것도 못 함', '기타'] as const
 const NONE = '아무것도 못 함'
@@ -17,7 +18,7 @@ function answer(form: FormData, name: string): string {
   return String(form.get(name) ?? '').trim() || '응답하지 않음'
 }
 
-function copyText(form: FormData): string {
+function copyText(form: FormData, preSurvey: PreSurvey): string {
   const device = answer(form, 'device')
   const deviceOther = String(form.get('deviceOther') ?? '').trim()
   const actions = form.getAll('actions').map(String)
@@ -27,7 +28,11 @@ function copyText(form: FormData): string {
     : '응답하지 않음'
 
   return [
-    '오늘도 사랑해 데모 후기',
+    '오늘도 사랑해 · 첫 설문 + 데모 후기',
+    '',
+    formatPreSurvey(preSurvey),
+    '',
+    '데모 체험 후 설문',
     '',
     `1. 어떤 기기로 체험하셨나요? ${device === '기타' && deviceOther ? `기타: ${deviceOther}` : device}`,
     `2. 데모에서 직접 해 본 것은 무엇인가요? ${actionText}`,
@@ -39,9 +44,15 @@ function copyText(form: FormData): string {
 }
 
 export function FeedbackForm() {
+  const [preSurvey, setPreSurvey] = useState<PreSurvey | null | undefined>(undefined)
   const [actions, setActions] = useState<string[]>([])
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'manual'>('idle')
   const [manualText, setManualText] = useState('')
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPreSurvey(readPreSurvey()), 0)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   function toggleAction(item: string) {
     setActions((current) => {
@@ -53,7 +64,8 @@ export function FeedbackForm() {
 
   async function handleCopy(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const text = copyText(new FormData(event.currentTarget))
+    if (!preSurvey) return
+    const text = copyText(new FormData(event.currentTarget), preSurvey)
     try {
       if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable')
       await navigator.clipboard.writeText(text)
@@ -69,13 +81,20 @@ export function FeedbackForm() {
     <div className="demo-feedback-container">
       <Link className="demo-feedback-back" href="/demo">← 데모로 돌아가기</Link>
       <header className="demo-feedback-header">
-        <p className="demo-feedback-eyebrow">체험 화면 밖 · 사용 후 설문</p>
+        <p className="demo-feedback-eyebrow">통합 참여 · 마지막 단계</p>
         <h1>데모 후기 설문</h1>
         <p>데모를 둘러본 경험을 알려주세요. 답하기 불편한 질문은 건너뛰셔도 됩니다.</p>
-        <p>답변은 자동으로 전송되지 않아요. 마지막에 복사한 뒤, 데모 링크를 받은 대화방에 붙여넣어 보내주세요.</p>
+        <p>마지막에 첫 설문과 후기 답변을 함께 복사할 수 있어요. 자동으로 전송되지는 않으니 데모 링크를 받은 대화방에 붙여넣어 보내주세요.</p>
       </header>
 
-      <form className="demo-feedback-form" onSubmit={(event) => void handleCopy(event)} onChange={() => { setCopyState('idle'); setManualText('') }}>
+      {preSurvey === undefined ? <p className="demo-feedback-result" role="status">첫 설문 답변을 확인하고 있어요…</p> : null}
+      {preSurvey === null ? <section className="demo-feedback-result demo-feedback-missing" role="alert">
+        <h2>첫 설문 답변을 찾지 못했어요.</h2>
+        <p>같은 탭에서 첫 설문을 마친 뒤 데모와 후기를 이어가면 두 답변을 함께 복사할 수 있어요.</p>
+        <Link className="demo-feedback-copy demo-pre-continue" href="/demo/pre-survey">첫 설문 작성하기</Link>
+      </section> : null}
+
+      {preSurvey ? <form className="demo-feedback-form" onSubmit={(event) => void handleCopy(event)} onChange={() => { setCopyState('idle'); setManualText('') }}>
         <div className="demo-feedback-privacy">
           이름·연락처·소중한 존재의 실명·사적인 글·사진·음성은 적지 말아 주세요. 대화방으로 보내면 그 대화방의 발신자 정보는 수신자에게 보일 수 있습니다.
         </div>
@@ -114,13 +133,13 @@ export function FeedbackForm() {
           <label className="demo-feedback-portfolio"><input type="checkbox" name="portfolioUse" value="yes" />포트폴리오에 직접 인용 없이 비식별 요약으로 쓰는 데 동의합니다. (선택)</label>
         </fieldset>
 
-        <button className="demo-feedback-copy" type="submit">설문 답변 복사하기</button>
+        <button className="demo-feedback-copy" type="submit">첫 설문 + 데모 후기 답변 복사하기</button>
         {copyState === 'copied' ? <div className="demo-feedback-result" role="status">답변을 복사했어요. 아직 전송되지 않았습니다. 데모 링크를 받은 대화방에 붙여넣어 보내주세요.</div> : null}
         {copyState === 'manual' ? <div className="demo-feedback-result" role="alert">
           자동 복사가 안 됐어요. 아래 답변을 선택해 직접 복사한 뒤 대화방에 보내주세요.
           <textarea aria-label="직접 복사할 설문 답변" readOnly rows={8} value={manualText} onFocus={(event) => event.currentTarget.select()} />
         </div> : null}
-      </form>
+      </form> : null}
     </div>
   </main>
 }
