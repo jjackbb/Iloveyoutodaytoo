@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘도 사랑해 · 가입 화면 시안 선택</title>
+  <style>
+    :root { color-scheme: light; font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f8f5f0; color: #302c2a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.55; }
+    main { max-width: 750px; margin: auto; padding: 32px 18px 70px; }
+    h1 { margin: 0 0 12px; font-size: clamp(1.6rem, 4vw, 2.1rem); line-height: 1.3; }
+    h2 { margin: 0 0 8px; font-size: 1.18rem; }
+    p { margin: 0 0 12px; }
+    .muted { color: #615b57; }
+    .note, section { background: #fff; border: 1px solid #e8dfd8; border-radius: 16px; padding: 20px; margin: 18px 0; }
+    label.choice { display: block; border: 1px solid #d9d0ca; border-radius: 10px; margin: 9px 0; padding: 12px; cursor: pointer; }
+    label.choice:has(input:checked) { border-color: #b94116; background: #fff7f2; }
+    input[type="radio"] { accent-color: #b94116; margin-right: 7px; }
+    .badge { display: inline-block; background: #ffe9dd; color: #9d3210; border-radius: 999px; padding: 2px 7px; font-size: .75rem; font-weight: 700; }
+    .why { display: block; margin: 4px 0 0 23px; color: #625d59; font-size: .92rem; }
+    textarea { width: 100%; margin-top: 8px; padding: 10px; border: 1px solid #bfb6b0; border-radius: 8px; font: inherit; resize: vertical; }
+    textarea.other { min-height: 72px; }
+    #result { min-height: 150px; }
+    button { padding: 12px 18px; border: 0; border-radius: 10px; background: #b94116; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid #c65b29; outline-offset: 2px; }
+    #status { min-height: 1.6em; color: #9d3210; font-weight: 700; }
+    a { color: #9d3210; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>가입 화면 시안, 남은 선택 2가지</h1>
+  <p class="muted">카카오·네이버 로그인/회원가입 철회와 14세 미만 허용의 UI 표현은 반영했습니다. 지금은 화면을 놓을 위치와 표현 범위만 정하면 됩니다.</p>
+  <div class="note">
+    <p><strong>운영 상태:</strong> 실제 가입은 닫혀 있습니다. 이 질문은 포트폴리오 화면 시안에만 관한 것입니다.</p>
+    <p>답변을 고른 뒤 복사해 대화창에 붙여 주세요. 서버 전송은 없으며 입력 내용은 이 브라우저에만 임시 저장됩니다.</p>
+  </div>
+  <form id="choices" novalidate>
+    <section>
+      <h2>1. 가입 시안은 어디에 둘까요?</h2>
+      <p class="muted">현재 참가자용 데모는 가입 없이 첫 설문 → 체험 → 후기로 이어집니다.</p>
+      <label class="choice"><input type="radio" name="location" value="참가자 흐름 밖의 별도 포트폴리오 미리보기 화면">참가자 흐름 밖의 별도 포트폴리오 미리보기 화면 <span class="badge">추천</span><span class="why">기존 사용성 테스트 과업을 바꾸지 않고 가입 시안만 볼 수 있습니다.</span></label>
+      <label class="choice"><input type="radio" name="location" value="참가자용 데모 시작 전에 가입 시안 추가">참가자용 데모 시작 전에 가입 시안 추가<span class="why">참가자가 체험 전에 시안을 거치므로 현재 계획과 과업이 달라집니다.</span></label>
+      <label class="choice"><input type="radio" name="location" value="문서나 디자인 캔버스의 정적 시안만 제작">문서나 디자인 캔버스의 정적 시안만 제작<span class="why">앱에서 누를 수 있는 화면은 만들지 않습니다.</span></label>
+      <label class="choice"><input type="radio" name="location" value="기타">기타 — 직접 입력<textarea class="other" name="locationOther" aria-label="1번 기타 답변"></textarea></label>
+    </section>
+    <section>
+      <h2>2. 14세 미만 허용을 화면에서 어디까지 보여줄까요?</h2>
+      <p class="muted">실제 생년월일·보호자 연락처를 수집하거나 Auth 계정을 만들지는 않습니다.</p>
+      <label class="choice"><input type="radio" name="scope" value="샘플 연령 전환과 보호자 동의 안내, 화면상 다음 단계까지">샘플 연령 전환과 보호자 동의 안내, 화면상 다음 단계까지 <span class="badge">추천</span><span class="why">실제 개인정보 입력 없이 흐름을 보여주고 ‘시안·실제 가입 불가’를 표시합니다.</span></label>
+      <label class="choice"><input type="radio" name="scope" value="가상 생년월일·보호자 입력 칸과 모의 완료 화면까지">가상 생년월일·보호자 입력 칸과 모의 완료 화면까지<span class="why">실제 값은 저장·전송하지 않지만 입력 화면은 더 자세해집니다.</span></label>
+      <label class="choice"><input type="radio" name="scope" value="보호자 동의 안내 정적 화면만">보호자 동의 안내 정적 화면만<span class="why">나이 선택이나 화면 전환은 없습니다.</span></label>
+      <label class="choice"><input type="radio" name="scope" value="기타">기타 — 직접 입력<textarea class="other" name="scopeOther" aria-label="2번 기타 답변"></textarea></label>
+    </section>
+    <button type="button" id="copy">답변 복사하기</button>
+    <p id="status" role="status" aria-live="polite"></p>
+    <label for="result"><strong>답변 미리보기</strong> · 자동 복사가 안 되면 여기에서 직접 복사하세요.</label>
+    <textarea id="result" readonly placeholder="선택한 답변이 여기에 표시됩니다."></textarea>
+  </form>
+  <p class="muted" style="margin-top:22px">근거: <a href="2026-09-28_E25_포트폴리오_가입화면범위_재결정.md">E25 인수인계</a></p>
+</main>
+<script>
+  (() => {
+    const form = document.getElementById('choices');
+    const status = document.getElementById('status');
+    const result = document.getElementById('result');
+    const storageKey = 'oneuldo-e25-ui-choices';
+    const names = ['location', 'scope'];
+    function save() {
+      const value = {};
+      for (const name of names) {
+        value[name] = form.querySelector(`input[name="${name}"]:checked`)?.value || '';
+        value[`${name}Other`] = form.elements[`${name}Other`].value;
+      }
+      try { localStorage.setItem(storageKey, JSON.stringify(value)); } catch (_) { /* 로컬 파일 접근 제한 */ }
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      for (const name of names) {
+        const input = [...form.querySelectorAll(`input[name="${name}"]`)].find((item) => item.value === saved[name]);
+        if (input) input.checked = true;
+        form.elements[`${name}Other`].value = saved[`${name}Other`] || '';
+      }
+    } catch (_) { /* 저장값이 없어도 사용 가능 */ }
+    form.addEventListener('change', save);
+    form.addEventListener('input', save);
+    form.querySelectorAll('textarea.other').forEach((field) => field.addEventListener('focus', () => {
+      form.querySelector(`input[name="${field.name.replace('Other', '')}"][value="기타"]`).checked = true;
+      save();
+    }));
+    document.getElementById('copy').addEventListener('click', async () => {
+      const answers = [];
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const input = form.querySelector(`input[name="${name}"]:checked`);
+        if (!input) {
+          status.textContent = `${i + 1}번 질문을 선택해 주세요.`;
+          form.querySelector(`input[name="${name}"]`).focus();
+          return;
+        }
+        const value = input.value === '기타' ? form.elements[`${name}Other`].value.trim() : input.value;
+        if (!value) {
+          status.textContent = `${i + 1}번 기타 답변을 적어 주세요.`;
+          form.elements[`${name}Other`].focus();
+          return;
+        }
+        answers.push(`${i + 1}. ${i === 0 ? '시안 위치' : '14세 미만 화면 범위'}: ${value}`);
+      }
+      result.value = ['오늘도 사랑해 · 가입 화면 시안 선택 답변', ...answers].join('\n');
+      try {
+        await navigator.clipboard.writeText(result.value);
+        status.textContent = '답변을 복사했습니다. 대화창에 붙여 주세요.';
+      } catch (_) {
+        result.focus();
+        result.select();
+        status.textContent = '자동 복사가 막혔습니다. 선택된 답변을 직접 복사해 주세요.';
+      }
+    });
+  })();
+</script>
+</body>
+</html>
