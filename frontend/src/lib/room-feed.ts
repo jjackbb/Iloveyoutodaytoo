@@ -10,6 +10,7 @@
 
 import type { MemoryCardProps, MemoryPhotoView } from '@/components/memory/MemoryCard'
 import { roomMemberName } from '@/lib/member-name'
+import { memoryHandwritingStyle, memoryVideoRange, type MemoryHandwritingStyle, type MemoryReaction, type MemoryVideoRange } from '@/lib/memory-expression'
 import type { createClient } from '@/lib/supabase/server'
 
 type Supabase = Awaited<ReturnType<typeof createClient>>
@@ -27,7 +28,7 @@ export const GRID_SLOTS = 3
  * 결과가 unknown이 된다. `as const`라 리터럴 타입이 그대로 전달된다.
  */
 export const MEMORY_CARD_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, visibility, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, handwriting_pen, handwriting_paper, video_path, video_duration_ms, video_trim_start_ms, video_trim_end_ms, video_poster_ms, author_id, pinned_at, visibility, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 위 select가 돌려주는 한 줄. 조회는 화면마다 다르지만 이 모양은 같다. */
 export type MemoryRow = {
@@ -41,9 +42,14 @@ export type MemoryRow = {
   /** 손글씨 획 좌표 파일(handwriting 버킷). 없으면 null. */
   handwriting_path: string | null
   handwriting_duration_ms: number | null
+  handwriting_pen: string
+  handwriting_paper: string
   /** 추억 영상(video 버킷). 한 추억에 최대 한 개. 없으면 null. */
   video_path: string | null
   video_duration_ms: number | null
+  video_trim_start_ms: number | null
+  video_trim_end_ms: number | null
+  video_poster_ms: number | null
   author_id: string | null
   pinned_at: string | null
   /** private = 작성자만 보는 추억(저장 순간 혼자였다), room = 방의 모두. 2026-09-28부터 작성자가 private → room 으로 열 수 있다. */
@@ -54,6 +60,12 @@ export type MemoryRow = {
 
 /** 카드에 그대로 넘길 수 있는 props. `as`는 부르는 화면이 정한다. */
 export type MemoryCardView = Omit<MemoryCardProps, 'as'>
+
+function storedVideoRange(memory: Pick<MemoryRow, 'video_path' | 'video_duration_ms' | 'video_trim_start_ms' | 'video_trim_end_ms' | 'video_poster_ms'>): MemoryVideoRange | null {
+  if (!memory.video_path || memory.video_duration_ms === null) return null
+  if (memory.video_trim_start_ms === null && memory.video_trim_end_ms === null && memory.video_poster_ms === null) return null
+  return memoryVideoRange(memory.video_duration_ms, memory.video_trim_start_ms, memory.video_trim_end_ms, memory.video_poster_ms)
+}
 
 /**
  * 이 방의 파일 경로가 맞는지.
@@ -332,10 +344,12 @@ export async function buildMemoryCards(options: {
         ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
         : null,
       handwritingDurationMs: memory.handwriting_duration_ms,
+      handwritingStyle: memoryHandwritingStyle(memory.handwriting_pen, memory.handwriting_paper),
       videoUrl: isRoomPath(memory.video_path, roomId)
         ? (videoUrlByPath.get(memory.video_path) ?? null)
         : null,
       hasVideo: memory.video_path !== null,
+      videoRange: storedVideoRange(memory),
       likeCount: likeCountByMemory.get(memory.id) ?? 0,
       likedByMe: likedByMe.has(memory.id),
       commentCount: commentCountByMemory.get(memory.id) ?? 0,
@@ -359,6 +373,7 @@ export async function buildMemoryCards(options: {
 /** 댓글 한 줄. 텍스트이거나 음성이거나, 둘 중 하나만 채워져 있다(DB CHECK). */
 export type MemoryCommentView = {
   commentId: string
+  replyTo: string | null
   /** 방별 별명 우선(roomMemberName). 탈퇴한 자리는 '탈퇴한 사용자'. */
   authorName: string
   /** 내가 남긴 댓글인가. 삭제 메뉴를 보일지 정한다. */
@@ -394,12 +409,15 @@ export type MemoryDetailView = {
   /** 서명된 handwriting 버킷 주소. 못 만들었으면 null. */
   handwritingUrl: string | null
   handwritingDurationMs: number | null
+  handwritingStyle: MemoryHandwritingStyle
   /** 서명된 video 버킷 주소. 못 만들었으면 null. */
   videoUrl: string | null
   /** 영상이 있는지(DB 기준). url 이 없는데 참이면 "불러오지 못했어요"로 흐른다. */
   hasVideo: boolean
+  videoRange: MemoryVideoRange | null
   likeCount: number
   likedByMe: boolean
+  reactions: Record<MemoryReaction, { count: number; selected: boolean }>
   isPinned: boolean
   isSaved: boolean
   /** 작성자만 보는 추억인가. 작성자 본인에게만 이런 글이 보인다. */
@@ -409,11 +427,11 @@ export type MemoryDetailView = {
 
 /** 상세에서 읽는 컬럼들. 카드와 달리 사진 수를 자르지 않는다(한 줄로 둔다 — 타입 추론). */
 const MEMORY_DETAIL_SELECT =
-  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, author_id, pinned_at, visibility, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
+  'id, created_at, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, handwriting_pen, handwriting_paper, video_path, video_duration_ms, video_trim_start_ms, video_trim_end_ms, video_poster_ms, author_id, pinned_at, visibility, author:users!memories_author_id_fkey(id, name), photos:memory_photos(storage_path, sort_order)' as const
 
 /** 댓글 한 줄을 읽을 때 쓰는 컬럼들. */
 const COMMENT_SELECT =
-  'id, created_at, edited_at, body, voice_path, voice_duration_sec, voice_levels, author_id, author:users!memory_comments_author_id_fkey(id, name)' as const
+  'id, reply_to, created_at, edited_at, body, voice_path, voice_duration_sec, voice_levels, author_id, author:users!memory_comments_author_id_fkey(id, name)' as const
 
 /**
  * 게시물 하나와 그 댓글들을 상세 화면 모양으로 읽는다.
@@ -491,6 +509,7 @@ export async function loadMemoryDetail(options: {
     handwritingUrlByPath,
     videoUrlByPath,
     likesResult,
+    reactionsResult,
     saveResult,
     nicknameByUser,
   ] = await Promise.all([
@@ -499,6 +518,7 @@ export async function loadMemoryDetail(options: {
       signPaths(supabase, 'handwriting', handwritingPaths),
       signPaths(supabase, 'video', videoPaths),
       supabase.from('memory_likes').select('user_id').eq('memory_id', memoryId),
+      supabase.from('memory_reactions').select('kind, user_id').eq('memory_id', memoryId),
       supabase
         .from('memory_saves')
         .select('id')
@@ -513,6 +533,16 @@ export async function loadMemoryDetail(options: {
   }
 
   const likes = likesResult.data ?? []
+  if (reactionsResult.error) console.error('[게시물] 마음 표현 조회 실패:', reactionsResult.error.message)
+  const reactions: MemoryDetailView['reactions'] = {
+    thanks: { count: 0, selected: false },
+    cheer: { count: 0, selected: false },
+    miss: { count: 0, selected: false },
+  }
+  for (const row of reactionsResult.data ?? []) {
+    reactions[row.kind].count += 1
+    if (row.user_id === viewerId) reactions[row.kind].selected = true
+  }
 
   const nameOf = (
     userId: string | null,
@@ -545,17 +575,21 @@ export async function loadMemoryDetail(options: {
       ? (handwritingUrlByPath.get(memory.handwriting_path) ?? null)
       : null,
     handwritingDurationMs: memory.handwriting_duration_ms,
+    handwritingStyle: memoryHandwritingStyle(memory.handwriting_pen, memory.handwriting_paper),
     videoUrl: isRoomPath(memory.video_path, roomId)
       ? (videoUrlByPath.get(memory.video_path) ?? null)
       : null,
     hasVideo: memory.video_path !== null,
+    videoRange: storedVideoRange(memory),
     likeCount: likes.length,
     likedByMe: likes.some((like) => like.user_id === viewerId),
+    reactions,
     isPinned: memory.pinned_at !== null,
     isSaved: saveResult.data !== null,
     isPrivate: memory.visibility === 'private',
     comments: comments.map((comment) => ({
       commentId: comment.id,
+      replyTo: comment.reply_to,
       authorName: nameOf(comment.author_id, comment.author),
       /*
         작성자가 탈퇴해 author_id가 null이 된 댓글은 아무의 것도 아니다.

@@ -1,0 +1,9 @@
+.memory-reactions { display: flex; min-width: 0; gap: 8px; align-items: center; }
+.memory-reactions-add { flex: none; position: relative; z-index: 1; }
+.memory-reactions-add button, .memory-reactions-scroll button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #e8e0d7; border-radius: 999px; background: #fff; padding: 0 12px; white-space: nowrap; font-size: 14px; font-weight: 700; }
+.memory-reactions-add button { min-width: 44px; }
+.memory-reactions-scroll { display: flex; min-width: 0; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.memory-reactions-scroll::-webkit-scrollbar { display: none; }
+.memory-reactions-scroll button { flex: none; }
+.memory-reactions-scroll button.selected { background: #fbece6; border-color: #d38e70; color: #954c35; }
+.memory-reactions button:disabled { opacity: .55; }

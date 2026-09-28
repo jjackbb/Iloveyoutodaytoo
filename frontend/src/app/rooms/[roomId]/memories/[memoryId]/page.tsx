@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { CommentBar } from './comment-bar'
 import { CommentList } from './comment-list'
 import { PhotoPager } from './photo-pager'
+import { ReplyProvider } from './reply-context'
 import { VideoPlayer } from '@/components/media/VideoPlayer'
 import { VoicePlayer } from '@/components/media/VoicePlayer'
-import { HandwritingPlayer } from '@/components/handwriting/HandwritingPlayer'
-import { LikeButton } from '@/components/memory/LikeButton'
+import { HandwritingReplay } from '@/components/handwriting/HandwritingReplay'
+import { MemoryReactions } from '@/components/memory/MemoryReactions'
 import { MemoryMenu } from '@/components/memory/MemoryMenu'
 import { PrivateBadge } from '@/components/memory/PrivateBadge'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
@@ -89,6 +90,7 @@ export default async function MemoryDetailPage({
 
   return (
     // 100dvh: 주소창이 접혔다 펴져도 아래 댓글바가 흔들리지 않는다(피드와 같다).
+    <ReplyProvider>
     <div className="flex h-[100dvh] flex-col">
       <RoomAppBar
         backHref={`/rooms/${roomId}`}
@@ -108,7 +110,8 @@ export default async function MemoryDetailPage({
       </RoomAppBar>
 
       <main className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-md px-screen-x pb-6">
+        <div className="mx-auto w-full max-w-md space-y-4 px-screen-x pb-6 pt-3">
+          <article className="rounded-card bg-white p-4 shadow-card">
           {/* 누가 언제 남겼는지 (캡처 24). */}
           <div className="flex items-center gap-3 pt-1 pb-3">
             <span
@@ -145,6 +148,7 @@ export default async function MemoryDetailPage({
               <VideoPlayer
                 src={detail.videoUrl}
                 label={`${detail.authorName}님이 남긴 영상`}
+                range={detail.videoRange}
               />
             </div>
           ) : null}
@@ -158,10 +162,10 @@ export default async function MemoryDetailPage({
           {/* 손글씨 — 열자마자 쓰는 과정이 지나간 뒤 결과가 남는다 (WRITE-02). */}
           {detail.handwritingUrl ? (
             <div className="pt-4">
-              <HandwritingPlayer
+              <HandwritingReplay
                 src={detail.handwritingUrl}
                 label={`${detail.authorName}님의 손글씨`}
-                autoPlay
+                style={detail.handwritingStyle}
               />
             </div>
           ) : detail.handwritingDurationMs !== null ? (
@@ -185,14 +189,9 @@ export default async function MemoryDetailPage({
             </p>
           ) : null}
 
-          {/* ♡ 와 댓글 수 (캡처 24). ♡는 피드와 같은 부품이라 여기서 눌러도 피드에 반영된다. */}
+          {/* 하트는 피드의 좋아요와 같은 DB 값이고, 다른 표현은 종류별로 보존한다. */}
+          <div className="pt-3"><MemoryReactions memoryId={detail.memoryId} authorName={detail.authorName} likeCount={detail.likeCount} liked={detail.likedByMe} reactions={detail.reactions} /></div>
           <div className="flex items-center gap-4 pt-1 text-sm font-medium text-muted">
-            <LikeButton
-              memoryId={detail.memoryId}
-              authorName={detail.authorName}
-              likeCount={detail.likeCount}
-              liked={detail.likedByMe}
-            />
             {/* 이미 댓글 목록이 아래에 펼쳐져 있어 누를 곳이 아니다. 수만 말한다. */}
             <p className="flex items-center gap-1.5">
               <CommentIcon />
@@ -200,12 +199,15 @@ export default async function MemoryDetailPage({
               <span className="sr-only">댓글</span>
             </p>
           </div>
+          </article>
 
-          <h2 className="mt-5 mb-2 text-base font-bold text-ink">
-            댓글 {commentCount}
+          <section className="rounded-card bg-white p-4 shadow-card" aria-label="댓글 목록">
+          <h2 className="mb-2 text-base font-bold text-ink">
+            남겨진 이야기 {commentCount}개
           </h2>
 
           <CommentList comments={detail.comments} />
+          </section>
         </div>
       </main>
 
@@ -214,6 +216,7 @@ export default async function MemoryDetailPage({
       */}
       <CommentBar key={detail.memoryId} roomId={roomId} memoryId={detail.memoryId} />
     </div>
+    </ReplyProvider>
   )
 }
 

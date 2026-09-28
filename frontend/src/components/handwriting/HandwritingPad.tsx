@@ -40,6 +40,7 @@ export function HandwritingPad({
   disabled = false,
   penColor: penColorProp,
   penWidth = HANDWRITING_PEN_WIDTH,
+  paperColor,
 }: {
   value: HandwritingDoc | null
   onChange: (next: HandwritingDoc | null) => void
@@ -48,6 +49,7 @@ export function HandwritingPad({
   penColor?: string
   /** 필기구 굵기(논리 좌표 기준). 없으면 기존 굵기. */
   penWidth?: number
+  paperColor?: string
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
@@ -271,6 +273,7 @@ export function HandwritingPad({
       */}
       <div
         ref={wrapRef}
+        style={paperColor ? { backgroundColor: paperColor } : undefined}
         className={[
           'relative w-full overflow-hidden rounded-inner border border-hairline bg-card',
           disabled ? 'opacity-60' : '',

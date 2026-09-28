@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
 
 import { COMMENT_END_ID } from './comment-anchor'
+import { useReply } from './reply-context'
 import {
   VoiceRecorder,
   type VoiceRecording,
@@ -78,6 +79,7 @@ export function CommentBar({
   const [sheetOpen, setSheetOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
+  const { target, setTarget } = useReply()
 
   const inputRef = useRef<HTMLInputElement>(null)
   const emojiWrapRef = useRef<HTMLDivElement>(null)
@@ -155,13 +157,14 @@ export function CommentBar({
     setError(null)
 
     startTransition(async () => {
-      const result = await createTextComment(memoryId, body)
+      const result = await createTextComment(memoryId, body, target?.parentId)
       if (!result.ok) {
         setError(result.error)
         return
       }
       // 보낸 뒤에만 비운다. 실패했는데 지워버리면 쓴 글을 잃는다.
       setText('')
+      setTarget(null)
       setPickerOpen(false)
       justSentRef.current = true
     })
@@ -195,6 +198,12 @@ export function CommentBar({
 
   return (
     <div className="shrink-0 border-t border-hairline bg-card">
+      {target ? (
+        <div className="mx-auto flex w-full max-w-md items-center justify-between px-4 pt-2 text-sm text-muted" role="status">
+          <span>{target.authorName}님에게 답글 남기는 중</span>
+          <button type="button" className="min-h-11 px-2 text-primary" onClick={() => setTarget(null)} aria-label="답글 그만두기">취소</button>
+        </div>
+      ) : null}
       {error ? (
         <p
           role="alert"
@@ -261,7 +270,7 @@ export function CommentBar({
           value={text}
           maxLength={TEXT_MAX_LENGTH}
           disabled={pending}
-          placeholder="메시지 또는 음성메시지를 남겨보세요"
+          placeholder={target ? `${target.authorName}님에게 답글 달기…` : '메시지 또는 음성메시지를 남겨보세요'}
           onChange={(event) => {
             setText(event.target.value)
             if (error) setError(null)
@@ -281,7 +290,7 @@ export function CommentBar({
         <button
           type="button"
           aria-label="음성 댓글 남기기"
-          disabled={pending}
+          disabled={pending || Boolean(target)}
           onClick={() => {
             setError(null)
             setPickerOpen(false)

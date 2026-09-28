@@ -33,6 +33,7 @@ import {
   VOICE_MIN_SEC,
 } from '@/lib/limits'
 import { HANDWRITING_MAX_DURATION_MS } from '@/lib/handwriting'
+import { MEMORY_PAPERS, MEMORY_PENS, MEMORY_REACTIONS, type MemoryHandwritingStyle, type MemoryReaction, type MemoryVideoRange } from '@/lib/memory-expression'
 import { sendPush } from '@/lib/push'
 import { createClient } from '@/lib/supabase/server'
 import { sanitizeLevels } from '@/lib/waveform'
@@ -56,6 +57,10 @@ export type CreateMemoryInput = {
   videoPath?: string | null
   /** 영상 길이(ms). 브라우저가 실제 파일에서 읽은 값. videoPath 가 없으면 null. */
   videoDurationMs?: number | null
+  /** E16: 한 추억의 손글씨 전체에 적용하는 필기구·편지지. */
+  handwritingStyle?: MemoryHandwritingStyle
+  /** E16: 원본 영상은 그대로 두고 재생 구간·대표 장면만 저장한다. */
+  videoRange?: MemoryVideoRange | null
   /**
    * 녹음하면서 잰 파형 막대 높이(0~1). 없으면 재생바가 재생할 때 파일을 해석한다.
    * 저장해 두면 화면에 뜨자마자 파형을 그릴 수 있어 파일을 미리 받지 않아도 된다.
@@ -77,6 +82,28 @@ export type CreateMemoryResult =
 
 function fail(error: string, retryable = false): CreateMemoryResult {
   return { ok: false, error, retryable }
+}
+
+function validatePresentation(
+  style: MemoryHandwritingStyle | undefined,
+  range: MemoryVideoRange | null | undefined,
+  videoDurationMs: number | null,
+):
+  | { ok: true; pen: string; paper: string; startMs: number | null; endMs: number | null; posterMs: number | null }
+  | { ok: false; error: string } {
+  const pen = style?.pen ?? 'ink'
+  const paper = style?.paper ?? 'hanji'
+  if (!(pen in MEMORY_PENS) || !(paper in MEMORY_PAPERS)) {
+    return { ok: false, error: '필기구나 편지지를 다시 골라주세요.' }
+  }
+  if (!range) return { ok: true, pen, paper, startMs: null, endMs: null, posterMs: null }
+  const { startMs, endMs, posterMs } = range
+  if (videoDurationMs === null || ![startMs, endMs, posterMs].every(Number.isInteger)
+      || startMs < 0 || endMs - startMs < 1000 || endMs > videoDurationMs
+      || posterMs < startMs || posterMs > endMs) {
+    return { ok: false, error: '영상 구간과 대표 장면을 다시 골라주세요.' }
+  }
+  return { ok: true, pen, paper, startMs, endMs, posterMs }
 }
 
 /**
@@ -250,6 +277,8 @@ export async function createMemory(
   // --- 영상 (선택, 최대 1개) ---
   const video = validateVideo(input.videoPath, input.videoDurationMs, roomId)
   if (!video.ok) return fail(video.error)
+  const presentation = validatePresentation(input.handwritingStyle, input.videoRange, video.durationMs)
+  if (!presentation.ok) return fail(presentation.error)
 
   /*
     하나 이상. 문제 정의가 "쑥스러워서 표현을 못 하는 사람"인데 가장 쑥스러운 일
@@ -293,17 +322,22 @@ export async function createMemory(
     그것마저 실패하는 일이 없다. 공개 범위(작성자만 / 방 공유)는 DB 트리거가 저장 순간의
     활성 참여자 수로 정하고, 여기서는 보내지 않는다.
   */
-  const { error: insertError } = await supabase.rpc('create_memory', {
+  const { error: insertError } = await supabase.rpc('create_memory_enhanced', {
     p_room_id: roomId,
     p_caption: caption,
     p_photo_paths: photoPaths,
-    p_voice_path: voice.path ?? undefined,
-    p_voice_duration_sec: voice.durationSec ?? undefined,
-    p_voice_levels: (voice.path ? sanitizeLevels(input.voiceLevels) : null) ?? undefined,
-    p_handwriting_path: handwriting.path ?? undefined,
-    p_handwriting_duration_ms: handwriting.durationMs ?? undefined,
-    p_video_path: video.path ?? undefined,
-    p_video_duration_ms: video.durationMs ?? undefined,
+    p_voice_path: voice.path,
+    p_voice_duration_sec: voice.durationSec,
+    p_voice_levels: voice.path ? sanitizeLevels(input.voiceLevels) : null,
+    p_handwriting_path: handwriting.path,
+    p_handwriting_duration_ms: handwriting.durationMs,
+    p_video_path: video.path,
+    p_video_duration_ms: video.durationMs,
+    p_handwriting_pen: presentation.pen,
+    p_handwriting_paper: presentation.paper,
+    p_video_trim_start_ms: presentation.startMs,
+    p_video_trim_end_ms: presentation.endMs,
+    p_video_poster_ms: presentation.posterMs,
   })
 
   if (insertError) return failFromDb(insertError, '추억 저장')
@@ -445,6 +479,29 @@ export async function toggleMemoryLike(
   return { ok: true }
 }
 
+/** 하트는 기존 memory_likes, 다른 세 표현은 종류별로 한 사람 한 번씩 저장한다. */
+export async function toggleMemoryReaction(memoryId: string, kind: MemoryReaction): Promise<MemoryActionResult> {
+  if (!(kind in MEMORY_REACTIONS)) return { ok: false, error: '마음 표현을 다시 골라주세요.' }
+  const user = await requireUser()
+  const supabase = await createClient()
+  const memory = await loadMemoryForAction(supabase, memoryId)
+  if (!memory) return { ok: false, error: RETRY_MESSAGE }
+
+  const { data: existing, error: readError } = await supabase.from('memory_reactions')
+    .select('id').eq('memory_id', memoryId).eq('user_id', user.id).eq('kind', kind).maybeSingle()
+  if (readError) return { ok: false, error: RETRY_MESSAGE }
+
+  if (existing) {
+    const { error } = await supabase.from('memory_reactions').delete().eq('id', existing.id)
+    if (error) return { ok: false, error: RETRY_MESSAGE }
+  } else {
+    const { error } = await supabase.from('memory_reactions').insert({ memory_id: memoryId, user_id: user.id, kind })
+    if (error && error.code !== '23505') return { ok: false, error: RETRY_MESSAGE }
+  }
+  revalidateRoom(memory.roomId)
+  return { ok: true }
+}
+
 /**
  * 게시물 고정/해제 (⋯ 메뉴의 "고정").
  *
@@ -537,6 +594,8 @@ export type UpdateMemoryInput = {
   handwritingDurationMs?: number | null
   videoPath?: string | null
   videoDurationMs?: number | null
+  handwritingStyle?: MemoryHandwritingStyle
+  videoRange?: MemoryVideoRange | null
   caption?: string | null
 }
 
@@ -597,6 +656,8 @@ export async function updateMemory(
   // --- 영상 (선택, 최대 1개) ---
   const video = validateVideo(input.videoPath, input.videoDurationMs, roomId)
   if (!video.ok) return fail(video.error)
+  const presentation = validatePresentation(input.handwritingStyle, input.videoRange, video.durationMs)
+  if (!presentation.ok) return fail(presentation.error)
 
   if (!voice.path && !handwriting.path && !video.path && photoPaths.length === 0) {
     return fail('목소리 · 손글씨 · 사진 · 영상 중 하나는 담아주세요.')
@@ -613,17 +674,22 @@ export async function updateMemory(
     실패하면 원래 사진이 그대로 남는다. 더 이상 가리키지 않는 옛 파일은 DB가 정리 목록
     (storage_deletion_jobs)에 올리고, 아래 settleStorageDeletions가 실제로 지운다.
   */
-  const { error: updateError } = await supabase.rpc('update_memory', {
+  const { error: updateError } = await supabase.rpc('update_memory_enhanced', {
     p_memory_id: memory.id,
     p_caption: caption,
     p_photo_paths: photoPaths,
-    p_voice_path: voice.path ?? undefined,
-    p_voice_duration_sec: voice.durationSec ?? undefined,
-    p_voice_levels: (voice.path ? sanitizeLevels(input.voiceLevels) : null) ?? undefined,
-    p_handwriting_path: handwriting.path ?? undefined,
-    p_handwriting_duration_ms: handwriting.durationMs ?? undefined,
-    p_video_path: video.path ?? undefined,
-    p_video_duration_ms: video.durationMs ?? undefined,
+    p_voice_path: voice.path,
+    p_voice_duration_sec: voice.durationSec,
+    p_voice_levels: voice.path ? sanitizeLevels(input.voiceLevels) : null,
+    p_handwriting_path: handwriting.path,
+    p_handwriting_duration_ms: handwriting.durationMs,
+    p_video_path: video.path,
+    p_video_duration_ms: video.durationMs,
+    p_handwriting_pen: presentation.pen,
+    p_handwriting_paper: presentation.paper,
+    p_video_trim_start_ms: presentation.startMs,
+    p_video_trim_end_ms: presentation.endMs,
+    p_video_poster_ms: presentation.posterMs,
   })
 
   if (updateError) return failFromDb(updateError, '추억 고치기')

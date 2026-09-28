@@ -8,6 +8,7 @@ import { MemoryMenu } from '@/components/memory/MemoryMenu'
 import { PrivateBadge } from '@/components/memory/PrivateBadge'
 import { formatRelativeTime } from '@/lib/format'
 import { PHOTO_MAX_COUNT } from '@/lib/limits'
+import { MEMORY_PAPERS, MEMORY_PENS, type MemoryHandwritingStyle, type MemoryVideoRange } from '@/lib/memory-expression'
 
 /**
  * 앨범방 피드의 추억 게시물 카드 (캡처 22).
@@ -61,10 +62,12 @@ export interface MemoryCardProps {
   handwritingUrl?: string | null
   /** 손글씨가 있는지(DB 기준). url 이 없는데 이 값이 있으면 "불러오지 못했어요"로 흐른다. */
   handwritingDurationMs?: number | null
+  handwritingStyle?: MemoryHandwritingStyle
   /** 서명된 video 버킷 주소. 못 만들었으면 null. */
   videoUrl?: string | null
   /** 영상이 있는지(DB 기준). url 이 없는데 참이면 "불러오지 못했어요"로 흐른다. */
   hasVideo?: boolean
+  videoRange?: MemoryVideoRange | null
   likeCount: number
   /** 이 화면을 보는 사람이 좋아요를 눌렀는지. 사람마다 다르다. */
   likedByMe: boolean
@@ -94,8 +97,10 @@ export function MemoryCard({
   voiceLevels = null,
   handwritingUrl = null,
   handwritingDurationMs = null,
+  handwritingStyle = { pen: 'ink', paper: 'hanji' },
   videoUrl = null,
   hasVideo = false,
+  videoRange = null,
   likeCount,
   likedByMe,
   commentCount,
@@ -186,7 +191,7 @@ export function MemoryCard({
       */}
       {hasVideo ? (
         <div className="px-4 pt-3.5">
-          <VideoPlayer src={videoUrl} label={`${authorName}님이 남긴 영상`} />
+          <VideoPlayer src={videoUrl} label={`${authorName}님이 남긴 영상`} range={videoRange} />
         </div>
       ) : null}
 
@@ -202,7 +207,7 @@ export function MemoryCard({
       */}
       {handwritingUrl ? (
         <div className="px-4 pt-3.5">
-          <HandwritingPlayer src={handwritingUrl} label={`${authorName}님의 손글씨`} />
+          <HandwritingPlayer src={handwritingUrl} label={`${authorName}님의 손글씨`} penWidth={MEMORY_PENS[handwritingStyle.pen].width} penColor={MEMORY_PENS[handwritingStyle.pen].color} paperColor={MEMORY_PAPERS[handwritingStyle.paper].color} />
         </div>
       ) : handwritingDurationMs !== null ? (
         <p className="px-4 pt-3.5 text-sm text-muted">

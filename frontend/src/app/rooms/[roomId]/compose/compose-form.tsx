@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import {
   VoiceRecorder,
@@ -18,6 +19,7 @@ import { controlClassName } from '@/components/ui/Field'
 import { createMemory, updateMemory } from '@/lib/actions/memories'
 import { HandwritingPad } from '@/components/handwriting/HandwritingPad'
 import { VideoPicker, type PickedVideo } from '@/components/memory/VideoPicker'
+import { VideoRangeEditor } from '@/components/memory/VideoRangeEditor'
 import {
   HANDWRITING_BUCKET,
   isHandwritingDoc,
@@ -27,6 +29,7 @@ import {
 import { track } from '@/lib/analytics'
 import { resizePhoto } from '@/lib/image'
 import { CAPTION_MAX_LENGTH, PHOTO_MAX_COUNT } from '@/lib/limits'
+import { DEFAULT_MEMORY_HANDWRITING_STYLE, MEMORY_PAPERS, MEMORY_PENS, type MemoryHandwritingStyle, type MemoryVideoRange } from '@/lib/memory-expression'
 import { createClient } from '@/lib/supabase/client'
 import { extensionForVideoMime, VIDEO_BUCKET } from '@/lib/video'
 
@@ -480,8 +483,18 @@ export type ComposeInitial = {
   handwriting: { path: string; url: string; durationMs: number } | null
   /** 지금 붙어 있는 영상. 없으면 null. */
   video: { path: string; url: string; durationMs: number } | null
+  handwritingStyle?: MemoryHandwritingStyle
+  videoRange?: MemoryVideoRange | null
   caption: string
 }
+
+type CaptureMethod = 'photo' | 'video' | 'voice' | 'handwriting'
+const CAPTURE_METHODS: { key: CaptureMethod; icon: string; title: string; detail: string }[] = [
+  { key: 'photo', icon: '▧', title: '사진', detail: '오늘의 장면' },
+  { key: 'video', icon: '▶', title: '영상', detail: '움직이는 순간' },
+  { key: 'voice', icon: '◉', title: '목소리', detail: '목소리로 전해요' },
+  { key: 'handwriting', icon: '✎', title: '손글씨', detail: '손으로 적어요' },
+]
 
 export function ComposeForm({
   roomId,
@@ -519,6 +532,11 @@ export function ComposeForm({
       : null,
   )
   const [caption, setCaption] = useState(initial?.caption ?? '')
+  const [handwritingStyle, setHandwritingStyle] = useState<MemoryHandwritingStyle>(initial?.handwritingStyle ?? DEFAULT_MEMORY_HANDWRITING_STYLE)
+  const [videoRange, setVideoRange] = useState<MemoryVideoRange | null>(initial?.videoRange ?? null)
+  const [method, setMethod] = useState<CaptureMethod | null>(() => initial?.photos.length ? 'photo' : initial?.video ? 'video' : initial?.voice ? 'voice' : initial?.handwriting ? 'handwriting' : null)
+  const [recordingActive, setRecordingActive] = useState(false)
+  const [videoActive, setVideoActive] = useState(false)
   const [phase, setPhase] = useState<Phase>('editing')
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -658,6 +676,7 @@ export function ComposeForm({
     uploadedVideoPathRef.current = null
     if (stale) void discardVideo(stale)
     setVideo(next)
+    setVideoRange(null)
     if (next) {
       if (stageRef.current === 'open') stageRef.current = 'capturing'
       track('capture_start', { kind: 'video' })
@@ -921,6 +940,8 @@ export function ComposeForm({
           handwritingDurationMs: handwriting?.durationMs ?? null,
           videoPath,
           videoDurationMs: videoPath ? (video?.durationMs ?? null) : null,
+          handwritingStyle,
+          videoRange: videoPath ? videoRange : null,
           caption: caption.trim() || null,
         }
 
@@ -986,11 +1007,13 @@ export function ComposeForm({
     photos,
     recording,
     handwriting,
+    handwritingStyle,
     handwritingIsOriginal,
     roomId,
     router,
     upload,
     video,
+    videoRange,
     voiceIsOriginal,
   ])
 
@@ -999,12 +1022,27 @@ export function ComposeForm({
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-md flex-col gap-6 px-screen-x pt-2 pb-screen-b">
+          <section aria-label="마음 남길 방법">
+            <h2 className="mb-1 text-lg font-bold text-ink">어떤 마음을 남길까요?</h2>
+            <p className="mb-3 text-sm text-muted">다른 방법도 함께 담을 수 있어요.</p>
+            <div className="grid grid-cols-2 gap-3" role="group" aria-label="마음 남길 방법">
+              {CAPTURE_METHODS.map((item) => {
+                const filled = item.key === 'photo' ? photos.length > 0 : item.key === 'video' ? Boolean(video) : item.key === 'voice' ? Boolean(recording || (voiceIsOriginal && initial?.voice)) : Boolean(handwriting || (handwritingIsOriginal && initial?.handwriting))
+                return <button key={item.key} type="button" disabled={busy || recordingActive || videoActive} aria-pressed={method === item.key} onClick={() => setMethod(item.key)} className={`relative flex min-h-[132px] flex-col items-center justify-center gap-2 rounded-[20px] border bg-white p-3 text-center shadow-sm ${method === item.key ? 'border-primary bg-primary-soft' : 'border-transparent'}`}>
+                  <span aria-hidden className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-2xl text-primary">{item.icon}</span>
+                  <strong className="text-base text-ink">{item.title}</strong>
+                  <span className="text-xs text-muted">{item.detail}</span>
+                  {filled ? <span className="absolute top-2 right-3 text-sm font-bold text-primary" aria-label="담았어요">✓</span> : null}
+                </button>
+              })}
+            </div>
+          </section>
           {/*
             사진 타일 줄 (캡처 12·13).
             가로로 넘치면 옆으로 민다 — 여러 줄로 접으면 카드가 아래로 밀려
             "함께 담을 목소리"가 화면 밖으로 나간다.
           */}
-          <section aria-label="담을 사진" className="-mx-screen-x">
+          <section aria-label="담을 사진" className={`rounded-[20px] bg-white py-4 shadow-sm ${method === 'photo' ? '-mx-screen-x' : 'hidden'}`}>
             {/*
               `overflow-x-auto`는 세로도 함께 잘라낸다(가로만 auto로 둘 수 없다).
               그래서 줄의 위아래 경계에 닿는 테두리·포커스 링·끌기 표시는 깎여 나온다.
@@ -1130,21 +1168,23 @@ export function ComposeForm({
           </section>
 
           {/* 영상 (2026-09-26). 한 개 · 30초 · 50MB. 파일 선택과 바로 찍기 모두. */}
-          <section aria-labelledby="video-label" className="flex flex-col gap-2">
+          <section aria-labelledby="video-label" className={`${method === 'video' ? 'flex' : 'hidden'} flex-col gap-2 rounded-[20px] bg-white p-4 shadow-sm`}>
             <h2 id="video-label" className="text-base font-bold text-ink">
               영상 <span className="font-medium text-muted">(선택)</span>
             </h2>
-            <VideoPicker value={video} onChange={handleVideoChange} disabled={busy} />
+            <VideoPicker value={video} onChange={handleVideoChange} disabled={busy} showLimitNote={false} onActivityChange={setVideoActive} />
+            {video ? <VideoRangeEditor video={video} value={videoRange} onChange={setVideoRange} disabled={busy} /> : null}
           </section>
 
           {/* 함께 담을 목소리 (캡처 12·16·18) */}
-          <section aria-labelledby="voice-label" className="flex flex-col gap-2">
+          <section aria-labelledby="voice-label" className={`${method === 'voice' ? 'flex' : 'hidden'} flex-col gap-2 rounded-[20px] bg-white p-4 shadow-sm`}>
             <h2 id="voice-label" className="text-base font-bold text-ink">
               목소리 <span className="font-medium text-muted">(선택)</span>
             </h2>
             <VoiceRecorder
               value={recording}
               onChange={handleRecordingChange}
+              onActivityChange={setRecordingActive}
               disabled={busy}
             />
           </section>
@@ -1153,7 +1193,7 @@ export function ComposeForm({
             손글씨 (WRITE-01, 2026-09-06 결정). 목소리 녹음이 쑥스러운 사람의 길.
             겉모습은 임시 — 브랜드가 정해지면 디자인 관문을 밟는다.
           */}
-          <section aria-labelledby="handwriting-label" className="flex flex-col gap-2">
+          <section aria-labelledby="handwriting-label" className={`${method === 'handwriting' ? 'flex' : 'hidden'} flex-col gap-2 rounded-[20px] bg-white p-4 shadow-sm`}>
             <h2 id="handwriting-label" className="text-base font-bold text-ink">
               손글씨 <span className="font-medium text-muted">(선택)</span>
             </h2>
@@ -1161,7 +1201,14 @@ export function ComposeForm({
               value={handwriting}
               onChange={handleHandwritingChange}
               disabled={busy}
+              penColor={MEMORY_PENS[handwritingStyle.pen].color}
+              penWidth={MEMORY_PENS[handwritingStyle.pen].width}
+              paperColor={MEMORY_PAPERS[handwritingStyle.paper].color}
             />
+            <div className="grid gap-2 rounded-[20px] bg-white p-3 shadow-sm">
+              <div><p className="mb-2 text-sm font-bold text-ink">필기구</p><div className="flex flex-wrap gap-2">{Object.entries(MEMORY_PENS).map(([key, pen]) => <button key={key} type="button" disabled={busy} aria-pressed={handwritingStyle.pen === key} onClick={() => setHandwritingStyle((style) => ({ ...style, pen: key as keyof typeof MEMORY_PENS }))} className={`min-h-11 rounded-full px-3 text-sm ${handwritingStyle.pen === key ? 'bg-primary text-white' : 'bg-surface-soft text-ink'}`}>{pen.label}</button>)}</div></div>
+              <div><p className="mb-2 text-sm font-bold text-ink">편지지</p><div className="flex flex-wrap gap-2">{Object.entries(MEMORY_PAPERS).map(([key, paper]) => <button key={key} type="button" disabled={busy} aria-pressed={handwritingStyle.paper === key} onClick={() => setHandwritingStyle((style) => ({ ...style, paper: key as keyof typeof MEMORY_PAPERS }))} className={`min-h-11 rounded-full px-3 text-sm ${handwritingStyle.paper === key ? 'ring-2 ring-primary' : ''}`} style={{ backgroundColor: paper.color }}>{paper.label}</button>)}</div></div>
+            </div>
           </section>
 
           {/*
@@ -1230,7 +1277,8 @@ export function ComposeForm({
 
       {/* 아래 고정 줄 (캡처 12 흐림 / 캡처 18 또렷함). */}
       <div className="shrink-0 border-t border-hairline bg-card px-screen-x py-3">
-        <div className="mx-auto w-full max-w-md">
+        <div className={`mx-auto w-full max-w-md ${editing ? 'grid grid-cols-2 gap-2' : ''}`}>
+          {editing && initial ? <Link href={`/rooms/${roomId}/memories/${initial.memoryId}`} onClick={(event) => { if ((recordingActive || videoActive) && !window.confirm('녹음을 그만두고 고치기를 취소할까요?')) event.preventDefault() }} className="flex min-h-12 items-center justify-center rounded-button border border-hairline bg-white text-base font-bold text-ink">취소</Link> : null}
           <Button
             onClick={submit}
             fullWidth

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { ComposeForm } from '@/app/rooms/[roomId]/compose/compose-form'
 import { RoomAppBar } from '@/components/room/RoomAppBar'
 import { requireUser } from '@/lib/auth'
+import { memoryHandwritingStyle, memoryVideoRange } from '@/lib/memory-expression'
 import { signPaths } from '@/lib/room-feed'
 import { createClient } from '@/lib/supabase/server'
 
@@ -32,7 +33,7 @@ export default async function EditMemoryPage({
   const { data: memory } = await supabase
     .from('memories')
     .select(
-      'id, author_id, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, video_path, video_duration_ms, photos:memory_photos(storage_path, sort_order)',
+      'id, author_id, description, voice_path, voice_duration_sec, voice_levels, handwriting_path, handwriting_duration_ms, handwriting_pen, handwriting_paper, video_path, video_duration_ms, video_trim_start_ms, video_trim_end_ms, video_poster_ms, photos:memory_photos(storage_path, sort_order)',
     )
     .eq('id', memoryId)
     .eq('room_id', roomId)
@@ -138,6 +139,11 @@ export default async function EditMemoryPage({
                   durationMs: memory.video_duration_ms ?? 0,
                 }
               : null,
+          handwritingStyle: memoryHandwritingStyle(memory.handwriting_pen, memory.handwriting_paper),
+          videoRange: memory.video_path && memory.video_duration_ms !== null &&
+            (memory.video_trim_start_ms !== null || memory.video_trim_end_ms !== null || memory.video_poster_ms !== null)
+            ? memoryVideoRange(memory.video_duration_ms, memory.video_trim_start_ms, memory.video_trim_end_ms, memory.video_poster_ms)
+            : null,
           caption: memory.description ?? '',
         }}
       />

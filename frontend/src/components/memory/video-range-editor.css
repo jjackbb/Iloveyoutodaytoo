@@ -1,0 +1,19 @@
+.memory-video-editor { display: grid; gap: 12px; padding: 14px; border-radius: 20px; background: #fff; box-shadow: 0 2px 12px #2020200d; }
+.memory-video-editor-heading, .memory-video-poster { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.memory-video-editor-heading span { margin-left: auto; color: #6f6863; font-variant-numeric: tabular-nums; }
+.memory-video-strip { position: relative; height: 64px; border-radius: 12px; overflow: hidden; touch-action: pan-y; }
+.memory-video-frames { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; height: 100%; background: #d9d1c8; }
+.memory-video-frames span { background-position: center; background-size: cover; border-right: 1px solid #fff5; }
+.memory-video-dim { position: absolute; top: 0; bottom: 0; background: #0008; pointer-events: none; }
+.memory-video-dim.before { left: 0; width: var(--start); }
+.memory-video-dim.after { right: 0; width: calc(100% - var(--end)); }
+.memory-video-selection { position: absolute; top: 0; bottom: 0; left: var(--start); right: calc(100% - var(--end)); border: 3px solid #c9784b; pointer-events: none; }
+.memory-video-strip input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; appearance: none; background: transparent; pointer-events: none; }
+.memory-video-strip input::-webkit-slider-thumb { appearance: none; width: 18px; height: 64px; border: 3px solid #c9784b; border-radius: 6px; background: #fff; pointer-events: auto; cursor: ew-resize; }
+.memory-video-strip input::-moz-range-thumb { width: 18px; height: 56px; border: 3px solid #c9784b; border-radius: 6px; background: #fff; pointer-events: auto; cursor: ew-resize; }
+.memory-video-poster { flex-wrap: wrap; }
+.memory-video-poster span { color: #6f6863; }
+.memory-video-poster button { margin-left: auto; min-height: 44px; padding: 0 12px; border: 1px solid #d8c9b9; border-radius: 12px; font-weight: 700; }
+.memory-video-poster-picker { display: grid; gap: 8px; }
+.memory-video-poster-picker video { width: 100%; max-height: 160px; border-radius: 12px; background: #111; object-fit: contain; }
+.memory-video-poster-picker input { width: 100%; accent-color: #c9784b; }

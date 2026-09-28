@@ -184,13 +184,13 @@ isOneToOne: false
                   ]
                 },"memories": {
                   Row: {
-                    "author_id": string | null,"created_at": string,"description": string | null,"handwriting_duration_ms": number | null,"handwriting_path": string | null,"id": string,"pinned_at": string | null,"room_id": string,"taken_at": string | null,"video_duration_ms": number | null,"video_path": string | null,"visibility": Database["public"]['Enums']["memory_visibility"],"voice_duration_sec": number | null,"voice_levels": (number)[] | null,"voice_path": string | null
+                    "author_id": string | null,"created_at": string,"description": string | null,"handwriting_duration_ms": number | null,"handwriting_paper": string,"handwriting_path": string | null,"handwriting_pen": string,"id": string,"pinned_at": string | null,"room_id": string,"taken_at": string | null,"video_duration_ms": number | null,"video_path": string | null,"video_poster_ms": number | null,"video_trim_end_ms": number | null,"video_trim_start_ms": number | null,"visibility": Database["public"]['Enums']["memory_visibility"],"voice_duration_sec": number | null,"voice_levels": (number)[] | null,"voice_path": string | null
                   }
                   Insert: {
-                    "author_id"?: string | null,"created_at"?: string,"description"?: string | null,"handwriting_duration_ms"?: number | null,"handwriting_path"?: string | null,"id"?: string,"pinned_at"?: string | null,"room_id": string,"taken_at"?: string | null,"video_duration_ms"?: number | null,"video_path"?: string | null,"visibility"?: Database["public"]['Enums']["memory_visibility"],"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
+                    "author_id"?: string | null,"created_at"?: string,"description"?: string | null,"handwriting_duration_ms"?: number | null,"handwriting_paper"?: string,"handwriting_path"?: string | null,"handwriting_pen"?: string,"id"?: string,"pinned_at"?: string | null,"room_id": string,"taken_at"?: string | null,"video_duration_ms"?: number | null,"video_path"?: string | null,"video_poster_ms"?: number | null,"video_trim_end_ms"?: number | null,"video_trim_start_ms"?: number | null,"visibility"?: Database["public"]['Enums']["memory_visibility"],"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
                   }
                   Update: {
-                    "author_id"?: string | null,"created_at"?: string,"description"?: string | null,"handwriting_duration_ms"?: number | null,"handwriting_path"?: string | null,"id"?: string,"pinned_at"?: string | null,"room_id"?: string,"taken_at"?: string | null,"video_duration_ms"?: number | null,"video_path"?: string | null,"visibility"?: Database["public"]['Enums']["memory_visibility"],"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
+                    "author_id"?: string | null,"created_at"?: string,"description"?: string | null,"handwriting_duration_ms"?: number | null,"handwriting_paper"?: string,"handwriting_path"?: string | null,"handwriting_pen"?: string,"id"?: string,"pinned_at"?: string | null,"room_id"?: string,"taken_at"?: string | null,"video_duration_ms"?: number | null,"video_path"?: string | null,"video_poster_ms"?: number | null,"video_trim_end_ms"?: number | null,"video_trim_start_ms"?: number | null,"visibility"?: Database["public"]['Enums']["memory_visibility"],"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
                   }
                   Relationships: [
                     {
@@ -209,13 +209,13 @@ isOneToOne: false
                   ]
                 },"memory_comments": {
                   Row: {
-                    "author_id": string | null,"body": string | null,"created_at": string,"deleted_at": string | null,"edited_at": string | null,"id": string,"memory_id": string,"voice_duration_sec": number | null,"voice_levels": (number)[] | null,"voice_path": string | null
+                    "author_id": string | null,"body": string | null,"created_at": string,"deleted_at": string | null,"edited_at": string | null,"id": string,"memory_id": string,"reply_to": string | null,"voice_duration_sec": number | null,"voice_levels": (number)[] | null,"voice_path": string | null
                   }
                   Insert: {
-                    "author_id"?: string | null,"body"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"edited_at"?: string | null,"id"?: string,"memory_id": string,"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
+                    "author_id"?: string | null,"body"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"edited_at"?: string | null,"id"?: string,"memory_id": string,"reply_to"?: string | null,"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
                   }
                   Update: {
-                    "author_id"?: string | null,"body"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"edited_at"?: string | null,"id"?: string,"memory_id"?: string,"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
+                    "author_id"?: string | null,"body"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"edited_at"?: string | null,"id"?: string,"memory_id"?: string,"reply_to"?: string | null,"voice_duration_sec"?: number | null,"voice_levels"?: (number)[] | null,"voice_path"?: string | null
                   }
                   Relationships: [
                     {
@@ -281,6 +281,14 @@ isOneToOne: false
       referencedRelation: "users"
       referencedColumns: ["id"]
     }
+                  ]
+                },"memory_reactions": {
+                  Row: { "created_at": string,"id": string,"kind": "thanks" | "cheer" | "miss","memory_id": string,"user_id": string }
+                  Insert: { "created_at"?: string,"id"?: string,"kind": "thanks" | "cheer" | "miss","memory_id": string,"user_id": string }
+                  Update: { "created_at"?: string,"id"?: string,"kind"?: "thanks" | "cheer" | "miss","memory_id"?: string,"user_id"?: string }
+                  Relationships: [
+                    { foreignKeyName: "memory_reactions_memory_id_fkey", columns: ["memory_id"], isOneToOne: false, referencedRelation: "memories", referencedColumns: ["id"] },
+                    { foreignKeyName: "memory_reactions_user_id_fkey", columns: ["user_id"], isOneToOne: false, referencedRelation: "users", referencedColumns: ["id"] }
                   ]
                 },"memory_photos": {
                   Row: {
@@ -549,6 +557,9 @@ isOneToOne: false
 "consume_guardian_verification":
 { Args: { "p_id": string,"p_phone": string }; Returns: boolean
                            },
+"create_memory_enhanced":
+{ Args: { "p_caption": string,"p_handwriting_duration_ms": number | null,"p_handwriting_paper": string,"p_handwriting_path": string | null,"p_handwriting_pen": string,"p_photo_paths": (string)[],"p_room_id": string,"p_video_duration_ms": number | null,"p_video_path": string | null,"p_video_poster_ms": number | null,"p_video_trim_end_ms": number | null,"p_video_trim_start_ms": number | null,"p_voice_duration_sec": number | null,"p_voice_levels": (number)[] | null,"p_voice_path": string | null }; Returns: string
+                           },
 "create_memory":
 { Args: { "p_caption": string,"p_handwriting_duration_ms"?: number,"p_handwriting_path"?: string,"p_photo_paths": (string)[],"p_room_id": string,"p_video_duration_ms"?: number,"p_video_path"?: string,"p_voice_duration_sec"?: number,"p_voice_levels"?: (number)[],"p_voice_path"?: string }; Returns: string
                            },
@@ -622,6 +633,9 @@ isOneToOne: false
                            },
 "storage_object_pending_deletion":
 { Args: { "p_bucket": string,"p_name": string }; Returns: boolean
+                           },
+"update_memory_enhanced":
+{ Args: { "p_caption": string,"p_handwriting_duration_ms": number | null,"p_handwriting_paper": string,"p_handwriting_path": string | null,"p_handwriting_pen": string,"p_photo_paths": (string)[],"p_memory_id": string,"p_video_duration_ms": number | null,"p_video_path": string | null,"p_video_poster_ms": number | null,"p_video_trim_end_ms": number | null,"p_video_trim_start_ms": number | null,"p_voice_duration_sec": number | null,"p_voice_levels": (number)[] | null,"p_voice_path": string | null }; Returns: undefined
                            },
 "update_memory":
 { Args: { "p_caption": string,"p_handwriting_duration_ms"?: number,"p_handwriting_path"?: string,"p_memory_id": string,"p_photo_paths": (string)[],"p_video_duration_ms"?: number,"p_video_path"?: string,"p_voice_duration_sec"?: number,"p_voice_levels"?: (number)[],"p_voice_path"?: string }; Returns: undefined

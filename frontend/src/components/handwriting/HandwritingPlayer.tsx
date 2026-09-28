@@ -31,6 +31,8 @@ export function HandwritingPlayer({
   autoPlay = false,
   className,
   penWidth = HANDWRITING_PEN_WIDTH,
+  penColor,
+  paperColor,
 }: {
   /** 서명된 handwriting 버킷 주소 */
   src: string
@@ -41,6 +43,8 @@ export function HandwritingPlayer({
   className?: string
   /** 필기구 굵기(2026-09-28 데모). 색은 캔버스의 글자색을 따른다. */
   penWidth?: number
+  penColor?: string
+  paperColor?: string
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -185,7 +189,7 @@ export function HandwritingPlayer({
     <div
       ref={wrapRef}
       className={boxClass}
-      style={{ aspectRatio: `${HANDWRITING_W} / ${HANDWRITING_H}` }}
+      style={{ aspectRatio: `${HANDWRITING_W} / ${HANDWRITING_H}`, color: penColor, backgroundColor: paperColor }}
     >
       {doc ? (
         <button

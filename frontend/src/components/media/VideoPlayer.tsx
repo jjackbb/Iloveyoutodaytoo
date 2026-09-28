@@ -1,3 +1,8 @@
+'use client'
+
+import { useRef } from 'react'
+import type { MemoryVideoRange } from '@/lib/memory-expression'
+
 /**
  * 추억 영상 재생 (2026-09-26 추억 영상).
  *
@@ -12,13 +17,17 @@ export function VideoPlayer({
   src,
   label,
   className = '',
+  range,
 }: {
   /** 서명된 video 버킷 주소. 못 만들었으면 null. */
   src: string | null
   /** 낭독기가 읽을 이름. 예: "엄마님이 남긴 영상". */
   label: string
   className?: string
+  /** 파일은 그대로 두고 이 구간만 재생한다. 첫 정지 장면은 posterMs다. */
+  range?: MemoryVideoRange | null
 }) {
+  const played = useRef(false)
   if (!src) {
     return (
       <p className={`text-sm text-muted ${className}`}>
@@ -34,6 +43,25 @@ export function VideoPlayer({
         controls
         playsInline
         preload="metadata"
+        onLoadedMetadata={(event) => {
+          if (range) event.currentTarget.currentTime = range.posterMs / 1000
+        }}
+        onPlay={(event) => {
+          if (!range) return
+          const media = event.currentTarget
+          if (!played.current || media.currentTime * 1000 >= range.endMs - 30 || media.currentTime * 1000 < range.startMs - 30) {
+            media.currentTime = range.startMs / 1000
+          }
+          played.current = true
+        }}
+        onTimeUpdate={(event) => {
+          if (!range) return
+          const media = event.currentTarget
+          if (media.currentTime * 1000 >= range.endMs - 30) {
+            media.pause()
+            media.currentTime = range.endMs / 1000
+          }
+        }}
         aria-label={label}
         className="h-full w-full object-contain"
       >

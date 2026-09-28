@@ -66,6 +66,7 @@ function revalidateRoom(roomId: string) {
 export async function createTextComment(
   memoryId: string,
   body: string,
+  replyTo?: string | null,
 ): Promise<CommentActionResult> {
   const user = await requireUser()
 
@@ -81,8 +82,21 @@ export async function createTextComment(
     return { ok: false, error: '게시물을 찾지 못했어요. 화면을 새로고침해 주세요.' }
   }
 
+  if (replyTo) {
+    const { data: parent } = await supabase
+      .from('memory_comments')
+      .select('id')
+      .eq('id', replyTo)
+      .eq('memory_id', memoryId)
+      .is('reply_to', null)
+      .is('deleted_at', null)
+      .maybeSingle()
+    if (!parent) return { ok: false, error: '답글을 달 댓글을 찾지 못했어요. 화면을 새로고침해 주세요.' }
+  }
+
   const { error } = await supabase.from('memory_comments').insert({
     memory_id: memoryId,
+    reply_to: replyTo ?? null,
     // RLS가 auth.uid()와 같은지 확인한다. 반드시 명시.
     author_id: user.id,
     body: trimmed,

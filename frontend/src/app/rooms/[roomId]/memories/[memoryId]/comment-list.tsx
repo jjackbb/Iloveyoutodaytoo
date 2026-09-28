@@ -1,6 +1,11 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+
 import { COMMENT_END_ID } from './comment-anchor'
 import { CommentBody } from './comment-body'
 import { CommentMenu } from './comment-menu'
+import { useReply } from './reply-context'
 import { VoicePlayer } from '@/components/media/VoicePlayer'
 import { formatRelativeTime } from '@/lib/format'
 import type { MemoryCommentView } from '@/lib/room-feed'
@@ -11,10 +16,12 @@ import type { MemoryCommentView } from '@/lib/room-feed'
  * 한 줄의 모양: 아바타(32px) + [이름 · 시간] 아래에 말풍선(텍스트) 또는 재생바(음성).
  * 오래된 것이 위, 새 댓글이 맨 아래에 붙는다.
  *
- * 서버 컴포넌트다. 누르는 잎(삭제 ⋯)만 클라이언트다.
  * 이름은 방별 별명 규칙(`roomMemberName`)을 이미 거쳐서 온다 — 여기서 다시 정하지 않는다.
  */
 export function CommentList({ comments }: { comments: MemoryCommentView[] }) {
+  const commentIds = new Set(comments.map((comment) => comment.commentId))
+  const topLevel = comments.filter((comment) => !comment.replyTo || !commentIds.has(comment.replyTo))
+  const repliesOf = (id: string) => comments.filter((comment) => comment.replyTo === id)
   if (comments.length === 0) {
     return (
       <>
@@ -30,8 +37,16 @@ export function CommentList({ comments }: { comments: MemoryCommentView[] }) {
   return (
     <>
       <ul className="flex flex-col gap-4">
-        {comments.map((comment) => (
-          <CommentRow key={comment.commentId} comment={comment} />
+        {topLevel.map((comment) => (
+          <li key={comment.commentId}>
+            {comment.replyTo && !commentIds.has(comment.replyTo) ? <p className="mb-1 ml-10 text-xs text-muted">원 댓글이 삭제되어 답글만 보여요.</p> : null}
+            <CommentRow comment={comment} replyUnavailable={Boolean(comment.replyTo && !commentIds.has(comment.replyTo))} />
+            {repliesOf(comment.commentId).length > 0 ? (
+              <ul className="mt-3 ml-8 flex flex-col gap-3 border-l border-hairline pl-3" aria-label={`${comment.authorName}님 댓글의 답글`}>
+                {repliesOf(comment.commentId).map((reply) => <li key={reply.commentId}><CommentRow comment={reply} /></li>)}
+              </ul>
+            ) : null}
+          </li>
         ))}
       </ul>
       {/*
@@ -43,9 +58,45 @@ export function CommentList({ comments }: { comments: MemoryCommentView[] }) {
   )
 }
 
-function CommentRow({ comment }: { comment: MemoryCommentView }) {
+function CommentRow({ comment, replyUnavailable = false }: { comment: MemoryCommentView; replyUnavailable?: boolean }) {
+  const { target, setTarget } = useReply()
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pressPoint = useRef<{ x: number; y: number } | null>(null)
+  const parentId = comment.replyTo ?? comment.commentId
+  const clearPress = () => {
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = null
+  }
+  useEffect(() => clearPress, [])
+  const startReply = () => {
+    if (replyUnavailable) return
+    setTarget({ parentId, authorName: comment.authorName })
+    document.getElementById('comment-input')?.focus()
+  }
   return (
-    <li className="flex gap-2.5">
+    <div
+      className={`flex gap-2.5 rounded-inner select-none [-webkit-touch-callout:none] ${target?.parentId === parentId ? 'bg-primary-soft/40' : ''}`}
+      tabIndex={0}
+      aria-label={replyUnavailable ? `${comment.authorName}님의 답글` : `${comment.authorName}님의 댓글. 길게 누르면 답글을 남길 수 있어요.`}
+      onPointerDown={(event) => {
+        if (replyUnavailable) return
+        if ((event.target as HTMLElement).closest('button, input, audio')) return
+        clearPress()
+        pressPoint.current = { x: event.clientX, y: event.clientY }
+        timer.current = setTimeout(startReply, 500)
+      }}
+      onPointerMove={(event) => {
+        if (pressPoint.current && Math.hypot(event.clientX - pressPoint.current.x, event.clientY - pressPoint.current.y) > 8) clearPress()
+      }}
+      onPointerUp={clearPress}
+      onPointerLeave={clearPress}
+      onPointerCancel={clearPress}
+      onContextMenu={(event) => { event.preventDefault(); clearPress(); startReply() }}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); startReply() }
+      }}
+    >
       <span
         aria-hidden
         className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary"
@@ -114,7 +165,7 @@ function CommentRow({ comment }: { comment: MemoryCommentView }) {
           </p>
         )}
       </div>
-    </li>
+    </div>
   )
 }
 

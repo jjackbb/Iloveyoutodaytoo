@@ -108,14 +108,20 @@ export function VideoPicker({
   onChange,
   disabled = false,
   showLimitNote = true,
+  onActivityChange,
 }: {
   value: PickedVideo | null
   onChange: (next: PickedVideo | null) => void
   disabled?: boolean
   /** "30초 · 50MB까지" 안내 줄. 데모는 뺀다(2026-09-28 사용자 요청). 넘으면 여전히 이유를 알린다. */
   showLimitNote?: boolean
+  onActivityChange?: (active: boolean) => void
 }) {
   const [phase, setPhase] = useState<PickerPhase>('idle')
+  useEffect(() => {
+    onActivityChange?.(phase !== 'idle')
+    return () => onActivityChange?.(false)
+  }, [phase, onActivityChange])
   const [error, setError] = useState<string | null>(null)
   const [elapsedMs, setElapsedMs] = useState(0)
 
