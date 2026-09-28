@@ -38,10 +38,16 @@ export function HandwritingPad({
   value,
   onChange,
   disabled = false,
+  penColor: penColorProp,
+  penWidth = HANDWRITING_PEN_WIDTH,
 }: {
   value: HandwritingDoc | null
   onChange: (next: HandwritingDoc | null) => void
   disabled?: boolean
+  /** 필기구 색(2026-09-28 데모의 필기구 고르기). 없으면 기존처럼 글자색(--color-ink). */
+  penColor?: string
+  /** 필기구 굵기(논리 좌표 기준). 없으면 기존 굵기. */
+  penWidth?: number
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
@@ -61,12 +67,13 @@ export function HandwritingPad({
   const scaleRef = useRef(1)
 
   const penColor = useCallback(() => {
+    if (penColorProp) return penColorProp
     if (typeof window === 'undefined') return '#222222'
     const ink = getComputedStyle(document.documentElement)
       .getPropertyValue('--color-ink')
       .trim()
     return ink || '#222222'
-  }, [])
+  }, [penColorProp])
 
   /** 끝난 획 전부를 처음부터 다시 그린다(되돌리기·지우기·크기 변경 뒤). */
   const redraw = useCallback(() => {
@@ -80,13 +87,13 @@ export function HandwritingPad({
     ctx.setTransform(scaleRef.current * dpr, 0, 0, scaleRef.current * dpr, 0, 0)
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
-    ctx.lineWidth = HANDWRITING_PEN_WIDTH
+    ctx.lineWidth = penWidth
     ctx.strokeStyle = penColor()
 
     for (const stroke of strokesRef.current) {
       drawStroke(ctx, stroke.p)
     }
-  }, [penColor])
+  }, [penColor, penWidth])
 
   /*
     폭에 맞춰 캔버스를 잡는다. CSS 크기는 4:3 으로 부모가 정하고, 실제 픽셀은 DPR 만큼
@@ -173,7 +180,7 @@ export function HandwritingPad({
     const ctx = event.currentTarget.getContext('2d')
     if (ctx) {
       ctx.strokeStyle = penColor()
-      ctx.lineWidth = HANDWRITING_PEN_WIDTH
+      ctx.lineWidth = penWidth
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
       // 톡 찍은 점도 보이게 아주 짧은 선을 긋는다(round cap 이 점이 된다).

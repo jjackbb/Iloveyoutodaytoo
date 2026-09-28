@@ -4,6 +4,8 @@
   --radius-card: 16px;
   --radius-button: 14px;
   --shadow-card: none;
+  /* 흰 카드 + 옅은 그림자(2026-09-28 사용자 선택, 스티치 8·9번). */
+  --demo-card-shadow: 0 1px 2px rgb(34 34 34 / .04), 0 4px 16px rgb(34 34 34 / .05);
   min-height: 100dvh;
   color: var(--color-ink);
   background: var(--color-canvas);
@@ -61,7 +63,7 @@
 .demo-actor-label select { min-height: 44px; color: var(--color-ink); font: inherit; font-size: 14px; font-weight: 600; padding: 8px; background: var(--color-surface-soft); border: 1px solid transparent; border-radius: 8px; }
 .demo-reset { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; min-height: 44px; padding: 6px; color: var(--color-muted); font: inherit; font-size: 13px; }
 .demo-reset svg { width: 17px; height: 17px; }
-.demo-phone { width: 100%; max-width: 440px; margin: 28px auto; min-height: 760px; background: white; border: 1px solid var(--color-hairline); border-radius: 20px; overflow: clip; }
+.demo-phone { width: 100%; max-width: 440px; margin: 28px auto; min-height: 760px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: 20px; overflow: clip; }
 .demo-appbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 76px; padding: 16px 20px 8px; }
 .demo-appbar h1 { font-size: 18px; font-weight: 700; letter-spacing: -.035em; }
 .demo-appbar .demo-brand { flex: 1; justify-content: center; font-size: 18px; display: flex; align-items: center; gap: 8px; }
@@ -71,9 +73,9 @@
 .demo-member-stack .demo-avatar + .demo-avatar { margin-left: -9px; }
 .demo-avatar-more { background: var(--color-surface-soft); color: var(--color-ink); }
 .demo-album-members { position: absolute; left: 9px; bottom: 37px; }
-.demo-room .demo-room-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.demo-room .demo-room-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
 .demo-room .demo-room-heading h2 { margin: 0; font-size: 20px; }
-.demo-room-members { display: flex; gap: 4px; }
+.demo-room-members { display: flex; gap: 4px; flex-shrink: 0; }
 .demo-room-members .demo-avatar { width: 34px; height: 34px; font-size: 13px; }
 .demo-room { position: relative; }
 .demo-fab { position: absolute; right: 20px; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 10; width: 56px; height: 56px; border-radius: 50%; background: var(--color-primary); color: white; display: grid; place-items: center; box-shadow: 0 6px 16px rgb(191 63 13 / .35); }
@@ -89,7 +91,7 @@
 .demo-subtle { font-size: 14px; line-height: 1.7; color: var(--color-muted); }
 .demo-section-heading { display: flex; gap: 8px; align-items: baseline; margin-bottom: 12px; }
 .demo-section-heading > span { font-size: 14px; color: var(--color-muted); font-variant-numeric: tabular-nums; }
-.demo-album { position: relative; border-radius: 16px; border: 1px solid var(--color-hairline); overflow: hidden; }
+.demo-album { position: relative; border-radius: 16px; overflow: hidden; background: white; box-shadow: var(--demo-card-shadow); }
 .demo-album-link { display: block; aspect-ratio: 4 / 3; position: relative; background: #e8ded0; color: var(--color-ink); }
 .demo-cover-art { position: absolute; inset: 0; display: grid; place-items: center; background: #ede6de; color: #7a6a5e; }
 .demo-cover-art > svg { width: 72%; height: 72%; }
@@ -106,15 +108,16 @@
 .demo-room-heading { margin-bottom: 32px; }
 .demo-room-heading h2 { margin-top: 4px; margin-bottom: 24px; }
 .demo-feed { list-style: none; padding: 0; margin: 0; }
-.demo-feed > li + li { border-top: 1px solid var(--color-hairline); margin-top: 24px; padding-top: 24px; }
+.demo-feed > li + li { margin-top: 14px; }
 .demo-memory-preview { display: block; color: inherit; text-decoration: none; }
 .demo-author { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
 .demo-author strong { font-size: 15px; font-weight: 600; }
 .demo-author p { font-size: 12px; line-height: 1.6; margin-top: 2px; color: var(--color-muted); }
 .demo-avatar { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #e8edf2; color: #53687d; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
 .demo-avatar-parent { background: #efe8df; color: #76614d; }
-.demo-handwriting-preview { background: #fcfbf8; border: 1px solid var(--color-hairline); border-radius: 14px; overflow: hidden; }
+.demo-handwriting-preview { background: var(--demo-paper, #fcfbf8); border: 1px solid var(--color-hairline); border-radius: 14px; overflow: hidden; }
 .demo-handwriting-preview svg { width: 100%; display: block; }
+.demo-handwriting-preview.demo-ink { color: var(--demo-pen, var(--color-ink)); }
 .demo-caption-preview { margin-top: 14px !important; font-size: 16px; line-height: 1.8; white-space: pre-wrap; }
 .demo-voice-preview { display: flex; align-items: center; gap: 10px; background: var(--color-surface-soft); border-radius: 14px; padding: 20px 16px; }
 .demo-voice-preview span:last-child { margin-left: auto; font-size: 13px; color: var(--color-primary); }
@@ -130,20 +133,19 @@
 .demo-compose-intro > p:first-child { font-size: 15px; }
 .demo-compose-intro > p:last-child { font-size: 15px; color: var(--color-muted); line-height: 1.6; margin-top: 10px; }
 .demo-compose-intro h2 { margin-top: 6px; }
-.demo-methods { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
-.demo-method { position: relative; display: flex; align-items: center; gap: 14px; min-width: 0; min-height: 80px; padding: 0 16px; border: 1px solid var(--color-hairline); border-radius: 16px; background: white; color: var(--color-ink); font-family: inherit; text-align: left; transition: border-color .15s, background-color .15s; }
-.demo-method:hover { background: var(--color-surface-soft); }
+.demo-methods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+/* 방법 고르기는 스티치식 2×2 흰 타일(2026-09-28 사용자 선택). */
+.demo-method { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 150px; padding: 12px; border: 1px solid transparent; border-radius: 20px; background: white; box-shadow: var(--demo-card-shadow); color: var(--color-ink); font-family: inherit; text-align: center; transition: border-color .15s, background-color .15s; }
+.demo-method:hover { border-color: var(--color-hairline-strong); }
 .demo-method.is-selected { border-color: var(--color-primary); background: var(--color-primary-soft); }
-.demo-method-icon { flex-shrink: 0; width: 48px; height: 48px; border-radius: 14px; background: var(--color-primary-soft); color: var(--color-primary); display: grid; place-items: center; }
-.demo-method-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.demo-method-icon { flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); display: grid; place-items: center; }
+.demo-method-text { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .demo-method strong { font-size: 17px; font-weight: 600; }
-.demo-method-text > span { font-size: 14px; color: var(--color-muted); word-break: keep-all; }
-.demo-method-arrow { flex-shrink: 0; display: flex; color: #9aa0a6; }
-.demo-method-arrow svg { width: 20px; height: 20px; }
+.demo-method-text > span { font-size: 13px; color: var(--color-muted); word-break: keep-all; }
 .demo-method-done { position: absolute; right: 6px; top: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--color-primary); color: white; display: grid; place-items: center; }
 .demo-method-done svg { width: 12px; height: 12px; }
-.demo-methods--compact { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 0; padding: 4px; border-radius: 14px; background: var(--color-surface-soft); }
-.demo-methods--compact .demo-method { justify-content: center; gap: 6px; min-height: 44px; padding: 8px 4px; border-color: transparent; border-radius: 11px; background: transparent; color: var(--color-muted); }
+.demo-methods--compact { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 0; padding: 4px; border-radius: 14px; background: #eceef1; }
+.demo-methods--compact .demo-method { flex-direction: row; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 4px; border-color: transparent; border-radius: 11px; background: transparent; box-shadow: none; color: var(--color-muted); }
 .demo-methods--compact .demo-method.is-selected { background: white; color: var(--color-primary); box-shadow: 0 1px 3px rgb(34 34 34 / .12); }
 .demo-methods--compact .demo-method.is-selected strong { font-weight: 700; }
 .demo-methods--compact .demo-method-icon { display: flex; width: auto; height: auto; margin: 0; background: none; color: inherit; }
@@ -154,11 +156,11 @@
 .demo-methods--compact .demo-method-done { width: 12px; height: 12px; right: 2px; top: 2px; }
 .demo-methods--compact .demo-method-done svg { width: 9px; height: 9px; }
 .demo-switch-hint { margin-top: 10px !important; font-size: 13px; color: var(--color-muted); line-height: 1.6; }
-.demo-input-section { margin-top: 28px; }
+.demo-input-section { margin-top: 16px; padding: 18px; border-radius: 20px; background: white; box-shadow: var(--demo-card-shadow); }
 .demo-input-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .demo-input-heading > span { font-size: 12px; color: var(--color-muted); }
 .demo-input-section > div > div.flex.items-center.justify-between { flex-wrap: wrap; }
-.demo-input-section canvas { background: #fcfbf8; }
+.demo-input-section canvas { background: var(--demo-paper, #fcfbf8); }
 .demo-input-section button { font-size: 14px; }
 .demo-photo-picker { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 100px; width: 100%; border: 1px dashed #aeb6bf; border-radius: 14px; background: var(--color-canvas); font-size: 15px; color: var(--color-muted); }
 .demo-photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; list-style: none; padding: 0; margin: 12px 0 0; }
@@ -217,9 +219,12 @@
 .demo-video-poster { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 14px; background: #111; }
 .demo-video-poster video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .demo-video-duration { position: absolute; left: 10px; bottom: 10px; padding: 2px 8px; border-radius: 99px; background: rgb(0 0 0 / .55); color: white; font-size: 12px; font-weight: 600; }
-.demo-detail-actions { margin-top: 16px; }
 .demo-detail .demo-detail-caption { margin: 8px 0 0 !important; font-size: 16px; line-height: 1.7; font-weight: 400; }
-.demo-comments { margin-top: 20px; border-top: 1px solid var(--color-hairline); padding-top: 16px; }
+.demo-comments { margin-top: 14px; }
+.demo-comments-heading { display: flex; align-items: center; gap: 6px; margin: -6px 0 12px; }
+.demo-comments-heading h3 { font-size: 15px; font-weight: 700; }
+.demo-comments-heading > span { font-size: 15px; font-weight: 700; color: var(--color-primary); font-variant-numeric: tabular-nums; }
+.demo-comments-heading .demo-text-button { margin: 0 -10px 0 auto; font-size: 14px; color: var(--color-muted); }
 .demo-comments ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 .demo-comments li { display: flex; gap: 10px; align-items: flex-start; }
 .demo-comments li .demo-avatar { width: 32px; height: 32px; font-size: 13px; }
@@ -238,10 +243,10 @@
 .demo-text-button.is-primary { color: var(--color-primary); font-weight: 700; }
 .demo-feed-item { position: relative; }
 .demo-more { position: relative; margin-left: auto; flex-shrink: 0; }
-.demo-feed-item > .demo-more { position: absolute; top: -3px; right: -10px; }
+.demo-feed-item > .demo-more { position: absolute; top: 12px; right: 6px; }
 .demo-more-button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--color-muted); display: grid; place-items: center; }
 .demo-more-button:hover, .demo-more-button[aria-expanded="true"] { background: var(--color-surface-soft); }
-.demo-menu { position: absolute; top: 46px; right: 0; z-index: 20; min-width: 160px; padding: 4px 0; display: flex; flex-direction: column; background: white; border: 1px solid var(--color-hairline); border-radius: 14px; box-shadow: 0 8px 24px rgb(34 34 34 / .14); }
+.demo-menu { position: absolute; top: 46px; right: 0; z-index: 20; width: max-content; min-width: 0; padding: 4px 0; display: flex; flex-direction: column; background: white; border: 1px solid var(--color-hairline); border-radius: 14px; box-shadow: 0 8px 24px rgb(34 34 34 / .14); }
 .demo-menu > a, .demo-menu > button { min-height: 44px; padding: 0 16px; display: flex; align-items: center; border: 0; background: none; font: inherit; font-size: 16px; font-weight: 500; color: var(--color-ink); text-align: left; text-decoration: none; }
 .demo-menu > a:hover, .demo-menu > button:hover { background: var(--color-surface-soft); }
 .demo-menu .is-danger { color: var(--color-primary); }
@@ -255,7 +260,7 @@ button.demo-primary { border: 0; font-family: inherit; }
 button.demo-secondary { font-family: inherit; }
 .demo-secondary.is-danger { color: var(--color-primary); }
 .demo-edit-hint { margin-bottom: 16px !important; font-size: 13px; color: var(--color-muted); }
-.demo-select-card { display: block; width: 100%; padding: 14px; border: 2px solid var(--color-hairline); border-radius: 16px; background: white; font: inherit; color: inherit; text-align: left; }
+.demo-select-card { display: block; width: 100%; padding: 14px; border: 2px solid transparent; border-radius: 20px; background: white; box-shadow: var(--demo-card-shadow); font: inherit; color: inherit; text-align: left; }
 .demo-select-card .demo-author { margin-bottom: 12px; }
 .demo-select-card.is-selected { border-color: var(--color-primary); background: var(--color-primary-soft); }
 .demo-select-card.is-disabled { opacity: .45; }
@@ -265,6 +270,8 @@ button.demo-secondary { font-family: inherit; }
 .demo-room-edit .demo-feed > li + li { border-top: 0; margin-top: 12px; padding-top: 0; }
 .demo-edit-bar > p:first-child { margin-top: 0; text-align: left; font-size: 15px; font-weight: 600; color: var(--color-ink); }
 .demo-edit-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.demo-save-actions { margin-top: 0; }
+.demo-save-actions .demo-secondary { min-height: 56px; border-radius: 16px; font-size: 17px; }
 
 /* 탭 네 칸이 좁은 화면(320px)에서 넘치지 않게 아이콘을 뺀다. */
 @media (max-width: 360px) {
@@ -276,3 +283,83 @@ button.demo-secondary { font-family: inherit; }
 /* 스크롤 칸이 있는 화면은 폰 틀이 화면 높이를 넘지 않게 한다 — 아래 고정 버튼·+ 가 늘 보이도록(2026-09-28). */
 .demo-phone.demo-phone--compose { min-height: 0; }
 @media (min-width: 521px) { .demo-phone.demo-phone--compose { margin-top: 20px; margin-bottom: 20px; } }
+
+/* 흰 카드 + 옅은 그림자(2026-09-28 사용자 선택). 회색 바탕 위에 카드마다 나눠 보이게 한다. */
+.demo-card, .demo-room .demo-feed-item { padding: 16px; border-radius: 20px; background: white; box-shadow: var(--demo-card-shadow); }
+.demo-room .demo-card-actions { margin-bottom: -6px; }
+.demo-detail-post .demo-author { margin-bottom: 14px; }
+.demo-detail-post > section { margin-top: 0; }
+.demo-detail-post > section + section, .demo-detail-post .demo-detail-photos + section { margin-top: 12px; }
+.demo-caption-field textarea { background: white; }
+.demo-compose-action .demo-edit-actions .btn-primary-surface { width: 100%; }
+
+/* 필기구·편지지(2026-09-28 스티치 4번) */
+.demo-ink-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.demo-ink-row { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 4px; }
+.demo-ink-row > span:first-child { font-size: 13px; color: var(--color-muted); }
+.demo-ink-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.demo-ink-chip { min-height: 44px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--color-hairline-strong); border-radius: 22px; background: white; font: inherit; font-size: 13px !important; font-weight: 600; color: var(--color-ink); }
+.demo-ink-chip.is-selected { border: 1.5px solid var(--color-primary); background: var(--color-primary-soft); color: var(--color-primary); }
+.demo-ink-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.demo-ink-dot.is-paper { width: 14px; height: 14px; border: 1px solid var(--color-hairline-strong); }
+.demo-ink .rounded-inner { color: var(--demo-pen, var(--color-ink)); background: var(--demo-paper, #fcfbf8); }
+
+/* 영상 구간 편집·대표 섬네일(2026-09-28 스티치 7번) */
+.demo-video-edit { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.demo-trim-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--color-muted); }
+.demo-trim-heading strong { color: var(--color-primary); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.demo-trim-track { position: relative; height: 56px; margin-top: 6px; }
+/* 아이폰 영상 편집처럼 장면 줄 위에서 구간을 고른다(2026-09-28 사용자 요청). */
+.demo-trim-strip { position: absolute; inset: 0; display: flex; overflow: hidden; border-radius: 10px; background: #2b2b2b; }
+.demo-trim-strip span { flex: 1; background-size: cover; background-position: center; }
+.demo-trim-dim { position: absolute; top: 0; bottom: 0; background: rgb(0 0 0 / .55); pointer-events: none; }
+.demo-trim-dim.is-before { left: 0; width: var(--from); border-radius: 10px 0 0 10px; }
+.demo-trim-dim.is-after { left: var(--to); right: 0; border-radius: 0 10px 10px 0; }
+.demo-trim-frame { position: absolute; top: 0; bottom: 0; left: var(--from); width: calc(var(--to) - var(--from)); border-top: 3px solid var(--color-primary); border-bottom: 3px solid var(--color-primary); pointer-events: none; }
+.demo-trim-track input { position: absolute; inset: 0; width: 100%; height: 56px; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.demo-trim-track input::-webkit-slider-runnable-track { height: 56px; background: none; }
+.demo-trim-track input::-moz-range-track { background: none; }
+.demo-trim-track input::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 16px; height: 56px; border: 0; border-radius: 6px; background: var(--color-primary) linear-gradient(white, white) center / 2px 18px no-repeat; cursor: grab; }
+.demo-trim-track input::-moz-range-thumb { pointer-events: auto; width: 16px; height: 56px; border: 0; border-radius: 6px; background: var(--color-primary); cursor: grab; }
+.demo-trim-track input:focus-visible::-webkit-slider-thumb { outline: 3px solid var(--color-ink); outline-offset: 1px; }
+.demo-trim-hint { margin-top: 2px !important; font-size: 12px; color: var(--color-muted); }
+.demo-poster-row { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 14px; background: var(--color-canvas); }
+.demo-poster-icon { flex-shrink: 0; color: var(--color-muted); display: flex; }
+.demo-poster-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.demo-poster-text strong { font-size: 14px; font-weight: 600; }
+.demo-poster-text > span { font-size: 12px; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+.demo-chip-button { flex-shrink: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--color-hairline-strong); border-radius: 12px; background: white; font: inherit; font-size: 13px !important; font-weight: 600; color: var(--color-ink); }
+.demo-poster-picker { display: flex; flex-direction: column; gap: 8px; }
+.demo-poster-picker input { width: 100%; min-height: 44px; accent-color: var(--color-primary); }
+.demo-video-frame { aspect-ratio: 4 / 3; overflow: hidden; border-radius: 14px; background: #000; }
+.demo-video-frame video { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+/* 상세의 여러 마음 표현(2026-09-28 스티치 8번) */
+.demo-reactions { display: flex; flex-wrap: nowrap; gap: 8px; margin: 14px -16px 0; padding: 0 16px 0 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.demo-reactions::-webkit-scrollbar { display: none; }
+.demo-reaction { flex-shrink: 0; white-space: nowrap; }
+.demo-reaction-add-slot { position: sticky; left: 0; z-index: 1; flex-shrink: 0; display: flex; margin-right: -4px; padding: 0 4px 0 16px; background: white; box-shadow: 6px 0 6px -2px white; }
+.demo-reaction-add { color: var(--color-muted); }
+.demo-reaction-add.is-open { background: var(--color-surface-soft); }
+.demo-reaction { min-height: 44px; min-width: 44px; justify-content: center; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--color-hairline-strong); border-radius: 22px; background: white; font: inherit; font-size: 14px; font-weight: 600; color: var(--color-ink); }
+.demo-reaction svg { width: 18px; height: 18px; }
+.demo-reaction:hover { background: var(--color-surface-soft); }
+.demo-reaction.is-on { border: 1.5px solid var(--color-primary); background: var(--color-primary-soft); color: var(--color-primary); }
+.demo-reaction-count { font-variant-numeric: tabular-nums; color: var(--color-muted); }
+.demo-reaction.is-on .demo-reaction-count { color: inherit; }
+.demo-detail-post .demo-detail-photos { margin-top: 0; }
+.demo-detail-post .demo-detail-photos + section { margin-top: 12px; }
+.demo-detail .demo-detail-post .demo-detail-caption { margin-top: 12px !important; }
+
+/* 댓글을 꾹 누르면 답글(2026-09-28 사용자 요청). 답글은 원래 댓글 아래에 들여 쓴다. */
+.demo-comment { display: flex; gap: 10px; align-items: flex-start; margin: -4px -6px; padding: 4px 6px; border-radius: 12px; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+.demo-comment.is-target { background: var(--color-primary-soft); }
+.demo-comment:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 1px; }
+.demo-comments li { display: block; }
+.demo-comment .demo-avatar { width: 32px; height: 32px; font-size: 13px; }
+.demo-replies { margin: 10px 0 0 42px !important; gap: 10px !important; }
+.demo-replies .demo-comment .demo-avatar { width: 26px; height: 26px; font-size: 11px; }
+.demo-comment-form { flex-wrap: wrap; }
+.demo-reply-bar { flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -4px 0 0 !important; font-size: 13px; color: var(--color-muted); }
+.demo-reply-bar button { width: 44px; height: 44px; margin: -10px -12px -10px 0; display: grid; place-items: center; border: 0; background: none; color: var(--color-muted); }
+.demo-reply-bar svg { width: 16px; height: 16px; }

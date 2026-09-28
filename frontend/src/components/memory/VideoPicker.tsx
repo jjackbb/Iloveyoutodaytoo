@@ -107,10 +107,13 @@ export function VideoPicker({
   value,
   onChange,
   disabled = false,
+  showLimitNote = true,
 }: {
   value: PickedVideo | null
   onChange: (next: PickedVideo | null) => void
   disabled?: boolean
+  /** "30초 · 50MB까지" 안내 줄. 데모는 뺀다(2026-09-28 사용자 요청). 넘으면 여전히 이유를 알린다. */
+  showLimitNote?: boolean
 }) {
   const [phase, setPhase] = useState<PickerPhase>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -394,7 +397,7 @@ export function VideoPicker({
         tabIndex={-1}
         aria-hidden
       />
-      <p className="text-sm text-muted">30초 · 50MB까지 한 개를 담을 수 있어요.</p>
+      {showLimitNote ? <p className="text-sm text-muted">30초 · 50MB까지 한 개를 담을 수 있어요.</p> : null}
       {phase === 'checking' ? (
         <p role="status" className="text-base text-muted">
           영상을 확인하는 중이에요…

@@ -30,6 +30,7 @@ export function HandwritingPlayer({
   label,
   autoPlay = false,
   className,
+  penWidth = HANDWRITING_PEN_WIDTH,
 }: {
   /** 서명된 handwriting 버킷 주소 */
   src: string
@@ -38,6 +39,8 @@ export function HandwritingPlayer({
   /** 화면에 들어오면 바로 재생할지. 상세는 true, 피드는 false(눌러서 본다). */
   autoPlay?: boolean
   className?: string
+  /** 필기구 굵기(2026-09-28 데모). 색은 캔버스의 글자색을 따른다. */
+  penWidth?: number
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -120,7 +123,7 @@ export function HandwritingPlayer({
     ctx.clearRect(0, 0, HANDWRITING_W, HANDWRITING_H)
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
-    ctx.lineWidth = HANDWRITING_PEN_WIDTH
+    ctx.lineWidth = penWidth
     ctx.strokeStyle =
       getComputedStyle(canvas).color || '#222222'
 
@@ -153,7 +156,7 @@ export function HandwritingPlayer({
       }
     }
     rafRef.current = requestAnimationFrame(frame)
-  }, [doc, stop])
+  }, [doc, stop, penWidth])
 
   // 받자마자 자동 재생(상세). 다음 프레임에 걸어 캔버스가 자리를 잡은 뒤 그린다.
   useEffect(() => {
@@ -206,6 +209,7 @@ export function HandwritingPlayer({
           <HandwritingView
             doc={doc}
             label={label}
+            penWidth={penWidth}
             className={[
               'absolute inset-0 h-full w-full',
               phase === 'done' ? '' : 'invisible',

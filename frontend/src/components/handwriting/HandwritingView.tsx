@@ -19,11 +19,14 @@ export function HandwritingView({
   doc,
   label,
   className,
+  penWidth = HANDWRITING_PEN_WIDTH,
 }: {
   doc: HandwritingDoc
   /** 낭독기용. "○○님의 손글씨" */
   label: string
   className?: string
+  /** 필기구 굵기(2026-09-28 데모). 색은 부모의 글자색(currentColor)을 따른다. */
+  penWidth?: number
 }) {
   return (
     <svg
@@ -33,7 +36,7 @@ export function HandwritingView({
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth={HANDWRITING_PEN_WIDTH}
+      strokeWidth={penWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
     >

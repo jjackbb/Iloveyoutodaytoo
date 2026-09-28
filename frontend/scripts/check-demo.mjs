@@ -53,6 +53,13 @@ async function draw(page) {
   await page.mouse.up()
 }
 
+/** 상세의 마음 표현 누르기. 아무도 안 누른 표현은 숨어 있어 [+]로 열고 고른다. */
+async function react(page, name) {
+  const chip = page.locator('.demo-reactions').getByRole('button', { name })
+  if (!(await chip.count())) await page.getByRole('button', { name: '마음 표현 더하기' }).click()
+  await chip.click()
+}
+
 function observe(page) {
   page.on('pageerror', (error) => errors.push(error.message))
   page.on('request', (request) => {
@@ -131,6 +138,60 @@ async function checkVideo(browser) {
   await context.close()
 }
 
+/** 영상 구간 편집·대표 섬네일(2026-09-28 스티치 7번): 구간·지점 저장, 상세·카드가 그 구간과 장면을 씀. */
+async function checkVideoTrim(browser) {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
+  const page = await context.newPage()
+  observe(page)
+  await page.goto(`${ROOM}/compose`, { waitUntil: 'networkidle' })
+  await page.getByRole('button', { name: /^영상/ }).click()
+  const webm = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 48
+    const ctx = canvas.getContext('2d')
+    const recorder = new MediaRecorder(canvas.captureStream(10), { mimeType: 'video/webm' })
+    const chunks = []
+    recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data) }
+    const stopped = new Promise((resolve) => { recorder.onstop = resolve })
+    recorder.start(100)
+    for (let i = 0; i < 40; i++) { ctx.fillStyle = `hsl(${i * 9} 60% 60%)`; ctx.fillRect(0, 0, 64, 48); await new Promise((r) => setTimeout(r, 100)) }
+    recorder.stop(); await stopped
+    const bytes = new Uint8Array(await new Blob(chunks, { type: 'video/webm' }).arrayBuffer())
+    let binary = ''; for (const byte of bytes) binary += String.fromCharCode(byte)
+    return btoa(binary)
+  })
+  await page.locator('input[type=file][accept*="video"]').setInputFiles({ name: 'four.webm', mimeType: 'video/webm', buffer: Buffer.from(webm, 'base64') })
+  await page.getByLabel('구간 시작').waitFor()
+  await page.getByText(/^0:00 - 0:0\d \(선택됨\)$/).waitFor()
+  await page.getByLabel('구간 시작').fill('1000')
+  await page.getByLabel('구간 끝').fill('3000')
+  await page.getByText('0:01 - 0:03 (선택됨)').waitFor()
+  // 시작 손잡이는 끝을 넘지 못한다(최소 1초).
+  await page.getByLabel('구간 시작').fill('3000')
+  await page.getByText('0:02 - 0:03 (선택됨)').waitFor()
+  await page.getByLabel('구간 시작').fill('1000')
+  await page.getByRole('button', { name: '영상에서 고르기' }).click()
+  await page.getByLabel('대표 섬네일 지점').fill('2000')
+  await page.getByText('0:02 지점 선택됨').waitFor()
+  // 구간 막대 뒤에 영상 장면 줄(아이폰 영상 편집처럼).
+  await poll(async () => (await page.locator('.demo-trim-strip span').count()) === 8, '장면 줄')
+  assert.ok((await page.locator('.demo-trim-strip span').first().evaluate((el) => el.style.backgroundImage)).startsWith('url("data:image/jpeg'))
+  assert.equal(await page.getByText(/50MB까지/).count(), 0)
+  await page.getByLabel('지금 담은 내용').getByText('영상 0:02').waitFor()
+  await page.getByLabel('영상 담기').screenshot({ path: path.join(OUTPUT, 'video-trim.png') })
+  await page.getByRole('button', { name: '마음 남기기', exact: true }).click()
+  await page.waitForURL('**/memories/**')
+  const saved = (await readSnapshot(page)).memories[0].video
+  assert.deepEqual([saved.trimStartMs, saved.trimEndMs, saved.posterMs], [1000, 3000, 2000])
+  const detailSrc = await page.getByLabel('지우님이 남긴 영상').getAttribute('src')
+  assert.ok(detailSrc.endsWith('#t=1,3'), detailSrc)
+  await page.goto(ROOM, { waitUntil: 'networkidle' })
+  const card = page.locator('li').first()
+  await card.getByText('영상 0:02').waitFor()
+  assert.ok((await card.locator('.demo-video-poster video').getAttribute('src')).endsWith('#t=2'))
+  record('영상 구간 편집·대표 섬네일: 구간 1~3초·섬네일 2초 저장, 상세는 그 구간만, 카드는 그 장면·길이 0:02')
+  await context.close()
+}
+
 /** 카드의 좋아요·댓글 수·손글씨 제자리 재생, 상세의 인스타그램식 좋아요·댓글(2026-09-28). */
 async function checkCardAndComments(browser) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
@@ -157,6 +218,15 @@ async function checkCardAndComments(browser) {
   assert.equal(await page.getByText('마음이 닿았어요').count(), 0)
   assert.equal(await page.getByText('답장을 서두르지 않아도').count(), 0)
   assert.equal(await page.getByText('함께 남긴 마음 더 보기').count(), 0)
+  // 상세 손글씨: '다시 보기' 안내 대신 카드처럼 오른쪽 위 ▶(2026-09-28 사용자 요청).
+  assert.equal(await page.getByText('손길을 다시 보고 싶다면').count(), 0)
+  const detailPlay = page.getByRole('button', { name: '엄마님의 손글씨 재생' })
+  const [playBox, mediaBox] = await Promise.all([detailPlay.boundingBox(), page.locator('.demo-detail-post .demo-card-media').boundingBox()])
+  assert.ok(playBox.x + playBox.width >= mediaBox.x + mediaBox.width - 6 && playBox.y <= mediaBox.y + 6, JSON.stringify({ playBox, mediaBox }))
+  await detailPlay.click()
+  await page.getByRole('button', { name: '엄마님의 손글씨 다시 재생' }).waitFor()
+  record('상세 손글씨: 오른쪽 위 ▶로 처음부터 다시 재생, 다시 보기 안내 없음')
+  assert.equal(await page.getByRole('button', { name: '댓글 달기' }).count(), 0)
   await page.getByText('아직 댓글이 없어요.').waitFor()
   await page.getByLabel('댓글', { exact: true }).fill('나도 보고 싶어요')
   await page.getByRole('button', { name: '게시' }).click()
@@ -164,12 +234,67 @@ async function checkCardAndComments(browser) {
   assert.equal(await page.getByLabel('댓글', { exact: true }).inputValue(), '')
   await page.reload({ waitUntil: 'networkidle' })
   await page.getByText('나도 보고 싶어요').waitFor()
-  assert.equal(await page.getByRole('button', { name: /^좋아요 1개/ }).getAttribute('aria-pressed'), 'true')
+  assert.equal(await page.getByRole('button', { name: /^하트 온기 1개/ }).getAttribute('aria-pressed'), 'true')
+  // 여러 마음 표현(2026-09-28 스티치 8번): 하트 온기는 카드 좋아요와 같은 값, 나머지는 각자 켜고 끈다.
+  // 누른 표현만 보이고, 나머지는 [+]로 연다(2026-09-28 사용자 요청).
+  const visibleChips = () => page.locator('.demo-reactions .demo-reaction:not(.demo-reaction-add)').evaluateAll((items) => items.map((item) => item.getAttribute('aria-label')))
+  assert.deepEqual(await visibleChips(), ['하트 온기 1개'])
+  // [+]는 맨 왼쪽에 고정.
+  assert.equal(await page.locator('.demo-reactions > :first-child button').getAttribute('aria-label'), '마음 표현 더하기')
+  await page.getByRole('button', { name: '마음 표현 더하기' }).click()
+  assert.deepEqual(await visibleChips(), ['하트 온기 1개', '고마워요 0개', '힘내요 0개', '보고싶어요 0개'])
+  // 한 줄: 모든 칩이 같은 높이에 있고, 넘치면 가로로 민다.
+  const row = await page.locator('.demo-reactions').evaluate((el) => ({ tops: [...el.children].map((child) => Math.round(child.getBoundingClientRect().top)), overflow: getComputedStyle(el).overflowX, wrap: getComputedStyle(el).flexWrap, scrolls: el.scrollWidth > el.clientWidth }))
+  assert.ok(new Set(row.tops).size === 1 && row.overflow === 'auto' && row.wrap === 'nowrap' && row.scrolls, JSON.stringify(row))
+  await page.locator('.demo-reactions').evaluate((el) => { el.scrollLeft = el.scrollWidth })
+  const pinned = await page.locator('.demo-reactions').evaluate((el) => Math.round(el.firstElementChild.getBoundingClientRect().left - el.getBoundingClientRect().left))
+  assert.equal(pinned, 0)
+  await page.locator('.demo-reactions').screenshot({ path: path.join(OUTPUT, 'reactions-picker.png') })
+  await page.locator('.demo-reactions').evaluate((el) => { el.scrollLeft = 0 })
+  await page.getByRole('button', { name: '고마워요 0개' }).click()
+  await page.getByRole('button', { name: '고마워요 1개' }).waitFor()
+  assert.deepEqual(await visibleChips(), ['하트 온기 1개', '고마워요 1개'])
+  await react(page, '보고싶어요 0개')
+  await page.getByRole('button', { name: '보고싶어요 1개' }).click()
+  await poll(async () => JSON.stringify(await visibleChips()) === JSON.stringify(['하트 온기 1개', '고마워요 1개']), '0개가 된 표현 숨김')
+  await page.reload({ waitUntil: 'networkidle' })
+  assert.equal(await page.getByRole('button', { name: '고마워요 1개' }).getAttribute('aria-pressed'), 'true')
+  assert.equal(await page.getByRole('button', { name: /^힘내요/ }).count(), 0)
+  const reacted = (await readSnapshot(page)).memories.find((item) => item.id === 'example-heart')
+  assert.deepEqual(reacted.reactions, { thanks: ['child'], miss: [] })
+  assert.deepEqual(reacted.likedBy, ['child'])
+  record('상세 마음 표현: 누른 것만 한 줄로 보이고 나머지는 맨 왼쪽 고정 [+]로 골라 켜고 끄기, 가로 스크롤, 새로고침 유지')
+
+  // 댓글을 꾹 누르면 답글(2026-09-28 사용자 요청).
+  const firstComment = page.locator('.demo-comment').filter({ hasText: '나도 보고 싶어요' })
+  await firstComment.scrollIntoViewIfNeeded()
+  const box = await firstComment.boundingBox()
+  await page.mouse.move(box.x + 60, box.y + 10)
+  await page.mouse.down()
+  await page.getByText('지우님에게 답글 남기는 중').waitFor()
+  await page.mouse.up()
+  await page.getByRole('button', { name: '답글 그만두기' }).click()
+  assert.equal(await page.getByText('답글 남기는 중').count(), 0)
+  await page.getByLabel('체험 인물').selectOption('parent')
+  await poll(async () => (await readSnapshot(page)).actor === 'parent', '답글 인물 전환')
+  await firstComment.click({ button: 'right' })
+  await page.getByText('지우님에게 답글 남기는 중').waitFor()
+  await page.getByLabel('댓글', { exact: true }).fill('엄마도 보고 싶어')
+  await page.getByRole('button', { name: '게시' }).click()
+  await page.locator('.demo-replies').getByText('엄마도 보고 싶어').waitFor()
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.locator('.demo-replies').getByText('엄마도 보고 싶어').waitFor()
+  const thread = (await readSnapshot(page)).memories.find((item) => item.id === 'example-heart').comments
+  assert.equal(thread[1].replyTo, thread[0].id)
+  await page.locator('.demo-comments').screenshot({ path: path.join(OUTPUT, 'comment-reply.png') })
+  await page.getByLabel('체험 인물').selectOption('child')
+  await poll(async () => (await readSnapshot(page)).actor === 'child', '자녀로 복귀')
+  record('댓글을 꾹 누르면 답글: 답글 표시·그만두기, 원래 댓글 아래 들여 쓰기, 새로고침 유지, 댓글 달기 버튼 없음')
   await page.screenshot({ path: path.join(OUTPUT, 'detail-like-comment.png') })
   await page.goto(ROOM, { waitUntil: 'networkidle' })
-  await page.locator('li').filter({ hasText: '바쁜 하루였지' }).getByRole('link', { name: '댓글 1개 보기' }).waitFor()
+  await page.locator('li').filter({ hasText: '바쁜 하루였지' }).getByRole('link', { name: '댓글 2개 보기' }).waitFor()
   await page.screenshot({ path: path.join(OUTPUT, 'room-card-actions.png') })
-  record('상세: 옛 문구 3개 없음, 댓글 달기·새로고침 유지, 카드 댓글 수 1')
+  record('상세: 옛 문구 3개 없음, 댓글 달기·새로고침 유지, 카드 댓글 수(답글 포함) 2')
   await context.close()
 }
 
@@ -187,6 +312,13 @@ async function checkEditDelete(browser) {
   for (const text of ['고칠 마음', '지울 마음']) {
     await page.goto(`${ROOM}/compose`, { waitUntil: 'networkidle' })
     await page.getByRole('button', { name: /^손글씨/ }).click()
+    // 필기구·편지지(2026-09-28 스티치 4번). 기본은 따뜻한 먹물펜·한지 크림.
+    if (text === '고칠 마음') {
+      assert.equal(await page.getByRole('button', { name: /따뜻한 먹물펜/ }).getAttribute('aria-pressed'), 'true')
+      assert.equal(await page.getByRole('button', { name: /한지 크림/ }).getAttribute('aria-pressed'), 'true')
+      await page.getByRole('button', { name: /연필/ }).click()
+      await page.getByRole('button', { name: /따스한 온기/ }).click()
+    }
     await draw(page)
     await page.getByLabel('함께 남길 한마디').fill(text)
     await page.getByRole('button', { name: '마음 남기기', exact: true }).click()
@@ -195,8 +327,14 @@ async function checkEditDelete(browser) {
   await page.goto(ROOM, { waitUntil: 'networkidle' })
   await page.locator('li').filter({ hasText: '고칠 마음' }).getByRole('link', { name: /마음 열기/ }).click()
   await page.waitForURL('**/memories/**')
-  await page.getByRole('button', { name: /^좋아요/ }).click()
-  await page.locator('button[aria-pressed="true"][aria-label^="좋아요"]').waitFor()
+  const styled = (await readSnapshot(page)).memories.find((item) => item.caption === '고칠 마음')
+  assert.deepEqual(styled.handwritingStyle, { pen: 'pencil', paper: 'warm' })
+  assert.equal(await page.locator('.demo-ink').first().evaluate((el) => getComputedStyle(el.querySelector('.rounded-inner')).backgroundColor), 'rgb(251, 235, 227)')
+  record('손글씨: 필기구·편지지를 골라 저장하면 상세에도 그 편지지로 보임')
+  // 아무도 누르지 않은 마음은 [+]만 보인다.
+  assert.equal(await page.locator('.demo-reactions .demo-reaction:not(.demo-reaction-add)').count(), 0)
+  await react(page, /^하트 온기/)
+  await page.locator('button[aria-pressed="true"][aria-label^="하트 온기"]').waitFor()
   await page.getByRole('button', { name: '지우님의 마음 더보기' }).click()
   await page.getByRole('menuitem', { name: '삭제' }).waitFor()
   await page.screenshot({ path: path.join(OUTPUT, 'detail-more-menu.png') })
@@ -205,25 +343,35 @@ async function checkEditDelete(browser) {
   await page.getByRole('heading', { name: '마음 고치기' }).waitFor()
   assert.equal(await page.getByLabel('함께 남길 한마디').inputValue(), '고칠 마음')
   await page.getByText('1획', { exact: true }).waitFor()
+  assert.equal(await page.getByRole('button', { name: /연필/ }).getAttribute('aria-pressed'), 'true')
+  assert.equal(await page.getByRole('button', { name: /따스한 온기/ }).getAttribute('aria-pressed'), 'true')
+  // 아래 두 버튼은 [취소][저장하기] 5:5(2026-09-28 사용자 요청).
+  const cancel = await page.getByRole('link', { name: '취소', exact: true }).boundingBox()
+  const saveBox = await page.getByRole('button', { name: '저장하기', exact: true }).boundingBox()
+  assert.ok(Math.abs(cancel.width - saveBox.width) <= 1 && Math.abs(cancel.y - saveBox.y) <= 1, JSON.stringify({ cancel, saveBox }))
+  assert.equal(await page.getByRole('button', { name: '고친 내용 저장하기' }).count(), 0)
+  await page.screenshot({ path: path.join(OUTPUT, 'reedit-buttons.png') })
+  await page.getByRole('button', { name: /만년필/ }).click()
   await page.getByLabel('함께 남길 한마디').fill('고친 마음')
-  await page.getByRole('button', { name: '고친 내용 저장하기' }).click()
+  await page.getByRole('button', { name: '저장하기', exact: true }).click()
   await page.waitForURL((url) => /\/memories\/[^/]+$/.test(url.pathname))
   await page.getByText('고친 마음').waitFor()
-  assert.equal(await page.getByRole('button', { name: /^좋아요/ }).getAttribute('aria-pressed'), 'true')
-  record('⋯ 수정: 원래 내용으로 열리고, 고친 뒤 받은 반응은 그대로')
+  assert.equal(await page.getByRole('button', { name: /^하트 온기/ }).getAttribute('aria-pressed'), 'true')
+  assert.deepEqual((await readSnapshot(page)).memories.find((item) => item.caption === '고친 마음').handwritingStyle, { pen: 'fountain', paper: 'warm' })
+  record('⋯ 수정: 원래 내용·필기구로 열리고, [취소][저장하기] 5:5, 고친 뒤 받은 반응은 그대로')
 
   await page.getByRole('button', { name: '지우님의 마음 더보기' }).click()
   await page.getByRole('menuitem', { name: '수정' }).click()
   await page.waitForURL('**/edit')
   await page.getByLabel('함께 남길 한마디').fill('저장하지 않을 글')
-  await page.getByRole('link', { name: '마음으로 돌아가기' }).click()
+  await page.getByRole('link', { name: '취소', exact: true }).click()
   await page.getByText('고친 마음').waitFor()
   await page.getByRole('button', { name: '지우님의 마음 더보기' }).click()
   await page.getByRole('menuitem', { name: '수정' }).click()
   await page.waitForURL('**/edit')
   assert.equal(await page.getByLabel('함께 남길 한마디').inputValue(), '고친 마음')
   await page.getByRole('link', { name: '마음으로 돌아가기' }).click()
-  record('고치다 떠나면 저장하지 않은 내용은 버려짐')
+  record('고치다 [취소]로 떠나면 저장하지 않은 내용은 버려짐')
 
   await page.goto(ROOM, { waitUntil: 'networkidle' })
   await page.getByRole('link', { name: '편집', exact: true }).click()
@@ -233,10 +381,11 @@ async function checkEditDelete(browser) {
   const picks = page.getByRole('button', { name: /지우님의 마음 고르기/ })
   assert.equal(await picks.count(), 2)
   await picks.nth(0).click()
-  await page.getByText('1개 골랐어요').waitFor()
+  await page.locator('[aria-pressed="true"][aria-label*="마음 고르기"]').waitFor()
+  assert.equal(await page.getByText(/개 골랐어요|선택됨/).count(), 0)
   assert.equal(await page.getByRole('link', { name: '수정', exact: true }).count(), 1)
   await picks.nth(1).click()
-  await page.getByText('2개 골랐어요').waitFor()
+  await poll(async () => (await page.locator('[aria-pressed="true"][aria-label*="마음 고르기"]').count()) === 2, '2개 고르기')
   assert.equal(await page.getByRole('button', { name: '수정', exact: true }).isDisabled(), true)
   await page.screenshot({ path: path.join(OUTPUT, 'room-edit.png') })
   await page.getByRole('button', { name: '삭제', exact: true }).click()
@@ -428,10 +577,23 @@ async function main() {
     // 스크롤해도 오른쪽 아래에 떠 있는 + (앱 화면 안).
     const fab = await page.getByRole('link', { name: '마음 남기기', exact: true }).evaluate((el) => { const r = el.getBoundingClientRect(); const phone = document.querySelector('.demo-phone').getBoundingClientRect(); return { right: phone.right - r.right, bottom: phone.bottom - r.bottom, visible: r.bottom <= innerHeight } })
     assert.ok(fab.visible && fab.right < 40 && fab.bottom < 40, JSON.stringify(fab))
-    record('앨범방: 프로필 나열·"함께 남긴 순간들", 오른쪽 아래 + 버튼')
+    const heading = await page.evaluate(() => {
+      const box = document.querySelector('.demo-room-heading').getBoundingClientRect()
+      const title = document.querySelector('.demo-room-heading h2').getBoundingClientRect()
+      const members = document.querySelector('.demo-room-members').getBoundingClientRect()
+      return { titleLeft: title.left - box.left, membersRight: box.right - members.right, order: title.left < members.left }
+    })
+    assert.ok(heading.titleLeft < 2 && heading.membersRight < 2 && heading.order, JSON.stringify(heading))
+    record('앨범방: "함께 남긴 순간들" 왼쪽 끝·프로필 오른쪽 끝, 오른쪽 아래 + 버튼')
     await page.getByRole('link', { name: '마음 남기기', exact: true }).click()
     assert.equal(await page.getByRole('button', { name: '마음 남기기', exact: true }).isDisabled(), true)
+    // 방법 고르기 안내 문구 정리(2026-09-28 사용자 요청).
+    await page.getByText('다른 방법도 함께 담을 수 있어요.', { exact: true }).waitFor()
+    for (const gone of ['소중한 존재에게', '편한 방법 하나면', '나중에 함께']) assert.equal(await page.getByText(gone).count(), 0, gone)
     await page.getByRole('button', { name: /^손글씨/ }).click()
+    assert.equal(await page.getByText('쓰는 모습도 함께 담겨요').count(), 0)
+    assert.equal(await page.locator('label[for="demo-caption"]').innerText(), '함께 남길 한마디')
+    record('작성 문구: 소개 두 줄·손글씨 안내·한마디 옆 "선택" 없음')
     await page.getByLabel('함께 남길 한마디').fill('검증용 기록: 오늘도 고마워요.')
     assert.equal(await page.getByRole('button', { name: '마음 남기기', exact: true }).isDisabled(), true)
     record('빈 입력·문구만으로 저장 불가')
@@ -481,7 +643,8 @@ async function main() {
       IDBObjectStore.prototype.put = function () { throw new DOMException('test quota', 'QuotaExceededError') }
     })
     await page.getByRole('button', { name: '마음 남기기', exact: true }).click()
-    await page.getByRole('alert').waitFor()
+    // Next.js의 화면 이동 안내(route announcer)도 alert라서 데모 오류 칸만 본다.
+    await page.locator('.demo-error[role="alert"]').waitFor()
     assert.equal(await page.getByLabel('함께 남길 한마디').inputValue(), '검증용 기록: 오늘도 고마워요.')
     assert.equal((await readSnapshot(page)).memories.length, 1)
     await page.evaluate(() => { IDBObjectStore.prototype.put = window.__demoOriginalPut })
@@ -507,10 +670,10 @@ async function main() {
 
     await page.getByLabel('체험 인물').selectOption('parent')
     await poll(async () => (await readSnapshot(page)).actor === 'parent', '반응 역할 전환')
-    await page.getByRole('button', { name: /^좋아요/ }).click()
-    await page.locator('button[aria-pressed="true"][aria-label^="좋아요"]').waitFor()
+    await react(page, /^하트 온기/)
+    await page.locator('button[aria-pressed="true"][aria-label^="하트 온기"]').waitFor()
     await page.reload({ waitUntil: 'networkidle' })
-    assert.equal(await page.getByRole('button', { name: /^좋아요/ }).getAttribute('aria-pressed'), 'true')
+    assert.equal(await page.getByRole('button', { name: /^하트 온기/ }).getAttribute('aria-pressed'), 'true')
     snapshot = await readSnapshot(page)
     assert.deepEqual(snapshot.memories[0].likedBy, ['parent'])
     record('부모 시점 반응·새로고침 유지')
@@ -550,6 +713,7 @@ async function main() {
 
     await checkRecordingLeave(browser)
     await checkVideo(browser)
+    await checkVideoTrim(browser)
     await checkCardAndComments(browser)
     await checkEditDelete(browser)
 
