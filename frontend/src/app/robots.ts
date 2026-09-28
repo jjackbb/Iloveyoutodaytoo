@@ -8,7 +8,7 @@ import type { MetadataRoute } from 'next'
  * **초대 링크(/invite/{토큰})는 로그인 없이 열리는 유일한 화면**이라
  * 어딘가로 링크가 새어 나가면 검색 결과에 뜰 수 있다. 그래서 명시적으로 막는다.
  *
- * 열어두는 것은 서비스 소개 역할을 하는 로그인·가입 화면과 약관뿐이다.
+ * 열어두는 것은 로그인·가입 준비 안내와 약관뿐이다.
  */
 export default function robots(): MetadataRoute.Robots {
   return {

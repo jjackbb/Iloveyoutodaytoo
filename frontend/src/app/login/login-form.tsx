@@ -69,12 +69,12 @@ export function LoginForm({ next }: { next: string }) {
       </Button>
 
       <p className="text-center text-base text-muted">
-        아직 계정이 없으신가요?{' '}
+        신규 가입은 준비 중이에요.{' '}
         <Link
           href={`/signup?next=${encodeURIComponent(next)}`}
           className="text-primary underline"
         >
-          가입하기
+          안내 보기
         </Link>
       </p>
     </form>

@@ -213,6 +213,13 @@ export async function signUp(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  // 개인정보 문서와 새 인증 방식을 확정할 때까지 서버에서도 가입을 닫아 둔다.
+  // 예전 폼의 Server Action 주소가 남아 있어도 새 계정을 만들 수 없게 한다.
+  const signupClosedForReview = true
+  if (signupClosedForReview) {
+    return { error: '신규 가입은 준비 중이에요. 이미 계정이 있다면 로그인해 주세요.' }
+  }
+
   const name = String(formData.get('name') ?? '').trim()
   const username = normalizeUsername(formData.get('username'))
   const password = String(formData.get('password') ?? '')

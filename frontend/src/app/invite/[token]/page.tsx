@@ -195,9 +195,9 @@ export default async function InvitePreviewPage({
               href={`/signup?next=/invite/${encodeURIComponent(token)}`}
               className="text-primary underline"
             >
-              가입하기
+              가입 안내
             </Link>
-            를 눌러 짧게 등록하고 오시면 돼요.
+            를 확인해 주세요. 지금은 신규 가입을 받지 않고 있어요.
           </p>
         </div>
       ) : (

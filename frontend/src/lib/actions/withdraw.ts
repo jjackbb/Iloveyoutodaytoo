@@ -6,8 +6,8 @@ import { createClient } from '@/lib/supabase/server'
 /**
  * 회원 탈퇴 Server Action.
  *
- * 여기서 하는 일은 DB 함수 withdraw_account(p_reason, p_detail)를 한 번 부르는 것,
- * 그리고 남은 세션을 정리하는 것. 이 둘뿐이다.
+ * DB 함수 withdraw_account가 삭제 대상 파일을 작업표에 기록하고 계정을 지운다.
+ * 성공 뒤 Storage 삭제를 시도하고 남은 세션을 정리한다.
  *
  * 코드가 직접 하지 않는 일 (DB 함수가 이미 한다. 또 하면 중복이 된다):
  *  - withdrawal_reasons 에 탈퇴 사유 넣기
@@ -21,8 +21,7 @@ import { createClient } from '@/lib/supabase/server'
  * ON DELETE SET NULL 이라, 내 자리만 비고 기록은 상대 쪽에 남는다.
  * 화면 문구(my/withdraw)는 이 사실에 맞춰 쓰여 있다. 함수를 고치면 문구도 함께 고쳐야 한다.
  *
- * auth.admin.deleteUser 는 쓰지 않는다. service_role 키가 비어 있고,
- * 클라이언트에서 닿는 코드에 관리자 키를 두지 않는 것이 이 프로젝트의 규칙이다.
+ * auth.admin.deleteUser 는 쓰지 않는다. 클라이언트에 관리자 키를 두지 않는 규칙이다.
  * 대신 SECURITY DEFINER 함수인 withdraw_account 가 그 일을 대신한다.
  */
 
@@ -42,182 +41,51 @@ const DETAIL_MAX_LENGTH = 1000
 const REASON_MAX_LENGTH = 200
 
 /**
- * 방이 사라질 때 함께 지워야 하는 파일 통. 셋 다 경로 규약이 `{room_id}/파일명` 이다.
- * 버킷을 새로 만들면 여기에 반드시 추가할 것 — 빠뜨리면 주인 없는 파일이 남는다.
- *
- * ⚠️ avatars는 여기 넣으면 안 된다. 경로 규약이 `{user_id}/파일명`이라
- * 방 id로 뒤지면 아무것도 못 찾는다. collectFilesToRemove 가 이 통만 따로 훑는다.
+ * DB 거래가 남긴 삭제 작업표를 시도한다. 삭제 실패나 호출 중단 뒤에도 작업표는 남아
+ * 관리자가 재시도할 수 있다. finish_storage_deletions는 실제 객체가 사라진 행만 지운다.
  */
-const FILE_BUCKETS = ['voice', 'media', 'covers', 'handwriting', 'video'] as const
-
-/** 프로필 사진 통. 경로 규약이 `{user_id}/파일명`이라 위 셋과 지우는 방법이 다르다. */
-const AVATAR_BUCKET = 'avatars'
-
-/** 지울 파일 한 묶음. 버킷 하나에 경로 여러 개. */
-type PendingRemoval = { bucket: string; paths: string[] }
-
-/**
- * 지워야 할 파일의 **목록만** 모은다. 실제 삭제는 하지 않는다.
- *
- * ⚠️ 이 순서가 핵심이다. 목록을 모으는 일은 계정이 살아 있어야 되고
- * (방 조회도, 스토리지 list 도 RLS가 "그 방 구성원인가"를 묻는다),
- * 지우는 일은 계정이 사라진 **뒤에** 해야 한다.
- *
- * 왜 뒤여야 하나: 전에는 파일을 먼저 지우고 withdraw_account 를 불렀다.
- * RPC가 실패하면 파일은 이미 사라졌는데 화면은 "계정은 그대로 있습니다"라고
- * 안내했다 — 사용자는 멀쩡하다고 믿는데 프로필 사진과 목소리는 이미 없다.
- * (2026-08-10 에 실제로 일어난 사고다. 아래 rpc 호출부 주석 참고)
- *
- * 지우는 쪽은 계정이 사라져도 된다: 스토리지 DELETE 정책은 owner_id = auth.uid()
- * 하나만 보고, 그 값은 아직 손에 쥔 JWT 에서 나온다. 방 구성원 여부를 묻지 않는다.
- */
-async function collectFilesToRemove(
+async function settleWithdrawStorageDeletions(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-): Promise<PendingRemoval[]> {
-  const pending: PendingRemoval[] = []
-
-  /*
-   * 내 프로필 사진.
-   *
-   * 방과 달리 프로필 사진은 **누구와도 공유되지 않는 내 개인정보**다. 계정이 사라지면
-   * 남겨둘 이유가 하나도 없다. 처리방침 제8조 2항이 약속한 "복구 불가능한 방법으로
-   * 영구 삭제"가 이 파일에도 적용된다.
-   *
-   * 사진을 바꿔 온 계정은 옛 파일이 이미 지워져 있어 대개 한 장뿐이지만,
-   * 지우기에 실패해 남은 것이 있을 수 있으므로 폴더를 통째로 훑는다.
-   */
-  try {
-    const { data: files, error } = await supabase.storage
-      .from(AVATAR_BUCKET)
-      .list(userId)
-
-    if (error) {
-      console.error('[회원 탈퇴] avatars 목록 조회 실패:', error.message)
-    } else if (files && files.length > 0) {
-      pending.push({
-        bucket: AVATAR_BUCKET,
-        paths: files.map((file) => `${userId}/${file.name}`),
-      })
-    }
-  } catch (cause) {
-    console.error('[회원 탈퇴] 프로필 사진 목록 수집 중 예외:', cause)
-  }
-
-  /*
-   * 나만 읽던 추억(작성 당시 혼자였던 추억)의 파일.
-   *
-   * withdraw_account 는 이런 추억을 함께 지운다 — 탈퇴하면 아무도 읽을 수 없는 기록이라
-   * 남겨 둘 이유가 없다(2026-09-26 새 DB). 방은 남아도 이 파일들은 모두 내가 올린 것이라
-   * owner 정책으로 지울 수 있다. 목록은 계정이 살아 있는 지금 모은다.
-   */
-  try {
-    const { data: privateMemories, error } = await supabase
-      .from('memories')
-      .select(
-        'voice_path, handwriting_path, video_path, photos:memory_photos(storage_path), comments:memory_comments(voice_path)',
-      )
-      .eq('author_id', userId)
-      .eq('visibility', 'private')
-
-    if (error) {
-      console.error('[회원 탈퇴] 나만 읽는 추억 조회 실패:', error.message)
-    } else {
-      const add = (bucket: string, path: string | null | undefined) => {
-        if (!path) return
-        const group = pending.find((item) => item.bucket === bucket)
-        if (group) group.paths.push(path)
-        else pending.push({ bucket, paths: [path] })
-      }
-      for (const memory of privateMemories ?? []) {
-        add('voice', memory.voice_path)
-        add('handwriting', memory.handwriting_path)
-        add('video', memory.video_path)
-        for (const photo of memory.photos ?? []) add('media', photo.storage_path)
-        for (const comment of memory.comments ?? []) add('voice', comment.voice_path)
-      }
-    }
-  } catch (cause) {
-    console.error('[회원 탈퇴] 나만 읽는 추억 파일 수집 중 예외:', cause)
-  }
-
-  /*
-   * 탈퇴로 함께 사라질 방의 파일.
-   *
-   * "사라질 방"의 정의는 DB 함수 withdraw_account 와 같아야 한다:
-   * 내가 방장이면서, 나 말고 아무도 room_members 행을 가진 적 없는 방.
-   * 여기서 한 방이라도 잘못 고르면 상대의 기록을 지우게 되므로 판정을 넓게 잡지 않는다.
-   *
-   * 남는 방의 파일은 모으지 않는다. 그건 상대의 사서함에 남아야 할 기록이다.
-   * 계정이 사라져도 상대는 여전히 그 방 구성원이라 재생할 수 있다.
-   */
-  try {
-    const { data: rooms, error } = await supabase
-      .from('rooms')
-      .select('id, room_members(user_id)')
-      .eq('owner_id', userId)
-
-    if (error) {
-      console.error('[회원 탈퇴] 사라질 방 조회 실패:', error.message)
-      return pending
-    }
-
-    const doomed = (rooms ?? [])
-      .filter((room) =>
-        (room.room_members ?? []).every((m) => m.user_id === userId),
-      )
-      .map((room) => room.id)
-
-    if (doomed.length === 0) return pending
-
-    for (const bucket of FILE_BUCKETS) {
-      for (const roomId of doomed) {
-        const { data: files, error: listError } = await supabase.storage
-          .from(bucket)
-          .list(roomId)
-
-        if (listError) {
-          console.error(
-            `[회원 탈퇴] ${bucket}/${roomId} 목록 조회 실패:`,
-            listError.message,
-          )
-          continue
-        }
-        if (!files || files.length === 0) continue
-
-        pending.push({
-          bucket,
-          paths: files.map((f) => `${roomId}/${f.name}`),
-        })
-      }
-    }
-  } catch (cause) {
-    console.error('[회원 탈퇴] 방 파일 목록 수집 중 예외:', cause)
-  }
-
-  return pending
-}
-
-/**
- * 모아둔 파일을 실제로 지운다. **계정 삭제가 성공한 뒤에만** 부른다.
- *
- * 실패해도 탈퇴를 되돌리지 않는다. 계정 삭제가 파일 정리보다 우선이고,
- * 남은 파일은 어차피 아무도 못 여는 상태가 된다(RLS가 방 구성원만 허용하는데 방이 사라진다).
- * 다만 조용히 넘기지 않고 로그를 남겨 나중에 정리할 수 있게 한다.
- */
-async function removeCollectedFiles(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  pending: PendingRemoval[],
 ): Promise<void> {
-  for (const { bucket, paths } of pending) {
-    try {
-      const { error } = await supabase.storage.from(bucket).remove(paths)
-      if (error) {
-        console.error(`[회원 탈퇴] ${bucket} 파일 삭제 실패:`, error.message)
+  const { data: pending, error: listError } = await supabase.rpc(
+    'pending_storage_deletions',
+  )
+  if (listError) {
+    console.error('[회원 탈퇴] 파일 삭제 작업표 조회 실패:', listError.message)
+    return
+  }
+
+  const byBucket = new Map<string, string[]>()
+  for (const job of pending ?? []) {
+    const paths = byBucket.get(job.bucket_id) ?? []
+    paths.push(job.object_name)
+    byBucket.set(job.bucket_id, paths)
+  }
+
+  const failures: string[] = []
+  for (const [bucket, paths] of byBucket) {
+    for (let offset = 0; offset < paths.length; offset += 100) {
+      try {
+        const { error } = await supabase.storage
+          .from(bucket)
+          .remove(paths.slice(offset, offset + 100))
+        if (error) failures.push(`${bucket}: ${error.message}`)
+      } catch (cause) {
+        failures.push(
+          `${bucket}: ${cause instanceof Error ? cause.message : String(cause)}`,
+        )
       }
-    } catch (cause) {
-      console.error(`[회원 탈퇴] ${bucket} 파일 삭제 중 예외:`, cause)
     }
+  }
+
+  const { data: left, error: finishError } = await supabase.rpc(
+    'finish_storage_deletions',
+    { p_error: failures.length > 0 ? failures.join(' / ') : undefined },
+  )
+  if (finishError) {
+    console.error('[회원 탈퇴] 파일 삭제 작업표 확인 실패:', finishError.message)
+  } else if (left && left > 0) {
+    console.error(`[회원 탈퇴] 파일 ${left}개 정리 대기:`, failures.join(' / '))
   }
 }
 
@@ -245,7 +113,7 @@ export async function withdrawAccount(
   formData: FormData,
 ): Promise<WithdrawState> {
   // 폼 밖에서도 호출될 수 있는 통로다. 서버에서 로그인 여부를 다시 확인한다.
-  const user = await requireUser()
+  await requireUser()
 
   // 되돌릴 수 없는 동작이라 마지막 확인 문구를 반드시 본다.
   // 버튼을 잠가두는 대신 눌러보고 안내를 받게 했다 — 왜 안 눌리는지 모르는 상황을 만들지 않는다.
@@ -281,18 +149,7 @@ export async function withdrawAccount(
 
   const supabase = await createClient()
 
-  /*
-   * 지울 파일의 **목록만** 먼저 모은다. 지우는 것은 계정 삭제가 성공한 뒤다.
-   *
-   * DB 행은 withdraw_account 가 지우지만 Storage 파일은 건드리지 못한다
-   * (DB 함수는 스토리지 API에 닿을 수 없다). 그냥 두면 처리방침 제8조 2항이 약속한
-   * "복구 불가능한 방법으로 영구 삭제"가 지켜지지 않고 파일만 떠돌게 된다.
-   *
-   * 목록을 지금 모으는 이유: 계정이 사라지면 방도 구성원 행도 사라져서
-   * 무엇을 지워야 했는지 알 길이 없어진다(스토리지 list 도 RLS에 막힌다).
-   */
-  const pendingRemoval = await collectFilesToRemove(supabase, user.id)
-
+  // DB 함수가 삭제 대상 파일을 작업표에 먼저 남기고 계정을 지운다.
   /*
    * withdraw_account 는 이번에 새로 만든 DB 함수라 src/types/database.ts 에 아직 없다.
    * 그 파일은 스키마에서 자동 생성되는 파일이라 손으로 고치지 않는다(수정 금지 목록).
@@ -323,8 +180,7 @@ export async function withdrawAccount(
     /*
      * 사용자에게는 부드럽게, 원인은 서버 로그에 남긴다. 조용히 삼키면 고칠 수가 없다.
      *
-     * 여기서 파일은 하나도 건드리지 않은 상태다. 그래서 "계정은 그대로 있습니다"가
-     * 참말이 된다 — 목록만 모아뒀을 뿐이고 그 목록은 이 함수와 함께 버려진다.
+   * 같은 DB 거래가 실패한 것이므로 계정과 파일은 그대로 있다.
      */
     console.error('[회원 탈퇴] withdraw_account 실패:', error.message)
     return {
@@ -334,14 +190,8 @@ export async function withdrawAccount(
     }
   }
 
-  /*
-   * 계정이 확실히 사라진 뒤에야 파일을 지운다.
-   *
-   * 스토리지 DELETE 정책은 owner_id = auth.uid() 하나만 보고, 그 값은 아직 손에 쥔
-   * JWT 에서 나온다 — 계정 행이 사라져도 이 삭제는 통과한다.
-   * 실패해도 되돌리지 않는다. 탈퇴는 이미 끝났고, 남은 파일은 아무도 못 여는 상태다.
-   */
-  await removeCollectedFiles(supabase, pendingRemoval)
+  // 계정 삭제가 끝난 뒤 파일을 지운다. 실패한 객체는 작업표에 남는다.
+  await settleWithdrawStorageDeletions(supabase)
 
   /*
    * 계정이 방금 사라졌으므로 로그아웃 요청은 401/403을 받을 수 있다.

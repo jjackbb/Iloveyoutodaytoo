@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { SocialSoonDrawer } from '@/app/start/social-soon-button'
 import { BrandMark } from '@/components/brand/BrandMark'
 import { ButtonLink } from '@/components/ui/Button'
 import { safeNextPath } from '@/lib/safe-redirect'
@@ -22,8 +21,7 @@ export const metadata: Metadata = { title: '시작하기 · 오늘도 사랑해'
  * 1. ~~몽실이가 화면 한가운데로.~~ **🗑 2026-09-06 폐기.** 캐릭터를 걷어냈다.
  *    ⚠️ 그 자리가 지금 **비어 있다.** 새 로고가 나오면 디자인 관문을 밟아
  *    이 화면을 다시 짠다 — 지금은 임시로 문구만 남긴 상태다.
- * 2. **되는 길 하나만 큰 버튼.** 준비 중 셋은 [다른 방법으로 시작하기] 안에 접었다.
- *    지우지는 않았다 — 이유는 SocialSoonDrawer 주석에 적었다.
+ * 2. 신규 가입을 받지 않는 동안 기존 계정 로그인만 큰 버튼으로 안내한다.
  * 3. **문구가 찌르지 않고 받아준다.** "못 한 말이 있죠"는 첫 화면에서 사람을 내보낸다.
  *    "쑥스러워도 괜찮아요"로 먼저 안아주고 나서 권한다.
  *
@@ -80,34 +78,29 @@ export default async function StartPage({ searchParams }: PageProps<'/start'>) {
       <div className="min-h-0 flex-1" />
 
       <div className="mt-8 flex flex-col gap-3">
-        {/* 지금 실제로 되는 유일한 길. 화면에서 제일 진한 것이 이것이어야 한다. */}
-        <ButtonLink href={withNext('/signup')} fullWidth>
-          시작하기
+        <ButtonLink href={withNext('/login')} fullWidth>
+          기존 계정으로 로그인
         </ButtonLink>
-
-        <SocialSoonDrawer />
       </div>
 
       <p className="mt-4 text-center text-base text-muted">
-        이미 함께하고 계신가요?{' '}
+        신규 가입은 준비 중이에요.{' '}
         <Link
-          href={withNext('/login')}
+          href={withNext('/signup')}
           className="font-bold text-primary underline underline-offset-4"
         >
-          로그인
+          안내 보기
         </Link>
       </p>
 
       <p className="mt-4 text-center text-sm leading-relaxed break-keep text-muted">
-        시작하면{' '}
         <Link href="/legal/terms" className="underline underline-offset-4">
           이용약관
         </Link>
-        과{' '}
+        ·{' '}
         <Link href="/legal/privacy" className="underline underline-offset-4">
           개인정보 처리방침
         </Link>
-        에 동의하는 것으로 봐요.
       </p>
     </main>
   )

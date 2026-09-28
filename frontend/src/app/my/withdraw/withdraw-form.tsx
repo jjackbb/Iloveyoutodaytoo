@@ -404,7 +404,8 @@ export function WithdrawFarewell({
 
       <div className="flex flex-col gap-3">
         <p className="text-base leading-relaxed text-ink">
-          계정과 개인정보는 모두 지워졌습니다.
+          계정과 가입 정보는 삭제됐습니다. 함께 나눈 기록은 상대방에게 남을 수 있고,
+          일부 첨부 파일은 삭제 재시도 대기 중일 수 있습니다.
         </p>
         <p className="text-base leading-relaxed text-muted">
           그동안 이곳에 남겨주신 마음, 고맙습니다.
